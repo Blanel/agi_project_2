@@ -155,7 +155,7 @@ enum class TGAEnc
     RunLengthEncRGB = 10
 };
 #ifdef _MSC_VER
-#pragma pack(push)
+#pragma pack(push,1)
 struct TGAHeader
 {
     i8  IDLength;
