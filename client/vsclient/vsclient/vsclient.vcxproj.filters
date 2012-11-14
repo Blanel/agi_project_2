@@ -1,0 +1,414 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\geo">
+      <UniqueIdentifier>{b5c5da53-d243-4e98-a944-c2cffe925661}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\math">
+      <UniqueIdentifier>{989ce66b-c90a-49e4-ae4c-57e8970f0380}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\renderer">
+      <UniqueIdentifier>{f2806c4d-59e0-4790-b026-a1853657be38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\renderer\gl">
+      <UniqueIdentifier>{3d8b5023-8aa0-4ffc-bf12-07643f1910f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\renderer">
+      <UniqueIdentifier>{c0df5726-80c0-4e03-b72f-7f8ab892ad80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\renderer\gl">
+      <UniqueIdentifier>{400015df-a412-4402-b8a8-6e8b8e63e366}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\geo">
+      <UniqueIdentifier>{9b47402a-2c0d-4425-a77e-c04dbccbb2d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\math">
+      <UniqueIdentifier>{821df163-0626-437d-a697-5af30672a916}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Device.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\geo\Mesh.cpp">
+      <Filter>Source Files\geo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\geo\VertexAttribute.cpp">
+      <Filter>Source Files\geo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\Blending.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\BufferHint.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\ClearState.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\ColorMask.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\DepthMask.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\DepthRange.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\DepthTest.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\DrawState.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\FacetCulling.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\FragmentOutput.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\Framebuffer.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\GpuException.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\GpuObject.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\GraphicsDevice.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\GraphicsDeviceCreator.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\IndexBuffer.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\PrimitiveRestart.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\ProgramPointSize.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\RenderWindow.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\SceneState.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\ScissorTest.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\ShaderProgram.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\ShaderVertexAttrib.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\StencilTest.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\Texture2D.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\TextureSampler.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\TextureUnit.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\Uniform.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\VertexArray.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\VertexBuffer.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\VertexBufferAttrib.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\WindingOrder.cpp">
+      <Filter>Source Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\gl\GraphicsDeviceGL.cpp">
+      <Filter>Source Files\renderer\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\gl\IndexBufferGL.cpp">
+      <Filter>Source Files\renderer\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\gl\RenderContextGL.cpp">
+      <Filter>Source Files\renderer\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\gl\RenderWindowGL.cpp">
+      <Filter>Source Files\renderer\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\gl\ShaderObjectGL.cpp">
+      <Filter>Source Files\renderer\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\gl\ShaderProgramGL.cpp">
+      <Filter>Source Files\renderer\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\gl\TextureSamplerGL.cpp">
+      <Filter>Source Files\renderer\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\gl\TextureUnitGL.cpp">
+      <Filter>Source Files\renderer\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\gl\UniformGL.cpp">
+      <Filter>Source Files\renderer\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\gl\VertexArrayGL.cpp">
+      <Filter>Source Files\renderer\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\gl\VertexBufferAttribGL.cpp">
+      <Filter>Source Files\renderer\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\renderer\gl\VertexBufferGL.cpp">
+      <Filter>Source Files\renderer\gl</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\renderer\gl\GraphicsDeviceGL.h">
+      <Filter>Header Files\renderer\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\gl\IndexBufferGL.h">
+      <Filter>Header Files\renderer\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\gl\RenderContextGL.h">
+      <Filter>Header Files\renderer\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\gl\RenderWindowGL.h">
+      <Filter>Header Files\renderer\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\gl\ShaderObjectGL.h">
+      <Filter>Header Files\renderer\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\gl\ShaderProgramGL.h">
+      <Filter>Header Files\renderer\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\gl\TextureSamplerGL.h">
+      <Filter>Header Files\renderer\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\gl\TextureUnitGL.h">
+      <Filter>Header Files\renderer\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\gl\UniformGL.h">
+      <Filter>Header Files\renderer\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\gl\VertexArrayGL.h">
+      <Filter>Header Files\renderer\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\gl\VertexBufferAttribGL.h">
+      <Filter>Header Files\renderer\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\gl\VertexBufferGL.h">
+      <Filter>Header Files\renderer\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\Blending.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\BufferHint.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\ClearState.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\ColorMask.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\DepthMask.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\DepthRange.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\DepthTest.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\DrawState.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\FacetCulling.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\FragmentOutput.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\Framebuffer.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\GpuException.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\GpuObject.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\GraphicsDevice.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\GraphicsDeviceCreator.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\IndexBuffer.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\Indices.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\PrimitiveRestart.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\PrimitiveType.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\ProgramPointSize.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\RenderContext.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\RenderState.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\RenderWindow.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\SceneState.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\ScissorTest.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\ShaderProgram.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\ShaderType.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\ShaderVertexAttrib.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\StencilTest.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\Texture2D.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\TextureSampler.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\TextureUnit.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\Uniform.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\VertexArray.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\VertexBuffer.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\VertexBufferAttrib.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\VertexComponent.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\renderer\WindingOrder.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\Constants.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\Matrix3x3.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\Matrix4x4.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\Point2.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\Point3.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\Quaternion.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\RMath.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\Transform.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\Triangle.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\Vector2.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\Vector3.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\Vector4.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\geo\Mesh.h">
+      <Filter>Header Files\geo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\geo\Rectangle.h">
+      <Filter>Header Files\geo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\geo\VertexAttribute.h">
+      <Filter>Header Files\geo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Agi12P2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Device.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Image2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\StopWatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
