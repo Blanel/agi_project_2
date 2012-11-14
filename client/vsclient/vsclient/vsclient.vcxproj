@@ -41,6 +41,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <SourcePath>$(SolutionDir)..\source</SourcePath>
     <IncludePath>$(SolutionDir)..\source;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)..\..\bin</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
