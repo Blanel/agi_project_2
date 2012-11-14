@@ -24,7 +24,6 @@ class UniformBlock
 {
     GLuint m_BlockIndex;
     GLint m_BlockSize;
-
 };
 
 
@@ -49,6 +48,8 @@ public:
             m_Value = value;
             ::glUniform1f(m_Location, m_Value);
         }
+
+        return *this;
     }
 
 };
@@ -73,6 +74,8 @@ public:
             m_Value = value;
             ::glUniform2f(m_Location, m_Value.x, m_Value.y);
         }
+
+        return *this;
     }
 };
 
@@ -97,6 +100,8 @@ public:
             m_Value = value;
             ::glUniform3f(m_Location, m_Value.x, m_Value.y, m_Value.z);
         }
+
+        return *this;
     }
 
 };
@@ -122,6 +127,8 @@ public:
             m_Value = value;
             ::glUniform4f(m_Location, m_Value.x, m_Value.y, m_Value.z, m_Value.w);
         }
+
+        return *this;
     }
 };
 
@@ -146,6 +153,8 @@ public:
             m_Value = value;
             ::glUniformMatrix3fv(m_Location, 1, GL_TRUE, &value.e[0]);
         }
+
+        return *this;
     }
 };
 
@@ -163,8 +172,12 @@ public:
 
     UniformGL_mat4& operator=(const math::mat4& value)
     {
-
-        ::glUniformMatrix4fv(m_Location, 1, GL_TRUE, &value.e[0]);
+        if (value != m_Value)
+        {
+            m_Value = value;
+            ::glUniformMatrix4fv(m_Location, 1, GL_TRUE, &value.e[0]);    
+        }
+        
         return *this;
     }
 };
