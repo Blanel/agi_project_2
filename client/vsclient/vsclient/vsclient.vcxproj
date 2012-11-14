@@ -38,14 +38,19 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <SourcePath>$(SolutionDir)..\source</SourcePath>
+    <IncludePath>$(SolutionDir)..\source;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\externals\vs2012\include\SDL;$(SolutionDir)..\externals\vs2012\include\glm;$(SolutionDir)..\externals\vs2012\include\GL;$(SolutionDir)..\externals\vs2012\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\externals\vs2012\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -62,6 +67,131 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\source\Camera.cpp" />
+    <ClCompile Include="..\..\source\Device.cpp" />
+    <ClCompile Include="..\..\source\geo\Mesh.cpp" />
+    <ClCompile Include="..\..\source\geo\VertexAttribute.cpp" />
+    <ClCompile Include="..\..\source\Log.cpp" />
+    <ClCompile Include="..\..\source\main.cpp" />
+    <ClCompile Include="..\..\source\renderer\Blending.cpp" />
+    <ClCompile Include="..\..\source\renderer\BufferHint.cpp" />
+    <ClCompile Include="..\..\source\renderer\ClearState.cpp" />
+    <ClCompile Include="..\..\source\renderer\ColorMask.cpp" />
+    <ClCompile Include="..\..\source\renderer\DepthMask.cpp" />
+    <ClCompile Include="..\..\source\renderer\DepthRange.cpp" />
+    <ClCompile Include="..\..\source\renderer\DepthTest.cpp" />
+    <ClCompile Include="..\..\source\renderer\DrawState.cpp" />
+    <ClCompile Include="..\..\source\renderer\FacetCulling.cpp" />
+    <ClCompile Include="..\..\source\renderer\FragmentOutput.cpp" />
+    <ClCompile Include="..\..\source\renderer\Framebuffer.cpp" />
+    <ClCompile Include="..\..\source\renderer\gl\GraphicsDeviceGL.cpp" />
+    <ClCompile Include="..\..\source\renderer\gl\IndexBufferGL.cpp" />
+    <ClCompile Include="..\..\source\renderer\gl\RenderContextGL.cpp" />
+    <ClCompile Include="..\..\source\renderer\gl\RenderWindowGL.cpp" />
+    <ClCompile Include="..\..\source\renderer\gl\ShaderObjectGL.cpp" />
+    <ClCompile Include="..\..\source\renderer\gl\ShaderProgramGL.cpp" />
+    <ClCompile Include="..\..\source\renderer\gl\TextureSamplerGL.cpp" />
+    <ClCompile Include="..\..\source\renderer\gl\TextureUnitGL.cpp" />
+    <ClCompile Include="..\..\source\renderer\gl\UniformGL.cpp" />
+    <ClCompile Include="..\..\source\renderer\gl\VertexArrayGL.cpp" />
+    <ClCompile Include="..\..\source\renderer\gl\VertexBufferAttribGL.cpp" />
+    <ClCompile Include="..\..\source\renderer\gl\VertexBufferGL.cpp" />
+    <ClCompile Include="..\..\source\renderer\GpuException.cpp" />
+    <ClCompile Include="..\..\source\renderer\GpuObject.cpp" />
+    <ClCompile Include="..\..\source\renderer\GraphicsDevice.cpp" />
+    <ClCompile Include="..\..\source\renderer\GraphicsDeviceCreator.cpp" />
+    <ClCompile Include="..\..\source\renderer\IndexBuffer.cpp" />
+    <ClCompile Include="..\..\source\renderer\PrimitiveRestart.cpp" />
+    <ClCompile Include="..\..\source\renderer\ProgramPointSize.cpp" />
+    <ClCompile Include="..\..\source\renderer\RenderWindow.cpp" />
+    <ClCompile Include="..\..\source\renderer\SceneState.cpp" />
+    <ClCompile Include="..\..\source\renderer\ScissorTest.cpp" />
+    <ClCompile Include="..\..\source\renderer\ShaderProgram.cpp" />
+    <ClCompile Include="..\..\source\renderer\ShaderVertexAttrib.cpp" />
+    <ClCompile Include="..\..\source\renderer\StencilTest.cpp" />
+    <ClCompile Include="..\..\source\renderer\Texture2D.cpp" />
+    <ClCompile Include="..\..\source\renderer\TextureSampler.cpp" />
+    <ClCompile Include="..\..\source\renderer\TextureUnit.cpp" />
+    <ClCompile Include="..\..\source\renderer\Uniform.cpp" />
+    <ClCompile Include="..\..\source\renderer\VertexArray.cpp" />
+    <ClCompile Include="..\..\source\renderer\VertexBuffer.cpp" />
+    <ClCompile Include="..\..\source\renderer\VertexBufferAttrib.cpp" />
+    <ClCompile Include="..\..\source\renderer\WindingOrder.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\Agi12P2.h" />
+    <ClInclude Include="..\..\source\Camera.h" />
+    <ClInclude Include="..\..\source\Color.h" />
+    <ClInclude Include="..\..\source\Device.h" />
+    <ClInclude Include="..\..\source\geo\Mesh.h" />
+    <ClInclude Include="..\..\source\geo\Rectangle.h" />
+    <ClInclude Include="..\..\source\geo\VertexAttribute.h" />
+    <ClInclude Include="..\..\source\Image2D.h" />
+    <ClInclude Include="..\..\source\Log.h" />
+    <ClInclude Include="..\..\source\math\Constants.h" />
+    <ClInclude Include="..\..\source\math\Matrix3x3.h" />
+    <ClInclude Include="..\..\source\math\Matrix4x4.h" />
+    <ClInclude Include="..\..\source\math\Point2.h" />
+    <ClInclude Include="..\..\source\math\Point3.h" />
+    <ClInclude Include="..\..\source\math\Quaternion.h" />
+    <ClInclude Include="..\..\source\math\RMath.h" />
+    <ClInclude Include="..\..\source\math\Transform.h" />
+    <ClInclude Include="..\..\source\math\Triangle.h" />
+    <ClInclude Include="..\..\source\math\Vector2.h" />
+    <ClInclude Include="..\..\source\math\Vector3.h" />
+    <ClInclude Include="..\..\source\math\Vector4.h" />
+    <ClInclude Include="..\..\source\renderer\Blending.h" />
+    <ClInclude Include="..\..\source\renderer\BufferHint.h" />
+    <ClInclude Include="..\..\source\renderer\ClearState.h" />
+    <ClInclude Include="..\..\source\renderer\ColorMask.h" />
+    <ClInclude Include="..\..\source\renderer\DepthMask.h" />
+    <ClInclude Include="..\..\source\renderer\DepthRange.h" />
+    <ClInclude Include="..\..\source\renderer\DepthTest.h" />
+    <ClInclude Include="..\..\source\renderer\DrawState.h" />
+    <ClInclude Include="..\..\source\renderer\FacetCulling.h" />
+    <ClInclude Include="..\..\source\renderer\FragmentOutput.h" />
+    <ClInclude Include="..\..\source\renderer\Framebuffer.h" />
+    <ClInclude Include="..\..\source\renderer\gl\GraphicsDeviceGL.h" />
+    <ClInclude Include="..\..\source\renderer\gl\IndexBufferGL.h" />
+    <ClInclude Include="..\..\source\renderer\gl\RenderContextGL.h" />
+    <ClInclude Include="..\..\source\renderer\gl\RenderWindowGL.h" />
+    <ClInclude Include="..\..\source\renderer\gl\ShaderObjectGL.h" />
+    <ClInclude Include="..\..\source\renderer\gl\ShaderProgramGL.h" />
+    <ClInclude Include="..\..\source\renderer\gl\TextureSamplerGL.h" />
+    <ClInclude Include="..\..\source\renderer\gl\TextureUnitGL.h" />
+    <ClInclude Include="..\..\source\renderer\gl\UniformGL.h" />
+    <ClInclude Include="..\..\source\renderer\gl\VertexArrayGL.h" />
+    <ClInclude Include="..\..\source\renderer\gl\VertexBufferAttribGL.h" />
+    <ClInclude Include="..\..\source\renderer\gl\VertexBufferGL.h" />
+    <ClInclude Include="..\..\source\renderer\GpuException.h" />
+    <ClInclude Include="..\..\source\renderer\GpuObject.h" />
+    <ClInclude Include="..\..\source\renderer\GraphicsDevice.h" />
+    <ClInclude Include="..\..\source\renderer\GraphicsDeviceCreator.h" />
+    <ClInclude Include="..\..\source\renderer\IndexBuffer.h" />
+    <ClInclude Include="..\..\source\renderer\Indices.h" />
+    <ClInclude Include="..\..\source\renderer\PrimitiveRestart.h" />
+    <ClInclude Include="..\..\source\renderer\PrimitiveType.h" />
+    <ClInclude Include="..\..\source\renderer\ProgramPointSize.h" />
+    <ClInclude Include="..\..\source\renderer\RenderContext.h" />
+    <ClInclude Include="..\..\source\renderer\RenderState.h" />
+    <ClInclude Include="..\..\source\renderer\RenderWindow.h" />
+    <ClInclude Include="..\..\source\renderer\SceneState.h" />
+    <ClInclude Include="..\..\source\renderer\ScissorTest.h" />
+    <ClInclude Include="..\..\source\renderer\ShaderProgram.h" />
+    <ClInclude Include="..\..\source\renderer\ShaderType.h" />
+    <ClInclude Include="..\..\source\renderer\ShaderVertexAttrib.h" />
+    <ClInclude Include="..\..\source\renderer\StencilTest.h" />
+    <ClInclude Include="..\..\source\renderer\Texture2D.h" />
+    <ClInclude Include="..\..\source\renderer\TextureSampler.h" />
+    <ClInclude Include="..\..\source\renderer\TextureUnit.h" />
+    <ClInclude Include="..\..\source\renderer\Uniform.h" />
+    <ClInclude Include="..\..\source\renderer\VertexArray.h" />
+    <ClInclude Include="..\..\source\renderer\VertexBuffer.h" />
+    <ClInclude Include="..\..\source\renderer\VertexBufferAttrib.h" />
+    <ClInclude Include="..\..\source\renderer\VertexComponent.h" />
+    <ClInclude Include="..\..\source\renderer\WindingOrder.h" />
+    <ClInclude Include="..\..\source\StopWatch.h" />
+    <ClInclude Include="..\..\source\Types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
