@@ -23,7 +23,6 @@ int main(int argc, char *argv[])
 	auto window = Device::graphics()->create_window(640, 480, "Hello world!");
 
 	auto& ctx = window->context();
-	std::cout << sizeof(TGAHeader);
 
     auto clearstate = std::make_shared<ClearState>();
 
