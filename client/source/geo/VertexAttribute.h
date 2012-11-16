@@ -12,55 +12,49 @@
 namespace revel
 {
 
-enum class VertexAttributeType
+enum class VertexAttribType
 {
-    FLOAT32,
-    FLOAT32_2,
-    FLOAT32_3,
-    FLOAT32_4,
-    VEC2_F32,
-    VEC3_F32,
-    VEC4_F32
+    FLOAT32 = 0x1,
+    FLOAT32_2 = 0x2,
+    FLOAT32_3 = 0x3,
+    FLOAT32_4 = 0x4,
+    UNDEFINED
 };
 
-namespace detail
+class VertexAttribBase
 {
-
-class VertexAttributeBase
-{
-public:
-
 protected:
     std::string m_Name;
-    VertexAttributeType m_Type;
+    VertexAttribType m_Type;
+
+    VertexAttribBase(const std::string& name, VertexAttribType type = VertexAttribType::UNDEFINED)
+        : m_Name(name)
+        , m_Type(type)
+    {}
 
 public:
-
-    VertexAttributeBase(const std::string& name, VertexAttributeType type);
+    virtual ~VertexAttribBase() {}    
 
     const std::string& name() const;
-    VertexAttributeType type() const;
+    VertexAttribType type() const;
 
     virtual u32 size_in_bytes() = 0;
     virtual void* raw_data_ptr() = 0;
 };
 
 template <typename T>
-class VertexAttribute : public VertexAttributeBase
+class VertexAttrib : public VertexAttribBase
 {
     std::vector<T> m_VertexData;
 
-public:
-    VertexAttribute(const std::string& name, VertexAttributeType type)
-        : VertexAttributeBase(name, type)
-        , m_VertexData()
-    {
-    }
+    void init();
 
-    VertexAttribute(const std::string &name, VertexAttributeType type, u32 capacity)
-        : VertexAttributeBase(name, type)
-        , m_VertexData(capacity)
+public:
+    VertexAttrib(const std::string &name, u32 capacity = 0) 
+        : VertexAttribBase(name)
+        , m_VertexData(capacity) 
     {
+        init();
     }
 
     std::vector<T>& data() { return m_VertexData; }
@@ -70,108 +64,32 @@ public:
     void* raw_data_ptr() { return &m_VertexData[0]; }
 };
 
-} // ::revel::detail
-
-class VertexAttribute_f32 : public detail::VertexAttribute<f32>
+template <typename T>
+void VertexAttrib<T>::init()
 {
-public:
-    VertexAttribute_f32(const std::string& name)
-        : VertexAttribute<f32>(name, VertexAttributeType::FLOAT32)
-    {
+    m_Type = VertexAttribType::UNDEFINED;
+}
 
-    }
+template <>
+void VertexAttrib<f32>::init();
 
-    VertexAttribute_f32(const std::string& name, u32 capacity)
-        : VertexAttribute<f32>(name, VertexAttributeType::FLOAT32, capacity)
-    {
+template <>
+void VertexAttrib<point3_f32>::init();
 
-    }
+template <>
+void VertexAttrib<vec2_f32>::init();
 
-};
+template <>
+void VertexAttrib<vec3_f32>::init();
 
-class VertexAttribute_vec2_f32 : public detail::VertexAttribute<vec2>
-{
-public:
-    VertexAttribute_vec2_f32(const std::string& name)
-        : detail::VertexAttribute<vec2>(name, VertexAttributeType::VEC2_F32)
-    {
+template <>
+void VertexAttrib<vec4_f32>::init();
 
-    }
 
-    VertexAttribute_vec2_f32(const std::string& name, u32 capacity)
-        : detail::VertexAttribute<vec2>(name, VertexAttributeType::VEC2_F32, capacity)
-    {
 
-    }
+typedef std::shared_ptr<VertexAttribBase> VertexAttribPtr;
+typedef std::vector<VertexAttribPtr> VertexAttribArray;
 
-};
-
-class VertexAttribute_vec3_f32 : public detail::VertexAttribute<vec3>
-{
-public:
-    VertexAttribute_vec3_f32(const std::string& name)
-        : detail::VertexAttribute<vec3>(name, VertexAttributeType::VEC3_F32)
-    {
-
-    }
-
-    VertexAttribute_vec3_f32(const std::string& name, u32 capacity)
-        : detail::VertexAttribute<vec3>(name, VertexAttributeType::VEC3_F32, capacity)
-    {
-
-    }
-
-};
-
-class VertexAttribute_point3_f32 : public detail::VertexAttribute<point3>
-{
-public:
-    VertexAttribute_point3_f32(const std::string& name)
-        : detail::VertexAttribute<point3>(name, VertexAttributeType::VEC3_F32)
-    {
-
-    }
-
-    VertexAttribute_point3_f32(const std::string& name, u32 capacity)
-        : detail::VertexAttribute<point3>(name, VertexAttributeType::VEC3_F32, capacity)
-    {
-
-    }
-
-};
-
-class VertexAttribute_vec4_f32 : public detail::VertexAttribute<vec4>
-{
-public:
-    VertexAttribute_vec4_f32(const std::string& name)
-        : detail::VertexAttribute<vec4>(name, VertexAttributeType::VEC4_F32)
-    {
-
-    }
-
-    VertexAttribute_vec4_f32(const std::string& name, u32 capacity)
-        : detail::VertexAttribute<vec4>(name, VertexAttributeType::VEC4_F32, capacity)
-    {
-
-    }
-
-};
-
-typedef std::shared_ptr<detail::VertexAttributeBase> VertexAttributePtr;
-typedef std::vector<VertexAttributePtr> VertexAttribArray;
-
-typedef VertexAttribute_f32      VAttr_f32;
-typedef VertexAttribute_vec2_f32 VAttr_vec2;
-typedef VertexAttribute_vec3_f32 VAttr_vec3;
-typedef VertexAttribute_vec4_f32 VAttr_vec4;
-
-typedef VertexAttribute_point3_f32 VAttr_point3;
-
-typedef VertexAttribute_vec2_f32 VAttr_vec2_f32;
-typedef VertexAttribute_vec3_f32 VAttr_vec3_f32;
-typedef VertexAttribute_vec4_f32 VAttr_vec4_f32;
-
-typedef VertexAttribute_vec4_f32 VAttr_vec4_f32;
 
 }
 

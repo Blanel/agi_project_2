@@ -15,8 +15,7 @@ VertexBufferGL::VertexBufferGL(BufferHint hint, u32 size)
 
 VertexBufferGL::~VertexBufferGL()
 {
-	//TODO: DELETE BUFFER!!
-	R_LOG_INFO("NOTE: NOT DELETING BUFFER");
+	::glDeleteBuffers(1, &m_Identifier);
 }
 
 } // ::revel::renderer::gl

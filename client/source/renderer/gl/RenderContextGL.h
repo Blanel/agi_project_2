@@ -25,6 +25,7 @@ public:
     virtual void clear(const std::shared_ptr<ClearState> &cs) override;
     virtual void clear(const ClearState& cs) override;
 
+    virtual void draw(PrimitiveType type, const std::shared_ptr<DrawState>& drawstate, const std::shared_ptr<SceneState>& scenestate);
     virtual void draw(const std::shared_ptr<geo::Mesh>& mesh) override;
     virtual void draw(const std::shared_ptr<VertexBuffer>& vbo) override;
 

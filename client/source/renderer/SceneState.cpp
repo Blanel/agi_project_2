@@ -6,9 +6,5 @@ namespace renderer
 {
 
 
-SceneState::SceneState()
-{
-}
-
 }
 }
