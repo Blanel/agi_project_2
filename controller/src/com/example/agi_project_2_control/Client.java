@@ -5,30 +5,30 @@ import java.net.*;
 public class Client {
 	
 	public void connect() throws UnknownHostException, IOException{
-		Socket socket = new Socket("192.168.0.16", 15003);
-		InputStream in = null;
-		OutputStream out = null; 
+		Socket nsocket = new Socket("192.168.0.16", 15003);
+		InputStream nin = null;
+		OutputStream nout = null; 
 		
 		try
 		{
-			in = socket.getInputStream();
-			out = socket.getOutputStream();
+			nin = nsocket.getInputStream();
+			nout = nsocket.getOutputStream();
 			
-			out.write("Hello world!".getBytes("UTF-8"));
-			out.flush();
+			nout.write("Hello world!".getBytes("UTF-8"));
+			nout.flush();
 		}
 		finally
 		{
 			if (in != null)
 				try
-				{	in.close();
+				{	nin.close();
 				}
 				catch (Throwable ignore)
 				{	//ignore
 				}
-			if (out != null)
+			if (nout != null)
 				try
-				{	out.close();
+				{	nout.close();
 				}
 				catch (Throwable ignore)
 				{	//ignore
