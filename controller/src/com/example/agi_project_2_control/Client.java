@@ -6,18 +6,16 @@ public class Client {
 	
 	public void connect() throws UnknownHostException, IOException{
 		Socket socket = null;
-		DataInputStream dataInputStream = null;
-		DataOutputStream dataOutputStream = null; 
+		InputStream inputStream = null;
+		OutputStream outputStream = null; 
 		
 		try {
 			socket = new Socket("192.168.0.16", 15003);
 			
-			dataInputStream = new DataInputStream(socket.getInputStream());
-			dataOutputStream = new DataOutputStream(socket.getOutputStream());
+			inputStream =  socket.getInputStream();
+			outputStream = socket.getOutputStream();
 			
-			dataOutputStream.writeUTF("Hello world!");
-			
-			dataOutputStream.flush();
+			outputStream.write("Hello world!".getBytes("UTF-8"));
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -34,18 +32,18 @@ public class Client {
 					e.printStackTrace();
 				}
 			}
-			if (dataOutputStream != null){
+			if (outputStream != null){
 				try {
-					dataOutputStream.close();
+					outputStream.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 			
-			if (dataInputStream != null){
+			if (inputStream != null){
 				try {
-					dataInputStream.close();
+					inputStream.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

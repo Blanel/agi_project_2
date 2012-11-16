@@ -6,8 +6,8 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
+import java.io.*;
+import java.net.*;
 import java.util.Date;
 
 public class MainActivity extends Activity 
@@ -24,10 +24,10 @@ public class MainActivity extends Activity
 		btn = (Button)findViewById(R.id.button);
 		btn.setOnClickListener(this);
 		updateTime();
-		fireButton();
 	}
 	
 	public void onClick(View view){
+		System.out.println("bajs");
 		fireButton();
 	}
 
