@@ -5,34 +5,52 @@ import java.net.*;
 public class Client {
 	
 	public void connect() throws UnknownHostException, IOException{
-		Socket nsocket = new Socket("192.168.0.16", 15003);
-		InputStream nin = null;
-		OutputStream nout = null; 
+		Socket socket = null;
+		DataInputStream dataInputStream = null;
+		DataOutputStream dataOutputStream = null; 
 		
-		try
-		{
-			nin = nsocket.getInputStream();
-			nout = nsocket.getOutputStream();
+		try {
+			socket = new Socket("192.168.0.16", 15003);
 			
-			nout.write("Hello world!".getBytes("UTF-8"));
-			nout.flush();
+			dataInputStream = new DataInputStream(socket.getInputStream());
+			dataOutputStream = new DataOutputStream(socket.getOutputStream());
+			
+			dataOutputStream.writeUTF("Hello world!");
+			
+			dataOutputStream.flush();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		finally
-		{
-			if (in != null)
-				try
-				{	nin.close();
+		finally{
+			if (socket != null){
+				try {
+					socket.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				catch (Throwable ignore)
-				{	//ignore
+			}
+			if (dataOutputStream != null){
+				try {
+					dataOutputStream.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-			if (nout != null)
-				try
-				{	nout.close();
+			}
+			
+			if (dataInputStream != null){
+				try {
+					dataInputStream.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				catch (Throwable ignore)
-				{	//ignore
-				}
+			}
 		}
 	}
 }

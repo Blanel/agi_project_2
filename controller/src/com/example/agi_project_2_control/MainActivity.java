@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Date;
 
-
 public class MainActivity extends Activity 
 	implements View.OnClickListener {
 	
