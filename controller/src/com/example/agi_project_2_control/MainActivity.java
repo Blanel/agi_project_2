@@ -8,30 +8,21 @@ import android.widget.Button;
 
 import java.io.*;
 import java.net.*;
-import java.util.Date;
 
 public class MainActivity extends Activity 
 	implements View.OnClickListener {
 	
 	private Button fireButton;
-	private Client client = new Client();
+	private Button gasButton;
+	private static Client client = new Client();	
 	
-	@Override
-	protected void onCreate(Bundle icicle) {
-		super.onCreate(icicle);
-		
-		setContentView(R.layout.button);
-		
-		this.fireButton = (Button)findViewById(R.id.button);
-		this.fireButton.setOnClickListener(this);
-		updateTime();
-		
-		
+	static
+	{
 		/**
 		 * Server connect
 		 */
 		try {
-			this.client.connect();
+			client.connect();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -39,24 +30,55 @@ public class MainActivity extends Activity
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 	
-	public void onClick(View view){
-		try {
-			fire();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	@Override
+	protected void onCreate(Bundle icicle) {
+		super.onCreate(icicle);
+		
+		setContentView(R.layout.activity_main);
+		
+		this.fireButton = (Button)findViewById(R.id.button);
+		this.fireButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				try {
+					fire();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		});
+		this.fireButton.setText("Fire");
+		
+		this.gasButton = (Button)findViewById(R.id.button01);
+		this.gasButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				try {
+					gas();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		});
+		this.gasButton.setText("Gas");		
+
 	}
+	
+
 
 	private void fire() throws IOException{
-		this.client.sendAction("fire");
+		client.sendAction("fire");
 	}
-	
-	private void updateTime(){
-		this.fireButton.setText(new Date().toString());
+	private void gas() throws IOException{
+		client.sendAction("gas");
 	}
 	
 	@Override
@@ -64,6 +86,12 @@ public class MainActivity extends Activity
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
+	}
+
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

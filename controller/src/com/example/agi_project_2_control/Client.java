@@ -5,7 +5,8 @@ import java.net.*;
 public class Client {
 	protected Socket socket = null;
 	protected InputStream inputStream = null;
-	protected OutputStream outputStream = null; 	
+	protected OutputStream outputStream = null;
+	protected Object sendMutex = new Object();
 	
 	
 	public void connect() throws UnknownHostException, IOException{
@@ -42,6 +43,10 @@ public class Client {
 			}
 	}
 	public void sendAction(String action) throws IOException{
-		this.outputStream.write(action.getBytes("UTF-8"));
+		synchronized(this.sendMutex)
+		{
+			this.outputStream.write((action + "\n\n").getBytes("UTF-8"));
+			this.outputStream.flush();
+		}
 	}
 }
