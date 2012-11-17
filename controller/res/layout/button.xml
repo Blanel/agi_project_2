@@ -6,4 +6,6 @@
     android:layout_height	="fill_parent"
     android:textColor		="#FF0000" 
     android:textSize		="20sp" 
+
     />
+    <!--android:onClick		="fire"-->

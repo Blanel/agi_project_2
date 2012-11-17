@@ -13,7 +13,8 @@ import java.util.Date;
 public class MainActivity extends Activity 
 	implements View.OnClickListener {
 	
-	Button btn;
+	private Button fireButton;
+	private Client client = new Client();
 	
 	@Override
 	protected void onCreate(Bundle icicle) {
@@ -21,19 +22,16 @@ public class MainActivity extends Activity
 		
 		setContentView(R.layout.button);
 		
-		btn = (Button)findViewById(R.id.button);
-		btn.setOnClickListener(this);
+		this.fireButton = (Button)findViewById(R.id.button);
+		this.fireButton.setOnClickListener(this);
 		updateTime();
-	}
-	
-	public void onClick(View view){
-		System.out.println("bajs");
-		fireButton();
-	}
-
-	private void fireButton(){
+		
+		
+		/**
+		 * Server connect
+		 */
 		try {
-			(new Client()).connect();
+			this.client.connect();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -41,10 +39,24 @@ public class MainActivity extends Activity
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+	}
+	
+	public void onClick(View view){
+		try {
+			fire();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void fire() throws IOException{
+		this.client.sendAction("fire");
 	}
 	
 	private void updateTime(){
-		btn.setText(new Date().toString());
+		this.fireButton.setText(new Date().toString());
 	}
 	
 	@Override

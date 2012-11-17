@@ -3,52 +3,45 @@ import java.io.*;
 import java.net.*;
 
 public class Client {
+	protected Socket socket = null;
+	protected InputStream inputStream = null;
+	protected OutputStream outputStream = null; 	
+	
 	
 	public void connect() throws UnknownHostException, IOException{
-		Socket socket = null;
-		InputStream inputStream = null;
-		OutputStream outputStream = null; 
-		
-		try {
-			socket = new Socket("192.168.0.16", 15003);
+			this.socket = new Socket("192.168.0.16", 15003);
 			
-			inputStream =  socket.getInputStream();
-			outputStream = socket.getOutputStream();
-			
-			outputStream.write("Hello world!".getBytes("UTF-8"));
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		finally{
-			if (socket != null){
+			this.inputStream =  this.socket.getInputStream();
+			this.outputStream = this.socket.getOutputStream();
+	}
+	public void disconnect() {
+			if (this.socket != null){
 				try {
-					socket.close();
+					this.socket.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			if (outputStream != null){
+			if (this.outputStream != null){
 				try {
-					outputStream.close();
+					this.outputStream.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 			
-			if (inputStream != null){
+			if (this.inputStream != null){
 				try {
-					inputStream.close();
+					this.inputStream.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-		}
+	}
+	public void sendAction(String action) throws IOException{
+		this.outputStream.write(action.getBytes("UTF-8"));
 	}
 }
