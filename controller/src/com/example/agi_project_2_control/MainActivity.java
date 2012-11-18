@@ -8,6 +8,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -16,7 +17,7 @@ import java.io.*;
 import java.net.*;
 
 public class MainActivity extends Activity 
-	implements View.OnClickListener, SensorEventListener {
+	implements View.OnClickListener, View.OnTouchListener, SensorEventListener {
 	
 	private ImageButton fireButton;
 	private ImageButton gasButton;
@@ -63,16 +64,27 @@ public class MainActivity extends Activity
 		//this.fireButton.setText("Fire");
 		
 		this.gasButton = (ImageButton)findViewById(R.id.imageButtonGas);
-		this.gasButton.setOnClickListener(new View.OnClickListener() {
+		this.gasButton.setOnTouchListener(new View.OnTouchListener() {
 			
 			@Override
-			public void onClick(View v) {
-				try {
-					gas();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			public boolean onTouch(View arg0, MotionEvent arg1) {
+				if(arg1.getAction() == MotionEvent.ACTION_DOWN) {
+					try {
+						gas();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
+				if(arg1.getAction() == MotionEvent.ACTION_UP) {
+					try {
+						noGas();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				return false;
 				
 			}
 		});
@@ -105,6 +117,9 @@ public class MainActivity extends Activity
 	private void gas() throws IOException{
 		client.sendAction("gas");
 	}
+	private void noGas() throws IOException{
+		client.sendAction("noGas");
+	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -130,25 +145,7 @@ public class MainActivity extends Activity
 		float x = event.values[0];
 		float y = event.values[1];
 		float z = event.values[2];
-		/*
-		if (!mInitialized) {
-			mLastX = x;
-			mLastY = y;
-			mLastZ = z;
-			mInitialized = true;
-		}
-		else{
-			float deltaX = Math.abs(mLastX - x);
-			float deltaY = Math.abs(mLastY - y);
-			float deltaZ = Math.abs(mLastZ - z);
-			if (deltaX < NOISE) deltaX = (float)0.0;
-			if (deltaY < NOISE) deltaY = (float)0.0;
-			if (deltaZ < NOISE) deltaZ = (float)0.0;
-			mLastX = x;
-			mLastY = y;
-			mLastZ = z;
-		
-		*/
+
 		try {
 			client.sendAction("x :"+Float.toString(x)+" y :"+Float.toString(y)+ " z :"+Float.toString(z));
 		} catch (IOException e) {
@@ -156,6 +153,11 @@ public class MainActivity extends Activity
 			e.printStackTrace();
 		}
 			
+	}
+	@Override
+	public boolean onTouch(View arg0, MotionEvent arg1) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
 	
