@@ -142,8 +142,27 @@ public class MainActivity extends Activity
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		// TODO Auto-generated method stub
+		float x = event.values[0];
+		float y = event.values[1];
+		float z = event.values[2];
 		
+		try {
+			client.sendAction("x :"+Float.toString(x)+" y :"+Float.toString(y)+ "z :"+Float.toString(z));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		/*
+		if (!mInitialized) {
+			mLastX = x;
+			mLastY = y;
+			mLastZ = z;
+			mInitialized = true;
+		}
+		else{
+			
+		}*/
 	}
 	
 }
