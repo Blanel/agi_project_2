@@ -1,17 +1,16 @@
 package com.example.agi_project_2_control;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
+
 
 import java.io.*;
 import java.net.*;
@@ -19,17 +18,12 @@ import java.net.*;
 public class MainActivity extends Activity 
 	implements View.OnClickListener, SensorEventListener {
 	
-	private Button fireButton;
-	private Button gasButton;
+	private ImageButton fireButton;
+	private ImageButton gasButton;
 	private static Client client = new Client();	
 	
-	private float mLastX;
-	private float mLastY;
-	private float mLastZ;
-	private boolean mInitialized;
 	private SensorManager mSensorManager;
 	private Sensor mAccelerometer;
-	private final float NOISE = (float) 2.0;
 	
 	static
 	{
@@ -52,7 +46,7 @@ public class MainActivity extends Activity
 		super.onCreate(icicle);
 		setContentView(R.layout.activity_main);
 		
-		this.fireButton = (Button)findViewById(R.id.button);
+		this.fireButton = (ImageButton)findViewById(R.id.imageButtonFire);
 		this.fireButton.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -66,9 +60,9 @@ public class MainActivity extends Activity
 				
 			}
 		});
-		this.fireButton.setText("Fire");
+		//this.fireButton.setText("Fire");
 		
-		this.gasButton = (Button)findViewById(R.id.button01);
+		this.gasButton = (ImageButton)findViewById(R.id.imageButtonGas);
 		this.gasButton.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -82,11 +76,7 @@ public class MainActivity extends Activity
 				
 			}
 		});
-		this.gasButton.setText("Gas");		
-		
-		
-		
-		
+
 		
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -106,11 +96,6 @@ public class MainActivity extends Activity
 	public void onAccuracyChanged1(Sensor sensor, int accuracy) {
 		// can be safely ignored for this demo
 	}
-	
-	
-	
-	
-	
 	
 	
 	
@@ -145,14 +130,6 @@ public class MainActivity extends Activity
 		float x = event.values[0];
 		float y = event.values[1];
 		float z = event.values[2];
-		
-		try {
-			client.sendAction("x :"+Float.toString(x)+" y :"+Float.toString(y)+ "z :"+Float.toString(z));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		/*
 		if (!mInitialized) {
 			mLastX = x;
@@ -161,8 +138,25 @@ public class MainActivity extends Activity
 			mInitialized = true;
 		}
 		else{
+			float deltaX = Math.abs(mLastX - x);
+			float deltaY = Math.abs(mLastY - y);
+			float deltaZ = Math.abs(mLastZ - z);
+			if (deltaX < NOISE) deltaX = (float)0.0;
+			if (deltaY < NOISE) deltaY = (float)0.0;
+			if (deltaZ < NOISE) deltaZ = (float)0.0;
+			mLastX = x;
+			mLastY = y;
+			mLastZ = z;
+		
+		*/
+		try {
+			client.sendAction("x :"+Float.toString(x)+" y :"+Float.toString(y)+ " z :"+Float.toString(z));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 			
-		}*/
 	}
-	
 }
+	
+
