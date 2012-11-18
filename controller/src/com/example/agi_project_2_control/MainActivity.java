@@ -10,27 +10,23 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageButton;
-
-
+import android.widget.ImageView;
 import java.io.*;
 import java.net.*;
 
 public class MainActivity extends Activity 
-	implements View.OnClickListener, View.OnTouchListener, SensorEventListener {
-	
-	private ImageButton fireButton;
-	private ImageButton gasButton;
+	implements View.OnTouchListener, SensorEventListener {
 	private static Client client = new Client();	
 	
+	private ImageView fireButton;
+	private ImageView gasButton;
 	private SensorManager mSensorManager;
 	private Sensor mAccelerometer;
 	
-	static
-	{
-		/**
-		 * Server connect
-		 */
+	/**
+	 * Server connect
+	 */
+	static{
 		try {
 			client.connect();
 		} catch (UnknownHostException e) {
@@ -47,25 +43,30 @@ public class MainActivity extends Activity
 		super.onCreate(icicle);
 		setContentView(R.layout.activity_main);
 		
-		this.fireButton = (ImageButton)findViewById(R.id.imageButtonFire);
-		this.fireButton.setOnClickListener(new View.OnClickListener() {
-			
+		this.fireButton = (ImageView)findViewById(R.id.imageFire);
+		
+		/*
+		this.fireButton.setOnTouchListener(new View.OnTouchListener() {
 			@Override
-			public void onClick(View v) {
-				try {
-					fire();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			public boolean onTouch(View arg0, MotionEvent arg1) {			    
+				if(arg1.getAction() == MotionEvent.ACTION_DOWN) {
+					try {
+						fire();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-				
+				return false;
 			}
 		});
-		//this.fireButton.setText("Fire");
+		*/
 		
-		this.gasButton = (ImageButton)findViewById(R.id.imageButtonGas);
+		this.gasButton = (ImageView)findViewById(R.id.imageGas);
+		
+		
+		/*
 		this.gasButton.setOnTouchListener(new View.OnTouchListener() {
-			
 			@Override
 			public boolean onTouch(View arg0, MotionEvent arg1) {
 				if(arg1.getAction() == MotionEvent.ACTION_DOWN) {
@@ -76,7 +77,7 @@ public class MainActivity extends Activity
 						e.printStackTrace();
 					}
 				}
-				if(arg1.getAction() == MotionEvent.ACTION_UP) {
+				else if(arg1.getAction() == MotionEvent.ACTION_UP) {
 					try {
 						noGas();
 					} catch (IOException e) {
@@ -88,14 +89,14 @@ public class MainActivity extends Activity
 				
 			}
 		});
+		*/
 
-		
+		/**
+		 * Accelerometer
+		 */
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-		
-		
-		
 	}
 	protected void onResume() {
 		super.onResume();
@@ -105,11 +106,6 @@ public class MainActivity extends Activity
 		super.onPause();
 		mSensorManager.unregisterListener(this);
 	}
-	public void onAccuracyChanged1(Sensor sensor, int accuracy) {
-		// can be safely ignored for this demo
-	}
-	
-	
 	
 	private void fire() throws IOException{
 		client.sendAction("fire");
@@ -121,25 +117,20 @@ public class MainActivity extends Activity
 		client.sendAction("noGas");
 	}
 	
+	/**
+	 * Option menu
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
-
-	@Override
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-	}
-
-	
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
 		
 	}
-
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		float x = event.values[0];
@@ -154,11 +145,12 @@ public class MainActivity extends Activity
 		}
 			
 	}
+	
+	
 	@Override
 	public boolean onTouch(View arg0, MotionEvent arg1) {
 		// TODO Auto-generated method stub
 		return false;
 	}
-}
-	
 
+}
