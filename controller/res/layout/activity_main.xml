@@ -8,24 +8,39 @@
     tools:context						=".MainActivity" >
 	
 	<ImageView
+	    android:id						="@+id/imageViewBK"
+	    android:layout_width			="wrap_content"
+	    android:layout_height			="wrap_content"
+	    android:layout_alignParentLeft	="true"
+	    android:layout_alignParentTop	="true"
+	    android:src						="@drawable/airp"
+	    />    
+    
+    
+	<ImageView
 	    android:id						="@+id/imageFire"
-	    android:layout_width			="100sp"
+	    android:layout_width			="wrap_content"
 	    android:layout_height			="wrap_content"
 	    android:layout_alignParentBottom="true"
 	    android:layout_alignParentRight	="true"
 	    android:layout_alignParentTop	="true"
 	    android:src						="@drawable/mod_target"
+	    android:background				="#8600ACE0" 
+	    
 	/>
 
 	<ImageView
 	    android:id						="@+id/imageGas"
-	    android:layout_width			="100sp"
+	    android:layout_width			="wrap_content"
 	    android:layout_height			="wrap_content"
 	    android:layout_alignParentBottom="true"
 	    android:layout_alignParentLeft	="true"
 	    android:layout_alignParentTop	="true"
 	    android:src						="@drawable/propeller"
+	    android:background				="#8600ACE0" 
 	/>
+
+
 
 </RelativeLayout>
 
@@ -38,16 +53,16 @@
 
    	Bör använda onklick istället i den här filen
    	men varför gick det inte.
-   	android:onClick			="fire"
-  	android:background 		="#00FF00"
-  	android:textColor		="#FF0000" 
+   	android:onClick					="fire"
+  	android:background 				="#00FF00"
+  	android:textColor				="#FF0000" 
   	android:background				="#FFFFFFCC" 
   	android:background				="#FF0000CC" 
   	android:opacity					="3"
   	
    
    	<TextView
-       android:layout_width			="wrap_content"
+       android:layout_width				="wrap_content"
        android:layout_height			="wrap_content"
        android:layout_centerHorizontal	="true"
        android:layout_centerVertical	="true"
