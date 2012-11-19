@@ -1,5 +1,6 @@
-#ifndef VERTEXARRAY_H
-#define VERTEXARRAY_H
+#ifndef VERTEXARRAY_H_
+#define VERTEXARRAY_H_
+
 
 #include "renderer/GpuObject.h"
 #include <vector>
@@ -87,4 +88,4 @@ typedef std::shared_ptr<VertexArray> VertexArrayPtr;
 } // ::revel
 
 
-#endif // VERTEXARRAY_H
+#endif // VERTEXARRAY_H_

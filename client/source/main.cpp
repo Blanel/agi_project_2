@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <thread>
+#include <chrono>
 
 #include "Device.h"
 #include "Config.h"
@@ -19,6 +21,7 @@
 #include "renderer/ShaderProgram.h"
 
 #include "BoundingVolume.h"
+
 
 using namespace std;
 using namespace revel;
@@ -47,18 +50,14 @@ int main(int argc, char *argv[])
     auto mesh = geo::Mesh::create_cube();
     auto va = ctx->create_vertex_array(mesh);
     
+    R_LOG_INFO("MESH index count: " << mesh->indices<u32>()->count());
+    R_LOG_INFO("VA index count: " << va->index_count());
 
     auto sp = Device::graphics()->create_shader_program_from_file("passthrough_vs.glsl", 
     															  "passthrough_fs.glsl"); 
     
-    
-    //auto vbo = 
-
-    //R_LOG_INFO("Creating a draw state");
 
     auto drawstate = std::make_shared<DrawState>(renderstate, sp, va);
-
-    //R_LOG_INFO("Crash");
 
 	bool running = true;
 
@@ -68,13 +67,10 @@ int main(int argc, char *argv[])
 
 	    SDL_Event e;
 
-	    //u8 currentMouseState = SDL_GetMouseState(NULL, NULL);
-
 	    while (SDL_PollEvent(&e))
 	    {
 	        switch(e.type)
 	        {
-
 	        case SDL_MOUSEMOTION:
 	            //xrot += e.motion.xrel;
 	            //R_LOG_INFO("XROT: " << xrot);
@@ -93,14 +89,23 @@ int main(int argc, char *argv[])
 	            }
 	            break;
 
+	        case SDL_KEYDOWN:
+	        	if (e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+	        		running = false;
+	        	break;
+
 	        case SDL_QUIT:
 	            running = false;
 	        }
 
     	}
 
+    	va->bind();
+    	::glDrawElements(GL_POINTS, 24, GL_UNSIGNED_INT, 0);
+
     	//ctx->draw(PrimitiveType::TRIANGLES, drawstate, scenestate);
 
+    	//::std::this_thread::yield();
 		window->swap_buffer();
 	}
 

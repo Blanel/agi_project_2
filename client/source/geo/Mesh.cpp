@@ -12,6 +12,8 @@ namespace geo
 Mesh::Mesh()
     : m_PrimitiveType(PrimitiveType::TRIANGLES)
     , m_WindingOrder(WindingOrder::COUNTER_CLOCKWISE)
+    , m_Attributes()
+    , m_pIndices(std::make_shared<Indices<u32>>())
 {
 }
 

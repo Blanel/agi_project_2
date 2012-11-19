@@ -1,4 +1,5 @@
 #include "RenderContext.h"
+#include "geo/Mesh.h"
 
 namespace revel
 {
@@ -9,9 +10,7 @@ std::shared_ptr<VertexArray>
 RenderContext::create_vertex_array(const std::shared_ptr<geo::Mesh>& pMesh)
 {
     R_LOG_INFO("Creating vertex array from mesh.");
-
     auto va = create_vertex_array();
-
     va->bind();
 
     //read all attributes and create vertex buffers
@@ -41,16 +40,22 @@ RenderContext::create_vertex_array(const std::shared_ptr<geo::Mesh>& pMesh)
                 datatype = ComponentDatatype::FLOAT32;
             break;
             default:
-            R_LOG_ERR("Unknown attribute type.");
+                R_LOG_ERR("Unknown attribute type.");
         }
 
         u32 buffersize = it->size_in_bytes();
 
-        auto vbuffer = Device::graphics()->create_vertex_buffer(BufferHint::STATIC_DRAW, buffersize);
-        vbuffer->copy_raw_from_sys_mem(it->raw_data_ptr(), 0, buffersize);
+        auto vbo = Device::graphics()->create_vertex_buffer(BufferHint::STATIC_DRAW, buffersize);
+        vbo->copy_raw_from_sys_mem(it->raw_data_ptr(), 0, buffersize);
 
-        auto& pAttrib = va->create_attrib(it->name(), vbuffer, datatype, num_of_components);
+        auto& pAttrib = va->create_attrib(it->name(), vbo, datatype, num_of_components);
 	}
+
+    auto indexsize = pMesh->indices<u32>()->size_in_bytes();
+
+    auto ibo = Device::graphics()->create_index_buffer(BufferHint::STATIC_DRAW, indexsize);
+    ibo->copy_from_sys_mem(pMesh->indices<u32>()->data());
+    va->set_index_buffer(ibo);
 
     return va;
 }

@@ -17,6 +17,7 @@ class IndexBuffer
 public:
     enum class Datatype
     {
+        UINT8,
         UINT16,
         UINT32
     };
@@ -38,6 +39,23 @@ public:
     Datatype get_datatype() const
     {
         return m_Datatype;
+    }
+
+    u32 size_in_bytes() const 
+    { 
+        return m_SizeInBytes;
+    }
+
+    u32 count() const 
+    { 
+        if (m_Datatype == Datatype::UINT8)
+            return size_in_bytes();
+        else if (m_Datatype == Datatype::UINT16)
+            return size_in_bytes() / 2;
+        else if (m_Datatype == Datatype::UINT32)
+            return size_in_bytes() / 4;
+        else
+            return size_in_bytes();
     }
 
     template <typename T>

@@ -38,6 +38,7 @@ void
 VertexArrayGL::set_index_buffer(const std::shared_ptr<IndexBuffer> &buffer)
 {
     this->bind();
+	m_pIndexBuffer = buffer;
     buffer->bind();    
     this->unbind();
 }

@@ -4,7 +4,6 @@
 #include "SDL.h"
 #include "Color.h"
 #include "geo/Rectangle.h"
-#include "geo/Mesh.h"
 #include <memory>
 
 #include "renderer/TextureUnit.h"
@@ -19,7 +18,8 @@
 namespace revel
 {
 
-class Entity;
+namespace geo { class Mesh; }
+
 
 namespace renderer
 {
@@ -53,16 +53,8 @@ public:
     virtual std::shared_ptr<VertexArray> create_vertex_array() = 0;
     virtual std::shared_ptr<VertexArray> create_vertex_array(const std::shared_ptr<geo::Mesh>& pMesh);
 
-/*
-    virtual std::shared_ptr<VertexArray> create_vertex_array(const std::shared_ptr<geo::Mesh>& pMesh, const std::shared_ptr<ShaderProgram>& sp)
-    {
-        auto va = create_vertex_array();
-    }
-*/
     /*
-
     virtual void create_framebuffer() = 0;
-    virtual void create_vertex_array_state() = 0;
 
     virtual const std::shared_ptr<Framebuffer>& get_framebuffer() = 0;
     virtual void set_framebuffer(const std::shared_ptr<Framebuffer>& fb) = 0;

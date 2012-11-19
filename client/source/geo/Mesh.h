@@ -31,10 +31,8 @@ public:
 
     static std::shared_ptr<Mesh> create_cube()
     {        
-        auto mesh = std::make_shared<Mesh>();
-        
+        auto mesh = std::make_shared<Mesh>();        
         auto pos = mesh->create_vertex_attrib<point3>("position", 8);
-        auto indices = mesh->create_indices<u32>();
 
         pos->data().push_back(point3(-1, -1,  1));
         pos->data().push_back(point3( 1, -1,  1));
@@ -45,6 +43,8 @@ public:
         pos->data().push_back(point3( 1, -1, -1));
         pos->data().push_back(point3( 1,  1, -1));
         pos->data().push_back(point3(-1,  1, -1));
+
+        auto indices = mesh->indices<u32>();
 
         indices->add_triangle(0, 1, 2); //front
         indices->add_triangle(2, 3, 0);
@@ -60,7 +60,6 @@ public:
         indices->add_triangle(1, 0, 4);
 
         mesh->add_vertex_attrib(pos);
-        mesh->set_index_array(indices);
         
         return mesh;
     }
@@ -106,7 +105,6 @@ public:
 
     const std::vector<VertexAttribPtr>& vertex_attrib_array() const;
 
-    //TODO: Does this leak memory? i.e. a new shared_ptr looking at the same object?
     template <typename T>
     std::shared_ptr<VertexAttrib<T>> vertex_attrib(const std::string& name)
     {
@@ -122,10 +120,7 @@ public:
     template <typename T>
     std::shared_ptr<Indices<T>> indices()
     {
-        if (m_pIndices)
-            return std::static_pointer_cast<Indices<T>>(m_pIndices);
-        else
-            return nullptr;
+        return std::static_pointer_cast<Indices<T>>(m_pIndices);
     }
 
 
