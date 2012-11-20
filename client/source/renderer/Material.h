@@ -10,13 +10,20 @@ class ShaderProgram;
 /*
 class Material
 {
-	std::shared_ptr<ShaderProgram> m_pProgram;
+	class RenderPass
+	{
+		std::shared_ptr<ShaderProgram> m_pProgram;
+		const std::shared_ptr<ShaderProgram>& shader_program() const;
+	
+	};
+
+	
 
 public:
-	Material(const ShaderProgram& sp);
+	Material();
 	virtual ~Material();
 
-	const std::shared_ptr<ShaderProgram>& shader_program() const;
+	
 };
 
 class RedMaterial : public Material
