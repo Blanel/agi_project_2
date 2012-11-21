@@ -34,8 +34,15 @@ public final class MainActivity extends Activity
 	public ImageView viewLifeImage;
 	public ImageView imageRedFlash;
 	
+	/**
+	 * Used for sensor usage
+	 */
 	private SensorManager mSensorManager;
 	private Sensor mAccelerometer;
+	
+	/**
+	 * Screen size
+	 */
 	private int screenWidth;
 	private int screenHeight;
 	
@@ -73,7 +80,7 @@ public final class MainActivity extends Activity
 		
 
 		/**
-		 * Sending Image size to server
+		 * Sending Image size to server and client type in this case Android.
 		 */
 		Display display = getWindowManager().getDefaultDisplay(); 
 		this.screenWidth = display.getWidth();
@@ -86,7 +93,9 @@ public final class MainActivity extends Activity
 			e.printStackTrace();
 		}
 		
-		
+		/**
+		 * Images
+		 */
 		this.fireImage 		= (ImageView)findViewById(R.id.imageFire);
 		this.gasImage 		= (ImageView)findViewById(R.id.imageGas);
 		this.viewBKImage 	= (ImageView)findViewById(R.id.imageViewBK);
@@ -267,14 +276,11 @@ public final class MainActivity extends Activity
 			this.imageRedFlash.setBackgroundColor(Color.parseColor("#86E00000"));
 			isHit = true;
 			isHitNumber = airplane.life;
-			if (isHitNumber != 0)
-			{
+			if (isHitNumber != 0){
 				endFlash = System.currentTimeMillis() + 300;
-				(new Thread()
-				{
+				(new Thread(){
 					@Override
-					public void run()
-					{
+					public void run(){
 						try {
 							while (System.currentTimeMillis() < endFlash)
 								Thread.sleep(endFlash - System.currentTimeMillis());
