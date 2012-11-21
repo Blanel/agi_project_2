@@ -29,7 +29,7 @@ public class Client {
 				System.out.flush();
 			}
 			else
-				System.out.print("\n" + line + " :was sent from client number [" + this.index + "]");
+				System.out.print("\n" + line + " : client number [" + this.index + "]");
 		}
 	}
 }

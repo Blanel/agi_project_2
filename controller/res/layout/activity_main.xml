@@ -14,8 +14,7 @@
 	    android:layout_alignParentLeft	="true"
 	    android:layout_alignParentTop	="true"
 	    android:src						="@drawable/airp"
-	    />    
-    
+	/>
     
 	<ImageView
 	    android:id						="@+id/imageFire"
@@ -39,13 +38,34 @@
 	    android:src						="@drawable/propeller"
 	    android:background				="#8600ACE0" 
 	/>
+	
 
 
+	<ImageView
+	    android:id						="@+id/imageViewLife"
+	    android:layout_width			="wrap_content"
+	    android:layout_height			="wrap_content"
+	    android:layout_alignParentLeft	="true"
+	    android:layout_alignParentTop	="true"
+	    android:src						="@drawable/life5" 
+	/>
 
+	<ImageView
+	    android:id						="@+id/imageRedFlash"
+	    android:layout_width			="wrap_content"
+	    android:layout_height			="wrap_content"
+	    android:layout_alignParentBottom="true"
+	    android:layout_alignParentLeft	="true"
+	    android:layout_alignParentRight	="true"
+	    android:layout_alignParentTop	="true"
+	    android:background				="#00E00000" 
+	    />
+	
 </RelativeLayout>
 
 <!-- 
-
+	    
+	android:background				="#86E00000" 
 
 	android:src						="@drawable/ic_launcher" 
 

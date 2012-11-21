@@ -4,13 +4,38 @@ package se.jonasandree.airbattles.server;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
-public class Program {
-
+public class Program implements Runnable {
+	
+	private static OutputStream[] clientOuts = new OutputStream[1024];
+	private static String action = "die"; 
+	
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws UnsupportedEncodingException {
+		Thread thread = new Thread(new Program());
+		thread.setDaemon(true);
+		thread.start();
+		Scanner stdin = new Scanner(System.in);
+		
+		while(stdin.hasNextLine()){
+			if(stdin.nextLine().equals(action)){
+				try {
+					clientOuts[0].write((action+"\n\n").getBytes("UTF-8"));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				System.out.print("die was sent to client 0");
+				
+			}
+		}
+	}
+	
+	@Override
+	public void run(){
 		try (ServerSocket server = new ServerSocket(15003, 20)) {
 			final ArrayList<Client> clients = new ArrayList<>();
 			for(;;){
@@ -31,6 +56,7 @@ public class Program {
 									{
 										int index = clients.size();
 										client = new Client(index, in, out);
+										Program.clientOuts[index] = out;
 										clients.add(client);
 									}
 									client.start();
@@ -39,14 +65,13 @@ public class Program {
 									e.printStackTrace();
 								}
 							}
-						};
+						};		
 				thread.setDaemon(true); // N�r alla ickedemoner har avslutat s� st�ngs programmet av.
 				thread.start();
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}	
 	}
-
 }
