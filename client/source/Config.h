@@ -13,6 +13,18 @@ class Config
 {
 	static std::map<std::string, std::string> s_ConfigMap;
 
+private:
+	static std::map<std::string, std::string> init()
+ {
+  std::map<std::string, std::string> configmap;
+
+  configmap["graphics_api"] = "OpenGL";
+  configmap["screen_width"] = "1280";
+  configmap["screen_height"] = "720";
+
+  return configmap;
+ }
+
 public:
 	template <typename T> static
 	T
