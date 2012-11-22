@@ -20,20 +20,19 @@ namespace geo
 class Mesh
 {
 protected:
-    renderer::PrimitiveType m_PrimitiveType;
-    renderer::WindingOrder  m_WindingOrder;
+    renderer::PrimitiveType         m_PrimitiveType;
+    renderer::WindingOrder          m_WindingOrder;
 
-    VertexAttribArray       m_Attributes;
-    IndicesPtr              m_pIndices;
+    VertexAttribArray               m_Attributes;
+    std::shared_ptr<IndicesBase>    m_pIndices;
 
 public:
     Mesh();
 
     static std::shared_ptr<Mesh> create_cube()
-    {
-        auto mesh = std::make_shared<Mesh>();
-        auto pos = mesh->create_vertex_attrib<VAttr_point3>("position");
-        auto indices = std::make_shared<IndicesU32>();
+    {        
+        auto mesh = std::make_shared<Mesh>();        
+        auto pos = mesh->create_vertex_attrib<point3>("position", 8);
 
         pos->data().push_back(point3(-1, -1,  1));
         pos->data().push_back(point3( 1, -1,  1));
@@ -44,6 +43,8 @@ public:
         pos->data().push_back(point3( 1, -1, -1));
         pos->data().push_back(point3( 1,  1, -1));
         pos->data().push_back(point3(-1,  1, -1));
+
+        auto indices = mesh->indices<u32>();
 
         indices->add_triangle(0, 1, 2); //front
         indices->add_triangle(2, 3, 0);
@@ -59,26 +60,33 @@ public:
         indices->add_triangle(1, 0, 4);
 
         mesh->add_vertex_attrib(pos);
-        mesh->set_index_array(indices);
-
+        
         return mesh;
     }
 
     template <typename T>
-    std::shared_ptr<T> create_vertex_attrib(const std::string& name, u32 capacity = 0)
+    std::shared_ptr<VertexAttrib<T>> create_vertex_attrib(const std::string& name, u32 capacity = 0)
     {
-        m_Attributes.push_back(std::make_shared<T>(name, capacity));
-        return std::static_pointer_cast<T>(m_Attributes.back());
+        auto attrib = std::make_shared<VertexAttrib<T>>(name, capacity);
+        m_Attributes.push_back(attrib);
+
+        return attrib;
     }
 
-    /*
     template <typename T>
-    std::shared_ptr<detail::VertexAttribute<T>> create_vertex_attrib2(const std::string& name, u32 capacity = 0)
+    std::shared_ptr<Indices<T>> create_indices(u32 capacity = 0)
     {
-        m_Attributes.push_back(std::make_shared<detail::VertexAttribute<T>>(name, capacity));
-        return std::static_pointer_cast<T>(m_Attributes.back());
+        if (m_pIndices != nullptr)
+        {
+            R_LOG_ERR("Already contains an index array");
+        }
+        else
+        {
+            m_pIndices = std::make_shared<Indices<T>>(capacity);    
+        }
+        
+        return std::static_pointer_cast<Indices<T>>(m_pIndices);
     }
-    */
 
     template <typename T>
     std::shared_ptr<T> create_index(u32 capacity = 0)
@@ -93,41 +101,26 @@ public:
         return indices;
     }
 
-    void add_vertex_attrib(const VertexAttributePtr& va);
+    void add_vertex_attrib(const VertexAttribPtr& va);
 
-    /*
-    template<typename T>
-    std::shared_ptr<VertexAttribute<T>> add_vertex_attrib(const VertexAttribute<T>&& va)
-    {
-        auto va_ptr = std::make_shared<VertexAttribute<T>>(va);
-        m_Attributes.push_back(va_ptr);
-        return va_ptr;
-
-    }
-    */
-
-    const std::vector<VertexAttributePtr>& vertex_attrib_array() const;
-
+    const std::vector<VertexAttribPtr>& vertex_attrib_array() const;
 
     template <typename T>
-    std::shared_ptr<detail::VertexAttribute<T>> vertex_attrib(const std::string& name)
+    std::shared_ptr<VertexAttrib<T>> vertex_attrib(const std::string& name)
     {
         for (auto attrib : m_Attributes)
         {
             if (attrib->name() == name)
-                return std::static_pointer_cast<detail::VertexAttribute<T>>(attrib);
+                return std::static_pointer_cast<VertexAttrib<T>>(attrib);
         }
 
         return nullptr;
     }
 
     template <typename T>
-    std::shared_ptr<detail::Indices<T>> indices()
+    std::shared_ptr<Indices<T>> indices()
     {
-        if (m_pIndices)
-            return std::static_pointer_cast<detail::Indices<T>>(m_pIndices);
-        else
-            return nullptr;
+        return std::static_pointer_cast<Indices<T>>(m_pIndices);
     }
 
 

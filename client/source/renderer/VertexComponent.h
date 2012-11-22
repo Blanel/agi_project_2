@@ -10,7 +10,7 @@ enum class ComponentDatatype
 {
     INT8,
     UINT8,
-    INT6,
+    INT16,
     UINT16,
     INT32,
     UINT32,

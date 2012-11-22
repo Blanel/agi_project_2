@@ -16,34 +16,23 @@ enum class TextureFormat
     RGBA_F32
 };
 
-class Texture2DDesc
+class Texture2D : public GpuObject
 {
-private:
     u32             m_Width;
     u32             m_Height;
-    bool            m_BuildMipMap;
-
     TextureFormat   m_InternalFormat;
+    bool            m_MipMapped;
 
 public:
-    Texture2DDesc(u32 w, u32 h, TextureFormat format, bool mipmap = true)
-        : m_Width(w)
-        , m_Height(h)
-        , m_InternalFormat(format)
-        , m_BuildMipMap(mipmap)
-    {
-    }
+    Texture2D(u32 w, u32 h, TextureFormat format, bool mimap = true);
 
     u32 width() const { return m_Width; }
     u32 height() const { return m_Height; }
-    bool build_mipmap() { return m_BuildMipMap; }
+    bool has_mipmap() { return m_MipMapped; }
     TextureFormat format() const { return m_InternalFormat; }
-};
 
-class Texture2D : public GpuObject
-{
-public:
-    Texture2D();
+    virtual void bind() = 0;
+    virtual void unbind() = 0;
 };
 
 } // ::revel::renderer

@@ -194,6 +194,7 @@ struct TGAHeader
 } __attribute__ ((__packed__));
 #endif
 
+
 class TGA
 {
 	static void write(const std::string& filename, const TGAHeader& header, const i8* dataptr, u32 byte)

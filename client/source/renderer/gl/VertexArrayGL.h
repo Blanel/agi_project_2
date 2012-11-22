@@ -13,8 +13,7 @@ namespace gl
 {
 
 
-class VertexArrayGL
-    : public VertexArray
+class VertexArrayGL : public VertexArray
 {
 public:
     VertexArrayGL();
@@ -40,9 +39,9 @@ public:
 
 };
 
-}
-}
-}
+} // ::revel::renderer::gl
+} // ::revel::renderer
+} // ::revel
 
 
 #endif // VERTEXARRAYGL_H

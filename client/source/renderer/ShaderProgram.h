@@ -24,8 +24,6 @@ public:
     virtual ~ShaderProgram();
 
     virtual void use() = 0;
-    //virtual void unbind() = 0;
-
 
     /**
      * @brief Find a vertex attribute in the shader program.
