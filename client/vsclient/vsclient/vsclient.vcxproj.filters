@@ -210,6 +210,9 @@
     <ClCompile Include="..\..\source\renderer\RenderContext.cpp">
       <Filter>Source Files\renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\TerrainTile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\renderer\gl\GraphicsDeviceGL.h">
@@ -457,6 +460,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\renderer\gl\Texture2DGL.h">
       <Filter>Header Files\renderer\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\TerrainTile.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
