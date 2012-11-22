@@ -74,7 +74,7 @@ SimplexNoise::p = {151,160,137,91,90,15,
 	};
 
 std::array<u8, 512>
-SimplexNoise::pmod12 = SimplexNoise::init_array();
+SimplexNoise::pmod12 = SimplexNoise::init_array(234);
 
 f32 
 SimplexNoise::noise(f32 xin, f32 yin)
