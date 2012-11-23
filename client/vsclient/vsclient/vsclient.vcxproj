@@ -139,10 +139,10 @@
     <ClCompile Include="..\..\source\renderer\WindingOrder.cpp" />
     <ClCompile Include="..\..\source\SceneObject.cpp" />
     <ClCompile Include="..\..\source\SimplexNoise.cpp" />
+    <ClCompile Include="..\..\source\TerrainManager.cpp" />
     <ClCompile Include="..\..\source\TerrainTile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\Agi12P2.h" />
     <ClInclude Include="..\..\source\BoundingVolume.h" />
     <ClInclude Include="..\..\source\Camera.h" />
     <ClInclude Include="..\..\source\Color.h" />
@@ -223,6 +223,7 @@
     <ClInclude Include="..\..\source\SceneObject.h" />
     <ClInclude Include="..\..\source\SimplexNoise.h" />
     <ClInclude Include="..\..\source\StopWatch.h" />
+    <ClInclude Include="..\..\source\TerrainManager.h" />
     <ClInclude Include="..\..\source\TerrainTile.h" />
     <ClInclude Include="..\..\source\Types.h" />
   </ItemGroup>

@@ -2,10 +2,11 @@
 
 namespace revel
 {
-	TerrainManager::TerrainManager(int optimalChunks)
+	TerrainManager::TerrainManager(int optimalChunks, int chunkRes, int chunkLen)
 	{
 		TerrainManager::optimalChunks = optimalChunks;
 	}
+
 	TerrainManager::~TerrainManager()
 	{
 
@@ -14,9 +15,13 @@ namespace revel
 	void TerrainManager::generate()
 	{
 		/*
-		Loop through all player positions
-			For each player, check so adjacent chunks have been generated.
-				If false, generate new chunk and add to list.
+		if NoChunks generated
+			GetSpawn from server
+			Generate chunks around spawn
+		else
+			Loop through all player positions
+				For each player, check so adjacent chunks have been generated.
+					If false, generate new chunk and add to list.
 
 		*/
 	}

@@ -213,6 +213,9 @@
     <ClCompile Include="..\..\source\TerrainTile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\TerrainManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\renderer\gl\GraphicsDeviceGL.h">
@@ -410,9 +413,6 @@
     <ClInclude Include="..\..\source\geo\VertexAttribute.h">
       <Filter>Header Files\geo</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Agi12P2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -462,6 +462,9 @@
       <Filter>Header Files\renderer\gl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\TerrainTile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\TerrainManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
