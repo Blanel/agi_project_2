@@ -48,6 +48,7 @@ PerspectiveCamera::projection_matrix() const
 
 }
 
+/*
 math::mat4
 OrthographicCamera::projection_matrix() const
 {
@@ -56,9 +57,8 @@ OrthographicCamera::projection_matrix() const
     f32 z = m_FarPlaneDistance - m_NearPlaneDistance;
 
     return math::mat4::Identity;
-
-
 }
+*/
 
 
 }
