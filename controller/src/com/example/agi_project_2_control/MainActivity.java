@@ -7,6 +7,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,11 +18,15 @@ import android.view.View;
 import android.widget.ImageView;
 import java.io.*;
 import java.net.*;
+
 import android.view.GestureDetector.OnGestureListener;
 import android.view.GestureDetector;
 
-public final class MainActivity extends Activity 
+public final class MainActivity extends Activity
 	implements View.OnTouchListener, SensorEventListener, OnGestureListener {
+	/**
+	 * Adding classes 
+	 */
 	private static Client client = new Client();	
 	public static Airplane airplane = new Airplane();
 	
@@ -32,7 +37,9 @@ public final class MainActivity extends Activity
 	private ImageView gasImage;
 	public ImageView viewBKImage;
 	public ImageView viewLifeImage;
-	public ImageView imageRedFlash;
+	public ImageView imageRedFlash; 
+	public ImageView imageViewNavigation;
+	public ImageView imageViewArrow;
 	
 	/**
 	 * Used for sensor usage
@@ -40,6 +47,10 @@ public final class MainActivity extends Activity
 	private SensorManager mSensorManager;
 	private Sensor mAccelerometer;
 	
+	/*
+	CustomDrawableView mCustomDrawableView = null;
+    ShapeDrawable mDrawable = new ShapeDrawable();
+	*/
 	/**
 	 * Screen size
 	 */
@@ -51,11 +62,16 @@ public final class MainActivity extends Activity
 	 */
 	public static boolean alive = true;
 
+	
 	private int lastFire = -1;
 	private int lastGas = -1;
 	private final Object touchMutex = new Object();
 
+	/**
+	 * Starting Threads
+	 */
 	private Thread threadImage;
+	private Thread threadInput;
 	
 	/**
 	 * Server connect
@@ -72,13 +88,16 @@ public final class MainActivity extends Activity
 		}
 	}
 	
+	/**
+	 * Called when the activity first creates.
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		new GestureDetector(this);
-		
 
+		
 		/**
 		 * Sending Image size to server and client type in this case Android.
 		 */
@@ -86,22 +105,35 @@ public final class MainActivity extends Activity
 		this.screenWidth = display.getWidth();
 		this.screenHeight = display.getHeight();
 		try {
-			client.sendAction("screenWidth: " + screenWidth + " screenHeight: " + screenHeight);
 			client.sendAction("Android");
+			client.sendAction("screenWidth" + screenWidth);
+			client.sendAction("screenHeight" + screenHeight);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		/*
+		/**
+		 * Initializing OpenGL
+		 * 
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE); 
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+ 		GLSurfaceView v = new GLSurfaceView(this);
+   		v.setRenderer(new OpenGLRenderer());
+   		setContentView(v);
+		*/
 		
 		/**
 		 * Images
 		 */
-		this.fireImage 		= (ImageView)findViewById(R.id.imageFire);
-		this.gasImage 		= (ImageView)findViewById(R.id.imageGas);
-		this.viewBKImage 	= (ImageView)findViewById(R.id.imageViewBK);
-		this.viewLifeImage 	= (ImageView)findViewById(R.id.imageViewLife);
-		this.imageRedFlash 	= (ImageView)findViewById(R.id.imageRedFlash);
-		
+		this.fireImage 				= (ImageView)findViewById(R.id.imageFire);
+		this.gasImage 				= (ImageView)findViewById(R.id.imageGas);
+		this.viewBKImage 			= (ImageView)findViewById(R.id.imageViewBK);
+		this.viewLifeImage 			= (ImageView)findViewById(R.id.imageViewLife);
+		this.imageRedFlash 			= (ImageView)findViewById(R.id.imageRedFlash);
+		this.imageViewNavigation 	= (ImageView)findViewById(R.id.imageViewNavigation);
+		this.imageViewArrow 		= (ImageView)findViewById(R.id.imageViewArrow);
+
 		/**
 		 * Accelerometer
 		 */
@@ -109,7 +141,7 @@ public final class MainActivity extends Activity
 		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 		
-		Thread threadInput = new Thread(){
+		threadInput = new Thread(){
 			@Override
 			public void run(){
 				while(true){
@@ -168,22 +200,66 @@ public final class MainActivity extends Activity
 			getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
+	
+	public float rotation = 0; 
+	/*
+	private static final int[] rotationImagesXPositiv = {
+		R.drawable.a352, R.drawable.a345, R.drawable.a337, R.drawable.a330,
+		R.drawable.a322, R.drawable.a315, R.drawable.a307, R.drawable.a300,
+		R.drawable.a292, R.drawable.a285, R.drawable.a277, R.drawable.a270,
+		R.drawable.a0,   R.drawable.a7,   R.drawable.a15,  R.drawable.a22, 
+		R.drawable.a30,  R.drawable.a37,  R.drawable.a45,  R.drawable.a52,
+		R.drawable.a60,  R.drawable.a67,  R.drawable.a75,  R.drawable.a82, 
+		R.drawable.a90
+	};
+	private static final int[] rotationImagesXNegative = {
+		R.drawable.a97,  R.drawable.a105, R.drawable.a112, R.drawable.a120,
+		R.drawable.a127, R.drawable.a135, R.drawable.a142, R.drawable.a150,
+		R.drawable.a157, R.drawable.a165, R.drawable.a172, R.drawable.a180,
+		R.drawable.a187, R.drawable.a195, R.drawable.a202, R.drawable.a210,
+		R.drawable.a217, R.drawable.a225, R.drawable.a232, R.drawable.a240,
+		R.drawable.a247, R.drawable.a255, R.drawable.a262
+	};
+	*/
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
 	}
+	
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		float x = event.values[0];
 		float y = event.values[1];
 		float z = event.values[2];
+		
 		try {
-			client.sendAction("x :"+Float.toString(x)+" y :"+Float.toString(y)+ " z :"+Float.toString(z));
+			client.sendAction("x"+Float.toString(x));
+			client.sendAction("y"+Float.toString(y));
+			//client.sendAction("z"+Float.toString(z));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
+		/*
+		if (x <= 0.0f){
+			if (y > 9.2f){
+				;
+				//this.imageViewArrow.setImageResource(rotationImagesXPositiv[0]);
+			}
+			int n = 24;
+			for(int i = 1; i < n ; i++){
+				if(y > -9.2f*i && y <= -8.4f*i){
+					;
+					//this.imageViewArrow.setImageResource(rotationImagesXPositiv[i]);
+				}
+			}
+			if (y < -9.2f){
+				;
+				//this.imageViewArrow.setImageResource(rotationImagesXPositiv[24]);
+			}
+		}*/
 	}
+	
 	@Override
     public boolean onTouchEvent(MotionEvent e){
 		synchronized (this.touchMutex){
@@ -238,7 +314,6 @@ public final class MainActivity extends Activity
 	@Override
 	public void onLongPress(MotionEvent arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 	@Override
 	public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2,
@@ -249,7 +324,6 @@ public final class MainActivity extends Activity
 	@Override
 	public void onShowPress(MotionEvent arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 	@Override
 	public boolean onSingleTapUp(MotionEvent arg0) {
@@ -262,13 +336,11 @@ public final class MainActivity extends Activity
 		return false;
 	}
 	
-	
-	
 	private boolean isHit = false;
 	private int isHitNumber = 5;
 	private long endFlash = 0;
+	private static final int[] lifeResources = { R.drawable.life, R.drawable.life1, R.drawable.life2, R.drawable.life3, R.drawable.life4 }; 
 	
-	private static final int[] lifeResources = { R.drawable.life, R.drawable.life1, R.drawable.life2, R.drawable.life3, R.drawable.life4 };  
 	private void lifeSpan() {
 		
 		if (airplane.life != isHitNumber){
@@ -293,13 +365,13 @@ public final class MainActivity extends Activity
 			}
 		}
     }
-
 	private void endFlash()
 	{
 		imageRedFlash.setBackgroundColor(Color.parseColor("#00E00000"));
 		isHit = false;
 	}
-	
+	public void  setRenderer(GLSurfaceView.Renderer renderer){	
+	}
 	public Handler mainHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             if (msg.what == 0) {
@@ -308,7 +380,11 @@ public final class MainActivity extends Activity
             if (msg.what == 1) {
             	endFlash();
             }
+            //if (mag.what == 2) {
+            	//reverseLandscape();
+            //}
         };
-    };
+    };  
 }
+
 

@@ -29,7 +29,6 @@ public class Program implements Runnable {
 					e.printStackTrace();
 				}
 				System.out.print("die was sent to client 0");
-				
 			}
 		}
 	}

@@ -14,7 +14,7 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         <activity
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="reverseLandscape"
             android:name="com.example.agi_project_2_control.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>

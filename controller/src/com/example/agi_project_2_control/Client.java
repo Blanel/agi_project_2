@@ -64,7 +64,6 @@ public class Client {
 			}
 			else{
 				airplane.hit();
-				this.sendAction("I was hit");
 			}	
 		}
 	}
