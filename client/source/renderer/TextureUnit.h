@@ -22,8 +22,8 @@ public:
     virtual ~TextureUnit() {}
     virtual void set_texture(const std::shared_ptr<Texture2D>& tex) = 0;
     virtual void set_sampler(const std::shared_ptr<TextureSampler>& sampler) = 0;
-	const std::shared_ptr<Texture2D>& texture() = 0;
-	const std::shared_ptr<TextureSampler>& sampler() = 0;
+	virtual const std::shared_ptr<Texture2D>& texture() = 0;
+	virtual const std::shared_ptr<TextureSampler>& sampler() = 0;
 };
 
 }

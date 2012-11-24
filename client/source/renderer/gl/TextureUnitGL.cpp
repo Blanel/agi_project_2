@@ -54,7 +54,7 @@ TextureUnitGL::set_texture(const std::shared_ptr<Texture2D> &tex)
 }
 
 void
-TextureUnitGL::set_texture_sampler(const std::shared_ptr<TextureSampler> &sampler)
+TextureUnitGL::set_sampler(const std::shared_ptr<TextureSampler> &sampler)
 {
     m_pSampler = sampler;
 }
