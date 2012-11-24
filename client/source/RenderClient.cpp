@@ -86,28 +86,22 @@ RenderClient::run()
     auto quad = std::make_shared<geo::Mesh>();
     
     auto quadp = quad->create_vertex_attrib<point3>("position");
+	auto quadn = quad->create_vertex_attrib<vec3>("normal");
+    auto quadt = quad->create_vertex_attrib<vec2>("texcoord");
 
     quadp->data().push_back(point3(-0.5, -0.5, 0));
     quadp->data().push_back(point3( 0.5, -0.5, 0));
     quadp->data().push_back(point3( 0.5,  0.5, 0));
     quadp->data().push_back(point3(-0.5,  0.5, 0));
 
-    /*
-    auto quadn = quad->create_vertex_attrib<vec3>("normal");
     quadn->data().push_back(vec3(0, 0, 1));
     quadn->data().push_back(vec3(0, 0, 1));
     quadn->data().push_back(vec3(0, 0, 1));
     quadn->data().push_back(vec3(0, 0, 1));
-    */
-
-    /*
-    auto quadt = quad->create_vertex_attrib<vec2>("texcoord");
     quadt->data().push_back(vec2(0, 0));
     quadt->data().push_back(vec2(1, 0));
     quadt->data().push_back(vec2(1, 1));
     quadt->data().push_back(vec2(0, 1));
-    */
-	
 
     auto quadi = quad->indices<u32>();
     quadi->data().push_back(0);
@@ -211,6 +205,7 @@ RenderClient::run()
 		//ctx->render(scene);
 
 		quadva->bind();
+		sp->use();
 		::glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     	//va->bind();
     	//::glDrawElements(GL_POINTS, 24, GL_UNSIGNED_INT, 0);

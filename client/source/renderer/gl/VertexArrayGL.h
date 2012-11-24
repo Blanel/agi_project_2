@@ -22,15 +22,15 @@ public:
     void bind();
     void unbind();
 
-    std::unique_ptr<VertexBufferAttrib>& create_attrib(const std::shared_ptr<VertexBuffer>& buffer, ComponentDatatype type, u32 numOfComponents)
+    std::unique_ptr<VertexBufferAttrib>& create_attrib(u32 index, const std::shared_ptr<VertexBuffer>& buffer, ComponentDatatype type, u32 numOfComponents)
     {
-        m_Attributes.push_back(std::unique_ptr<VertexBufferAttrib>(new VertexBufferAttribGL(buffer, type, numOfComponents)));
+        m_Attributes.push_back(std::unique_ptr<VertexBufferAttrib>(new VertexBufferAttribGL(index, buffer, type, numOfComponents)));
         return m_Attributes.back();
     }
 
-    std::unique_ptr<VertexBufferAttrib>& create_attrib(const std::string& name, const std::shared_ptr<VertexBuffer>& buffer, ComponentDatatype type, u32 numOfComponents)
+    std::unique_ptr<VertexBufferAttrib>& create_attrib(u32 index, const std::string& name, const std::shared_ptr<VertexBuffer>& buffer, ComponentDatatype type, u32 numOfComponents)
     {
-        auto& ptr = create_attrib(buffer, type, numOfComponents);
+        auto& ptr = create_attrib(index, buffer, type, numOfComponents);
         m_AttribMap[name] = ptr.get();
         return ptr;
     }

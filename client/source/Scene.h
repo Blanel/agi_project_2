@@ -2,7 +2,9 @@
 #include "renderer/SceneState.h"
 #include "renderer/VertexArray.h"
 #include "renderer/RenderContext.h"
+#include "renderer/ShaderProgram.h"
 #include "geo/Mesh.h"
+
 
 namespace revel
 {
@@ -72,6 +74,25 @@ public:
 
 class TerrainNode : public SceneNode
 {
+	std::shared_ptr<renderer::ShaderProgram> m_pShader;
+
+public:
+	TerrainNode()
+	{
+		m_pShader = Device::graphics()->create_shader_program_from_file("terrain_vs.glsl", 
+    															  		"terrain_fs.glsl"); 
+
+
+	}
+
+	void draw()
+	{
+		m_pShader->use();
+		//m_pVertexArray->bind();
+		//::glDrawElements(GL_TRIANGLES, )
+
+
+	}
 
 
 };
@@ -80,10 +101,10 @@ class Scene
 {
 	std::shared_ptr<renderer::RenderContext> 	m_pContext; // Keep this global instead?
 
-	std::shared_ptr<renderer::SceneState> 	m_pSceneState;
-	std::shared_ptr<Camera>			m_pActiveCamera;
+	std::shared_ptr<renderer::SceneState> 		m_pSceneState;
+	std::shared_ptr<Camera>						m_pActiveCamera;
 
-	std::unique_ptr<SceneNode>		m_pRoot;
+	std::unique_ptr<SceneNode>					m_pRoot;
 	
 public:
 	Scene(const std::shared_ptr<renderer::RenderContext>& ctx);

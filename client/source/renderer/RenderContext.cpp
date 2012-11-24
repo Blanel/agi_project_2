@@ -15,12 +15,12 @@ RenderContext::create_vertex_array(const std::shared_ptr<geo::Mesh>& pMesh)
     //read all attributes and create vertex buffers
     auto attribs = pMesh->vertex_attrib_array();
 
-    for (auto it : attribs)
+    for (u32 i = 0; i < attribs.size(); ++i)
     {
         i32 n_comp;
         ComponentDatatype datatype;
 
-        switch (it->type())
+        switch (attribs[i]->type())
         {
             case VertexAttribType::FLOAT32:
                 n_comp = 1;
@@ -42,12 +42,12 @@ RenderContext::create_vertex_array(const std::shared_ptr<geo::Mesh>& pMesh)
                 R_LOG_ERR("Unknown attribute type.");
         }
 
-        u32 buffersize = it->size_in_bytes();
+        u32 buffersize = attribs[i]->size_in_bytes();
 
         auto vbo = Device::graphics()->create_vertex_buffer(BufferHint::STATIC, buffersize);
-        vbo->copy_raw_from_sys_mem(it->raw_data_ptr(), 0, buffersize);
+        vbo->copy_raw_from_sys_mem(attribs[i]->raw_data_ptr(), 0, buffersize);
 
-        auto& pAttrib = va->create_attrib(it->name(), vbo, datatype, n_comp);
+        auto& pAttrib = va->create_attrib(i, attribs[i]->name(), vbo, datatype, n_comp);
 	}
 
     auto indexsize = pMesh->indices<u32>()->size_in_bytes();
