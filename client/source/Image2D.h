@@ -56,6 +56,7 @@ struct RGBA_u8
 	RGBA_u8(u8 r, u8 g, u8 b, u8 a);
 	RGBA_u8(const RGBA_u8& c);
 	RGBA_u8(const RGB_u8& c, u8 a = 255);
+	RGBA_u8(const Gray_f32& c);
 
 	static PixelFormat pixel_format();
 
@@ -106,12 +107,10 @@ public:
 		, m_Height(img.height())
 		, m_PixelFormat(T::pixel_format())
 	{
-		/*
-		for (u32 i = 0; i < img.m_Pixels.size(); ++i)
+		for (u32 i = 0; i < m_Pixels.size(); ++i)
 		{
-			m_Pixels[img.m_Pixels[i]];
+			m_Pixels[i] = img.data()[i];
 		}
-		*/
 	}
 
 	Image2D(u32 w, u32 h, const std::vector<T>& pixeldata)
