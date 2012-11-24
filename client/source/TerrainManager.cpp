@@ -1,10 +1,14 @@
 #include "TerrainManager.h"
+#include <iostream>
+#include "Types.h"
 
 namespace revel
 {
 	TerrainManager::TerrainManager(int optimalChunks, int chunkRes, int chunkLen)
 	{
 		TerrainManager::optimalChunks = optimalChunks;
+		TerrainManager::chunkLen = chunkLen;
+		TerrainManager::chunkRes = chunkRes;
 	}
 
 	TerrainManager::~TerrainManager()
@@ -14,16 +18,18 @@ namespace revel
 
 	void TerrainManager::generate()
 	{
-		/*
-		if NoChunks generated
-			GetSpawn from server
-			Generate chunks around spawn
+		if(TerrainManager::tiles.size() == 0)
+		{
+			//GetSpawn from server
+			//Generate chunks around spawn
+		}
 		else
-			Loop through all player positions
-				For each player, check so adjacent chunks have been generated.
-					If false, generate new chunk and add to list.
+		{
+			//Loop through all player positions
+			//	For each player, check so adjacent chunks have been generated.
+			//		If false, generate new chunk and add to list.
+		}
 
-		*/
 	}
 
 	void TerrainManager::prune()
