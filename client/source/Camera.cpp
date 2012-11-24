@@ -11,7 +11,7 @@ Camera::Camera()
     , m_Up(0, 1, 0)
     , m_Right(1, 0, 0)
     , m_FieldOfView(90)
-    , m_AspectRatio(4.0/3.0)
+    , m_AspectRatio(16.0/9.0)
     , m_NearPlaneDistance(0.1f)
     , m_FarPlaneDistance(100.0f)
 {
