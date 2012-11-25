@@ -2,7 +2,11 @@ package com.example.agi_project_2_control;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -39,7 +43,8 @@ public final class MainActivity extends Activity
 	public ImageView viewLifeImage;
 	public ImageView imageRedFlash; 
 	public ImageView imageViewNavigation;
-	public ImageView imageViewArrow;
+	//public ImageView imageViewArrow;
+	public ImageView circle;
 	
 	/**
 	 * Used for sensor usage
@@ -144,7 +149,7 @@ public final class MainActivity extends Activity
 		this.viewLifeImage 			= (ImageView)findViewById(R.id.imageViewLife);
 		this.imageRedFlash 			= (ImageView)findViewById(R.id.imageRedFlash);
 		this.imageViewNavigation 	= (ImageView)findViewById(R.id.imageViewNavigation);
-		this.imageViewArrow 		= (ImageView)findViewById(R.id.imageViewArrow);
+		//this.imageViewArrow 		= (ImageView)findViewById(R.id.imageViewArrow);
 
 		/**
 		 * Accelerometer
@@ -244,7 +249,29 @@ public final class MainActivity extends Activity
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		float degree = (float) ((Math.atan2(x, y)+Math.PI/2)*180/Math.PI);
+		float degree = (float) (-Math.atan2(y/10, x/10)*180/Math.PI);
+		
+		circle = (ImageView) findViewById(R.id.imageViewArrow);
+		Bitmap myImg = BitmapFactory.decodeResource(getResources(), R.drawable.a0);
+
+		Matrix matrix = new Matrix(); 
+		matrix.postRotate(degree);
+		
+		Bitmap rot = Bitmap.createBitmap(myImg, 0, 0, myImg.getWidth(), myImg.getHeight(), matrix, true);
+		int off = (rot.getWidth() - myImg.getWidth()) / 2;
+		Bitmap result = Bitmap.createBitmap(rot, off, off, myImg.getWidth(), myImg.getHeight());
+		circle.setImageBitmap(result);
+		
+		/*float R[] = {(float) Math.cos(radian), (float) -Math.sin(radian),
+		             (float) Math.sin(radian), (float) Math.cos(radian)};
+		*//*
+		this.imageViewArrow.
+		this.imageViewArrow.setImageDrawable(drawable);
+		Matrix matrix = this.imageViewArrow.getImageMatrix();
+		matrix.postRotate(degree);
+		this.imageViewArrow.setImageMatrix(matrix);
+		*/	
+		
 		
 	}
 	private int fireSoundPtr = 0;
