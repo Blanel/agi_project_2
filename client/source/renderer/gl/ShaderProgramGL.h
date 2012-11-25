@@ -25,7 +25,7 @@ protected:
     void setup_uniforms();
     void setup_attributes();
 
-    std::unique_ptr<Uniform> create_uniform();
+    //std::unique_ptr<UniformBase> create_uniform();
 
     bool link();
 };

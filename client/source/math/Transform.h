@@ -4,6 +4,7 @@
 #include "Types.h"
 #include "math/RMath.h"
 #include "math/Vector3.h"
+#include "math/Vector4.h"
 #include "math/Matrix4x4.h"
 #include "math/Quaternion.h"
 
@@ -203,6 +204,20 @@ public:
         return scale(v.x, v.y, v.z);
     }
 };
+
+/*
+math::mat4
+translate(const math::mat4& m, const vec3& v)
+{
+    return m * vec4(v, 1.0);
+}
+
+math::mat4
+scale(const math::mat4& m, const vec3& s)
+{
+    return m * vec4(s, 1.0);
+}
+*/
 
 typedef MatrixTransform<f32> Transform;
 

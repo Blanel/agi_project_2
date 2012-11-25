@@ -14,6 +14,9 @@
 
 namespace revel
 {
+
+//class Image2D;
+
 namespace renderer
 {
 
@@ -80,6 +83,16 @@ public:
      */
     virtual std::shared_ptr<Texture2D>          create_texture_2d(const Texture2DDesc& desc) = 0;
 
+    //virtual std::shared_ptr<Texture2D>          create_texture_2d() = 0;
+    
+    /*
+    template <typename T>
+    virtual std::shared_ptr<Texture2D>          create_texture_2d(const Image2D<T>& img)
+    {
+
+    }
+    */
+
     /**
      * @brief Create a GPU shader program.
      *
@@ -118,11 +131,11 @@ public:
      * @param wrapt Texture wrap method in t direction
      * @param ani Maximum anistropy.
      */
-    virtual std::shared_ptr<TextureSampler>     create_texture_2d_sampler(TextureMinFilter min,
-                                                                          TextureMagFilter mag,
-                                                                          TextureWrap wraps,
-                                                                          TextureWrap wrapt,
-                                                                          f32 ani = 0.0f) = 0;
+    virtual std::shared_ptr<TextureSampler>     create_texture_sampler(TextureMinFilter min,
+                                                                       TextureMagFilter mag,
+                                                                       TextureWrap wraps,
+                                                                       TextureWrap wrapt,
+                                                                       f32 ani = 0.0f) = 0;
 
     virtual i32                               	max_texture_units() = 0;
     virtual i32                               	max_vertex_attribs() = 0;

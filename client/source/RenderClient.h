@@ -15,7 +15,7 @@ class RenderClient
 	void update();
 
 public:
-	RenderClient();
+	RenderClient();	
 	~RenderClient();
 
 	i32 run();
