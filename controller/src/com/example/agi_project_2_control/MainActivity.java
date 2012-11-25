@@ -71,9 +71,8 @@ public final class MainActivity extends Activity
 	/**
 	 * Sound
 	 */
-	//private static MediaPlayer fireSounds;// = MediaPlayer.create(this, R.raw.shot);
-	//private static MediaPlayer backgroundMusic;// = MediaPlayer.create(this, R.raw.roxcity);// = MediaPlayer.create(this, R.raw.shot);
-	
+	private static MediaPlayer fireSounds;// = MediaPlayer.create(this, R.raw.shot);
+	private static MediaPlayer backgroundMusic;// = MediaPlayer.create(this, R.raw.roxcity);// = MediaPlayer.create(this, R.raw.shot);
 	
 
 	/**
@@ -106,9 +105,11 @@ public final class MainActivity extends Activity
 		setContentView(R.layout.activity_main);
 		new GestureDetector(this);
 		
-		//MediaPlayer backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
+		backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
 		//backgroundMusic.setLooping(true);
-		//backgroundMusic.start();
+		backgroundMusic.start();
+		
+		
 		/**
 		 * Sending Image size to server and client type in this case Android.
 		 */
@@ -170,15 +171,17 @@ public final class MainActivity extends Activity
 		threadImage = new Thread(){
 			@Override
 			public void run(){
-				while(true)
+				while(true){
 					try {
 						Thread.sleep(100);
 						(Message.obtain(MainActivity.this.mainHandler, 0)).sendToTarget();
+						if (!backgroundMusic.isPlaying())
+							backgroundMusic.start();
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				
+				}
 			}
 		};
         
@@ -244,7 +247,8 @@ public final class MainActivity extends Activity
 		float degree = (float) ((Math.atan2(x, y)+Math.PI/2)*180/Math.PI);
 		
 	}
-	
+	private int fireSoundPtr = 0;
+	private MediaPlayer[] fireSoundPool = new MediaPlayer[10];
 	@Override
     public boolean onTouchEvent(MotionEvent e){
 
@@ -273,10 +277,10 @@ public final class MainActivity extends Activity
 			}
 			String msg = "";
 			if ((fire != this.lastFire) && (fire != -1)){
-				//this.fireSounds.stop();
-				//this.fireSounds.release();
-				//this.fireSounds.;
-				//fireSounds.start();
+				if (this.fireSoundPool[this.fireSoundPtr] == null)
+					this.fireSoundPool[this.fireSoundPtr] = MediaPlayer.create(this, R.raw.shot);
+				this.fireSoundPool[this.fireSoundPtr++].start();
+				this.fireSoundPtr %= this.fireSoundPool.length;
 				
 				msg += "fire\n";
 			}
