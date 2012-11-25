@@ -205,6 +205,7 @@ public:
     }
 };
 
+/*
 math::mat4
 translate(const math::mat4& m, const vec3& v)
 {
@@ -216,6 +217,7 @@ scale(const math::mat4& m, const vec3& s)
 {
     return m * vec4(s, 1.0);
 }
+*/
 
 typedef MatrixTransform<f32> Transform;
 
