@@ -27,4 +27,4 @@ solution "AGI12 Project2"
 		configuration "gmake"
 			links{ "glew32", "opengl32", "mingw32", "SDL2main", "SDL2", "m" }
 			libdirs{"client/externals/mingw64/lib"}
-			buildoptions { "-std=c++11", "-mwindows" }
+			buildoptions { "-std=c++11", "-mwindows", "-mno-ms-bitfields" }

@@ -14,10 +14,8 @@ namespace gl
 
 class VertexBufferAttribGL : public VertexBufferAttrib
 {
-    GLuint m_Index;
-
 public:
-    VertexBufferAttribGL(const std::shared_ptr<VertexBuffer>& pBuffer, ComponentDatatype type, u32 numOfComponents);
+    VertexBufferAttribGL(u32 index, const std::shared_ptr<VertexBuffer>& pBuffer, ComponentDatatype type, u32 numOfComponents);
     ~VertexBufferAttribGL();
 
     void enable_array(bool enable = true);

@@ -1,4 +1,5 @@
 #include "renderer/RenderWindow.h"
+#include "Scene.h"
 #include <memory>
 
 namespace revel
@@ -8,6 +9,8 @@ class RenderClient
 {
 	std::shared_ptr<renderer::RenderWindow> m_pWindow;
 	bool m_Running;
+
+	std::shared_ptr<Scene> m_pScene;
 
 	void update();
 
