@@ -5,6 +5,7 @@
 #include "renderer/gl/ShaderObjectGL.h"
 #include "renderer/gl/ShaderProgramGL.h"
 #include "renderer/gl/TextureSamplerGL.h"
+#include "renderer/gl/Texture2DGL.h"
 
 #include <stdexcept>
 #include <fstream>
@@ -51,6 +52,15 @@ GraphicsDeviceGL::create_index_buffer(BufferHint hint, u32 size)
 {
     return std::make_shared<IndexBufferGL>(hint, size);
 }
+
+/*
+std::shared_ptr<Texture2D> 
+GraphicsDeviceGL::create_texture_2d(const Image2D<T>& img)
+{
+    //img
+    return std::make_shared<Texture2DGL>();
+}
+*/
 
 std::shared_ptr<Texture2D>
 GraphicsDeviceGL::create_texture_2d(const Texture2DDesc& description)
@@ -117,7 +127,7 @@ GraphicsDeviceGL::create_shader_program_from_file(const std::string &vsf, const 
 
 
 std::shared_ptr<TextureSampler>
-GraphicsDeviceGL::create_texture_2d_sampler(TextureMinFilter min, TextureMagFilter mag, TextureWrap wraps, TextureWrap wrapt, f32 ani)
+GraphicsDeviceGL::create_texture_sampler(TextureMinFilter min, TextureMagFilter mag, TextureWrap wraps, TextureWrap wrapt, f32 ani)
 {
     return std::make_shared<TextureSamplerGL>(min, mag, wraps, wrapt, ani);
 }

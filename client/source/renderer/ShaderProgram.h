@@ -49,20 +49,20 @@ public:
      * @brief Find a uniform in the shader program.
      */
     template <typename T>
-    UniformT<T>& uniform(const std::string& name)
+    Uniform<T>& uniform(const std::string& name)
     {
         auto it = m_Uniforms.find(name);
 
         if (it != m_Uniforms.end())
         {
-            return *reinterpret_cast<UniformT<T>*>(it->second.get());
+            return *reinterpret_cast<Uniform<T>*>(it->second.get());
         }
 
         else throw GpuException("Invalid uniform name");
     }
 
 protected:
-    std::map<std::string, std::unique_ptr<Uniform>> m_Uniforms;
+    std::map<std::string, std::unique_ptr<UniformBase>> m_Uniforms;
     std::map<std::string, ShaderVertexAttrib> m_Attributes;
 
     std::vector<std::unique_ptr<FragmentOutput>> m_FragmentOutputs;
