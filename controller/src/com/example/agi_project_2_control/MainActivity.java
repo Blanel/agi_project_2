@@ -7,6 +7,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,7 +30,6 @@ public final class MainActivity extends Activity
 	 */
 	private static Client client = new Client();	
 	public static Airplane airplane = new Airplane();
-	
 	/**
 	 * Image Viewers
 	 */
@@ -66,6 +66,15 @@ public final class MainActivity extends Activity
 	private int lastFire = -1;
 	private int lastGas = -1;
 	private final Object touchMutex = new Object();
+	
+
+	/**
+	 * Sound
+	 */
+	//private static MediaPlayer fireSounds;// = MediaPlayer.create(this, R.raw.shot);
+	//private static MediaPlayer backgroundMusic;// = MediaPlayer.create(this, R.raw.roxcity);// = MediaPlayer.create(this, R.raw.shot);
+	
+	
 
 	/**
 	 * Starting Threads
@@ -96,8 +105,10 @@ public final class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		new GestureDetector(this);
-
 		
+		//MediaPlayer backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
+		//backgroundMusic.setLooping(true);
+		//backgroundMusic.start();
 		/**
 		 * Sending Image size to server and client type in this case Android.
 		 */
@@ -167,6 +178,7 @@ public final class MainActivity extends Activity
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+				
 			}
 		};
         
@@ -181,6 +193,9 @@ public final class MainActivity extends Activity
 	 */
 	protected void onResume() {
 		super.onResume();
+		//MediaPlayer backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
+		//backgroundMusic.setLooping(true);
+		//backgroundMusic.start();
 		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 	}
 	/**
@@ -188,6 +203,9 @@ public final class MainActivity extends Activity
 	 */
 	protected void onPause() {
 		super.onPause();
+		//MediaPlayer backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
+		//backgroundMusic.setLooping(true);
+		//backgroundMusic.start();
 		mSensorManager.unregisterListener(this);
 	}
 	
@@ -202,25 +220,7 @@ public final class MainActivity extends Activity
 	}
 	
 	public float rotation = 0; 
-	/*
-	private static final int[] rotationImagesXPositiv = {
-		R.drawable.a352, R.drawable.a345, R.drawable.a337, R.drawable.a330,
-		R.drawable.a322, R.drawable.a315, R.drawable.a307, R.drawable.a300,
-		R.drawable.a292, R.drawable.a285, R.drawable.a277, R.drawable.a270,
-		R.drawable.a0,   R.drawable.a7,   R.drawable.a15,  R.drawable.a22, 
-		R.drawable.a30,  R.drawable.a37,  R.drawable.a45,  R.drawable.a52,
-		R.drawable.a60,  R.drawable.a67,  R.drawable.a75,  R.drawable.a82, 
-		R.drawable.a90
-	};
-	private static final int[] rotationImagesXNegative = {
-		R.drawable.a97,  R.drawable.a105, R.drawable.a112, R.drawable.a120,
-		R.drawable.a127, R.drawable.a135, R.drawable.a142, R.drawable.a150,
-		R.drawable.a157, R.drawable.a165, R.drawable.a172, R.drawable.a180,
-		R.drawable.a187, R.drawable.a195, R.drawable.a202, R.drawable.a210,
-		R.drawable.a217, R.drawable.a225, R.drawable.a232, R.drawable.a240,
-		R.drawable.a247, R.drawable.a255, R.drawable.a262
-	};
-	*/
+
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
@@ -235,7 +235,8 @@ public final class MainActivity extends Activity
 		try {
 			client.sendAction("x"+Float.toString(x));
 			client.sendAction("y"+Float.toString(y));
-			//client.sendAction("z"+Float.toString(z));
+			
+			//client.sendAction("z"+Float.toString(z)); No need to send at the moment we do not need to use it.
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -246,6 +247,8 @@ public final class MainActivity extends Activity
 	
 	@Override
     public boolean onTouchEvent(MotionEvent e){
+
+		//MediaPlayer fireSounds = MediaPlayer.create(this, R.raw.shot);
 		synchronized (this.touchMutex){
 			int fire = -1, gas = -1;
 			int n = e.getPointerCount();
@@ -269,17 +272,25 @@ public final class MainActivity extends Activity
 				fireImage.setBackgroundColor(Color.parseColor("#8600ACE0"));
 			}
 			String msg = "";
-			if ((fire != this.lastFire) && (fire != -1))
+			if ((fire != this.lastFire) && (fire != -1)){
+				//this.fireSounds.stop();
+				//this.fireSounds.release();
+				//this.fireSounds.;
+				//fireSounds.start();
+				
 				msg += "fire\n";
-			if (gas != this.lastGas)
+			}
+			if (gas != this.lastGas){
 				msg += gas != -1 ? "+gas"+e.getY()+"\n" : "-gas\n";
-			if (msg.isEmpty() == false)
+			}
+			if (msg.isEmpty() == false){
 				try {
 					client.sendAction(msg + "\n");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+			}
 			
 			this.lastGas = gas;
 			this.lastFire = fire;
