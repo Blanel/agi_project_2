@@ -82,6 +82,8 @@ RenderClient::run()
     auto mesh = geo::Mesh::create_cube();
     auto va = ctx->create_vertex_array(mesh);
 
+    // Load assets
+
     // Manually create a mesh
     auto quad = std::make_shared<geo::Mesh>();
     
@@ -98,6 +100,7 @@ RenderClient::run()
     quadn->data().push_back(vec3(0, 0, 1));
     quadn->data().push_back(vec3(0, 0, 1));
     quadn->data().push_back(vec3(0, 0, 1));
+
     quadt->data().push_back(vec2(0, 0));
     quadt->data().push_back(vec2(1, 0));
     quadt->data().push_back(vec2(1, 1));
@@ -112,11 +115,9 @@ RenderClient::run()
     quadi->data().push_back(2);
     quadi->data().push_back(3);
 
-    auto quadva = ctx->create_vertex_array(quad);
+    //auto text = Device::graphics()->create_texture_2d();
 
-    
-    //R_LOG_INFO("MESH index count: " << mesh->indices<u32>()->count());
-    //R_LOG_INFO("VA index count: " << va->index_count());
+    auto quadva = ctx->create_vertex_array(quad);
 
     auto sp = Device::graphics()->create_shader_program_from_file("passthrough_vs.glsl", 
     															  "passthrough_fs.glsl"); 
@@ -125,6 +126,8 @@ RenderClient::run()
 
     //Create and setup scene
 	auto camera = std::make_shared<PerspectiveCamera>();
+
+	//ctx->texture_unit(0).set_texture();
 
 	//Only use one (dynamic?) light source
 	//Light sun(LightType::DIRECTIONAL);
@@ -152,12 +155,15 @@ RenderClient::run()
 
     Image2D<pixel::RGBA_u8> terrain(heightmap);
 
-    TGA::write("D:/hello.tga", terrain);
+    //TGA::write("D:/hello.tga", terrain);
 
     //Generate clouds
     //Set render target
     //std::vector<Texture2D> cloud;
 
+    mat4 projection = Transform::perspective(60.0f, 16.0/9.0, 0.1, 100.0);
+    mat4 viewmatrix = mat4::Identity;
+    mat4 modelmatrix = mat4::Identity;
 
 	while (this->is_running())
 	{

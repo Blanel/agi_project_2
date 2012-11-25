@@ -60,6 +60,8 @@ public:
     virtual void set_framebuffer(const std::shared_ptr<Framebuffer>& fb) = 0;
     */
 
+    const std::unique_ptr<TextureUnit>& texture_unit(u32 i = 0) { return m_TextureUnits.at(i); }
+
     virtual void clear(const std::shared_ptr<ClearState>& cs) = 0;
     virtual void clear(const ClearState& cs) = 0;
 
