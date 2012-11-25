@@ -19,8 +19,8 @@ namespace revel
 
 	void TerrainManager::generate()
 	{
-		TerrainTile* test;
-		tiles.insert(std::make_pair(vec2_i32(0,0), test));
+		//TerrainTile* test;
+		//tiles.insert(std::make_pair(vec2_i32(0,0), test));
 		if(tiles.size() == 0)
 		{
 			std::cout<<"Herp";

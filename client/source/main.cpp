@@ -14,8 +14,8 @@ int main(int argc, char *argv[])
 
 
 	//SimplexNoise::debug();
-	TerrainManager test(20, 5, 5,5);
-	test.generate();
+	//TerrainManager test(20, 5, 5,5);
+	//test.generate();
 
 	RenderClient renderclient;
 	return renderclient.run();
