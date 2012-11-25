@@ -240,24 +240,8 @@ public final class MainActivity extends Activity
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		/*
-		if (x <= 0.0f){
-			if (y > 9.2f){
-				;
-				//this.imageViewArrow.setImageResource(rotationImagesXPositiv[0]);
-			}
-			int n = 24;
-			for(int i = 1; i < n ; i++){
-				if(y > -9.2f*i && y <= -8.4f*i){
-					;
-					//this.imageViewArrow.setImageResource(rotationImagesXPositiv[i]);
-				}
-			}
-			if (y < -9.2f){
-				;
-				//this.imageViewArrow.setImageResource(rotationImagesXPositiv[24]);
-			}
-		}*/
+		float degree = (float) ((Math.atan2(x, y)+Math.PI/2)*180/Math.PI);
+		
 	}
 	
 	@Override
@@ -288,7 +272,7 @@ public final class MainActivity extends Activity
 			if ((fire != this.lastFire) && (fire != -1))
 				msg += "fire\n";
 			if (gas != this.lastGas)
-				msg += gas != -1 ? "+gas\n" : "-gas\n";
+				msg += gas != -1 ? "+gas"+e.getY()+"\n" : "-gas\n";
 			if (msg.isEmpty() == false)
 				try {
 					client.sendAction(msg + "\n");
@@ -296,6 +280,7 @@ public final class MainActivity extends Activity
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+			
 			this.lastGas = gas;
 			this.lastFire = fire;
 			return true;

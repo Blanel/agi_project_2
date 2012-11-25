@@ -32,15 +32,13 @@ public class Program implements Runnable {
 			}
 		}
 	}
-	
 	@Override
 	public void run(){
 		try (ServerSocket server = new ServerSocket(15003, 20)) {
 			final ArrayList<Client> clients = new ArrayList<>();
 			for(;;){
 				final Socket socket = server.accept();
-				Thread thread = new Thread("Client-" + socket.getRemoteSocketAddress())
-						{
+				Thread thread = new Thread("Client-" + socket.getRemoteSocketAddress()){
 							/**
 							 * logik f�r tr�den(non-Javadoc)
 							 * @see java.lang.Thread#run()
@@ -65,7 +63,7 @@ public class Program implements Runnable {
 								}
 							}
 						};		
-				thread.setDaemon(true); // N�r alla ickedemoner har avslutat s� st�ngs programmet av.
+				thread.setDaemon(true);
 				thread.start();
 			}
 		} catch (IOException e) {
