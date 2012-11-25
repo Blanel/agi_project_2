@@ -12,11 +12,13 @@ namespace geo
 Mesh::Mesh()
     : m_PrimitiveType(PrimitiveType::TRIANGLES)
     , m_WindingOrder(WindingOrder::COUNTER_CLOCKWISE)
+    , m_Attributes()
+    , m_pIndices(std::make_shared<Indices<u32>>())
 {
 }
 
 void
-Mesh::add_vertex_attrib(const VertexAttributePtr& va)
+Mesh::add_vertex_attrib(const VertexAttribPtr& va)
 {
     m_Attributes.push_back(va);
 }
@@ -57,7 +59,7 @@ Mesh::set_winding_order(WindingOrder order)
     m_WindingOrder = order;
 }
 
-const std::vector<VertexAttributePtr>&
+const std::vector<VertexAttribPtr>&
 Mesh::vertex_attrib_array() const
 {
     return m_Attributes;

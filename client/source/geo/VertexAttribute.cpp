@@ -3,27 +3,46 @@
 namespace revel
 {
 
-namespace detail
-{
-
-VertexAttributeBase::VertexAttributeBase(const std::string &name, VertexAttributeType type)
-    : m_Name(name)
-    , m_Type(type)
-{
-}
-
 const std::string&
-VertexAttributeBase::name() const
+VertexAttribBase::name() const
 {
     return m_Name;
 }
 
-VertexAttributeType
-VertexAttributeBase::type() const
+VertexAttribType
+VertexAttribBase::type() const
 {
     return m_Type;
 }
 
-}
+template <> 
+void VertexAttrib<f32>::init()
+{
+    m_Type = VertexAttribType::FLOAT32;
+};
+
+template <>
+void VertexAttrib<vec2_f32>::init()
+{
+    m_Type = VertexAttribType::FLOAT32_2;
+};
+
+template <> 
+void VertexAttrib<vec3_f32>::init()
+{
+    m_Type = VertexAttribType::FLOAT32_3;
+};
+
+template <>
+void VertexAttrib<vec4_f32>::init()
+{
+    m_Type = VertexAttribType::FLOAT32_4;
+};
+
+template <> 
+void VertexAttrib<point3>::init()
+{
+    m_Type = VertexAttribType::FLOAT32_3;
+};
 
 }
