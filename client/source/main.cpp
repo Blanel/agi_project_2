@@ -5,6 +5,8 @@
 
 #include "RenderClient.h"
 
+#include "TerrainManager.h"
+
 using namespace std;
 using namespace revel;
 using namespace revel::renderer;
@@ -19,8 +21,9 @@ int main(int argc, char *argv[])
 
 	R_LOG_INFO("NOISE: " << x);
 
-	SimplexNoise::debug();
-
+	//SimplexNoise::debug();
+	TerrainManager test(20, 5, 5,5);
+	test.generate();
 	RenderClient renderclient;
 	return renderclient.run();
 }

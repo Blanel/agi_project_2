@@ -9,11 +9,12 @@ namespace revel
 	class TerrainManager
 	{
 		int optimalChunks;
+		int minChunks;
 		std::map<vec2_i32, TerrainTile*> tiles;
 		int chunkRes;
 		int chunkLen;
 	public:
-		TerrainManager(int optimalChunks, int chunkRes, int chunkLen);
+		TerrainManager(int optimalChunks, int minChunks, int chunkRes, int chunkLen);
 		~TerrainManager();
 		void prune();
 		void generate();

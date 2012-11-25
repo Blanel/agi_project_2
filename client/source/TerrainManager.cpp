@@ -4,11 +4,12 @@
 
 namespace revel
 {
-	TerrainManager::TerrainManager(int optimalChunks, int chunkRes, int chunkLen)
+	TerrainManager::TerrainManager(int optimalChunks, int minChunks, int chunkRes, int chunkLen)
 	{
 		TerrainManager::optimalChunks = optimalChunks;
 		TerrainManager::chunkLen = chunkLen;
 		TerrainManager::chunkRes = chunkRes;
+		TerrainManager::minChunks = minChunks;
 	}
 
 	TerrainManager::~TerrainManager()
@@ -18,13 +19,17 @@ namespace revel
 
 	void TerrainManager::generate()
 	{
-		if(TerrainManager::tiles.size() == 0)
+		TerrainTile* test;
+		tiles.insert(std::make_pair(vec2_i32(0,0), test));
+		if(tiles.size() == 0)
 		{
+			std::cout<<"Herp";
 			//GetSpawn from server
 			//Generate chunks around spawn
 		}
 		else
 		{
+			std::cout<<"Derp";
 			//Loop through all player positions
 			//	For each player, check so adjacent chunks have been generated.
 			//		If false, generate new chunk and add to list.
