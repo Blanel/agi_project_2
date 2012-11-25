@@ -31,11 +31,8 @@ public:
     void copy_raw_from_sys_mem(void* pSource, u32 offsetInByte, u32 lengthInByte)
     {
         this->bind();
-
         ::glBufferData(GL_ELEMENT_ARRAY_BUFFER, lengthInByte, pSource, GL_STATIC_DRAW);
-
-
-        //void* pSourceAddr = pSource + offsetInByte;
+        m_SizeInBytes = lengthInByte;
         this->unbind();
     }
 };

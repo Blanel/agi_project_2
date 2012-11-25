@@ -13,6 +13,9 @@
 #include <iostream>
 #include <memory>
 
+#include "renderer/DrawState.h"
+#include "renderer/SceneState.h"
+
 #include "renderer/GpuException.h"
 #include "Device.h"
 
@@ -30,7 +33,7 @@ RenderContextGL::RenderContextGL(RenderWindowGL *win)
 {
     assert(win);
     m_pWindow = win;
-
+	glewExperimental = GL_TRUE;
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
@@ -104,6 +107,12 @@ std::shared_ptr<VertexArray>
 RenderContextGL::create_vertex_array()
 {
     return std::make_shared<VertexArrayGL>();
+}
+
+void
+RenderContextGL::draw(PrimitiveType type, const std::shared_ptr<DrawState>& drawstate, const std::shared_ptr<SceneState>& scenestate)
+{
+
 }
 
 void

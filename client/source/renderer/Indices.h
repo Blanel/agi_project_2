@@ -10,14 +10,11 @@ namespace revel
 
 enum class IndexType
 {
-    UNDEFINED,
     U8,
     U16,
-    U32
+    U32,
+    UNDEFINED
 };
-
-namespace detail
-{
 
 class IndicesBase
 {
@@ -30,54 +27,50 @@ public:
     IndicesBase() {}
     virtual ~IndicesBase() {}
 
+    //virtual void add_triangle(u8 a, u8 b, u8 c) = 0;
+    //virtual void add_triangle(u16 a, u16 b, u16 c) = 0;
     virtual void add_triangle(u32 a, u32 b, u32 c) = 0;
-    virtual u32 count() = 0;
+    virtual u32 size_in_bytes() const = 0;
+    virtual u32 count() const = 0;
 };
 
 template <typename T>
 class Indices : public IndicesBase
 {
-protected:
     std::vector<T> m_Indices;
+    void init();
 
 public:
-    Indices(IndexType type) {}
+    Indices(u32 capacity = 0) : m_Indices(capacity) { init(); }
     virtual ~Indices() {}
 
+    //virtual void add_triangle(u8 a, u8 b, u8 c) { m_Indices.push_back(a); m_Indices.push_back(b); m_Indices.push_back(c); }
+    //virtual void add_triangle(u16 a, u16 b, u16 c) { m_Indices.push_back(a); m_Indices.push_back(b); m_Indices.push_back(c); }
     virtual void add_triangle(u32 a, u32 b, u32 c) { m_Indices.push_back(a); m_Indices.push_back(b); m_Indices.push_back(c); }
-    virtual u32 count() { return m_Indices.size(); }
+
+    virtual u32 count() const { return m_Indices.size(); }
+    virtual u32 size_in_bytes() const { return sizeof(T) * count(); }
+
     std::vector<T>& data() { return m_Indices; }
     const std::vector<T>& data() const { return m_Indices; }
 };
 
-} // ::revel::detail
-
-class IndicesU16
-    : public detail::Indices<u16>
+template <typename T>
+void Indices<T>::init()
 {
-public:
-    IndicesU16()
-        : detail::Indices<u16>(IndexType::U16)
-    {
+    m_Type = IndexType::UNDEFINED;
+}
 
-    }
-};
+template <>
+void Indices<u8>::init();
 
-class IndicesU32
-    : public detail::Indices<u32>
-{
-public:
-    IndicesU32()
-        : detail::Indices<u32>(IndexType::U32)
-    {
+template <>
+void Indices<u16>::init();
 
-    }
-};
+template <>
+void Indices<u32>::init();
 
-typedef IndicesU16 indices_u16;
-typedef IndicesU32 indices_u32;
-
-typedef std::shared_ptr<detail::IndicesBase> IndicesPtr;
+typedef std::shared_ptr<IndicesBase> IndicesPtr;
 
 
 } // ::revel

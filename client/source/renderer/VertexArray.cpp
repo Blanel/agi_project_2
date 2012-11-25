@@ -21,23 +21,16 @@ VertexArray::~VertexArray()
 bool
 VertexArray::has_index_buffer() const
 {
-    if (m_pIndexBuffer != nullptr)
-        return true;
-    else
-        return false;
+    return (m_pIndexBuffer != nullptr);
 }
 
 u32
 VertexArray::index_count() const
 {
-    return m_IndexCount;
-    /*
-
     if (m_pIndexBuffer != nullptr)
         return m_pIndexBuffer->count();
     else
         return 0;
-    */
 }
 
 VertexBufferAttrib*

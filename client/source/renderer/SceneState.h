@@ -32,10 +32,13 @@ protected:
     math::mat4 m_ProjectionMatrix;
     math::mat4 m_ModelViewProjectionMatrix;
 
-    std::shared_ptr<Camera> m_pCamera;
+    //std::shared_ptr<Camera> m_pCamera;
 
 public:
-    SceneState();
+    SceneState()
+    {
+
+    }
 
     const math::mat4& model_matrix() const
     {
@@ -87,6 +90,7 @@ public:
         m_ModelViewProjectionMatrix = m;
     }
 
+/*
     const std::shared_ptr<Camera>& camera()
     {
         return m_pCamera;
@@ -96,6 +100,7 @@ public:
     {
         m_pCamera = cam;
     }
+*/
 
 };
 
