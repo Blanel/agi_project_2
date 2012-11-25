@@ -164,7 +164,6 @@ public:
 	}
 };
 
-
 } // ::revel
 
 #endif // IMAGE2D_H_

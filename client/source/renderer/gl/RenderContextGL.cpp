@@ -33,7 +33,7 @@ RenderContextGL::RenderContextGL(RenderWindowGL *win)
 {
     assert(win);
     m_pWindow = win;
-
+	glewExperimental = GL_TRUE;
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 

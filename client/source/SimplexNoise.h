@@ -4,6 +4,8 @@
 #include <cmath>
 #include "math/RMath.h"
 
+#include <random>
+#include <algorithm>
 #include "Log.h"
 
 // borrowed code from www.itn.liu.se/~stegu/simplexnoise/SimplexNoise.java
@@ -51,8 +53,10 @@ class SimplexNoise
 	static f32 F2, G2, F3, G3, F4, G4;
 
 
-	static std::array<u8, 512> init_array()
+	static std::array<u8, 512> init_array(int seed)
 	{
+		std::mt19937 g(seed);
+		std::shuffle(p.begin(), p.end(), g);
 		std::array<u8, 512> array = p;
 
 		for (auto& i : array)
