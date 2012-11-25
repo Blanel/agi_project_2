@@ -12,6 +12,7 @@ class Texture2DGL : public Texture2D
 {
 public:
 	Texture2DGL()
+		: Texture2D()
 	{
 		::glGenTextures(1, &m_Identifier);
 	}
@@ -21,16 +22,21 @@ public:
 		::glDeleteTextures(1, &m_Identifier);
 	}
 
-	virtual void bind()
+	virtual void bind() override
 	{
 		::glBindTexture(GL_TEXTURE_2D, m_Identifier);
 	}
 
-	virtual void unbind()
+	virtual void unbind() override
 	{
 		::glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
+	virtual void copy_raw_from_sys_mem()
+	{
+		this->bind();
+
+	}
 
 };
 
