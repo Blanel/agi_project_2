@@ -17,8 +17,12 @@ class Light
 	vec3 	m_Direction;
 	
 public:
-	Light(LightType type)
-	{}
+	Light();
+	virtual ~Light();
+
+	const point3& position() const;
+	void set_position(f32 x, f32 y, f32 z);
+	void set_position(const point3& p);
 	
 };
 	
