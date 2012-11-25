@@ -18,13 +18,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -43,6 +43,13 @@
     <IncludePath>$(SolutionDir)..\source;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)..\..\bin\</OutDir>
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>client</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)..\..\bin\</OutDir>
+    <TargetName>client</TargetName>
+    <IncludePath>$(SolutionDir)..\source;$(IncludePath)</IncludePath>
+    <SourcePath>$(SolutionDir)..\source</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -54,6 +61,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)..\externals\vs2012\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>glew32.lib;SDLmain.lib;SDL.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -62,20 +70,26 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\externals\vs2012\include\SDL;$(SolutionDir)..\externals\vs2012\include\glm;$(SolutionDir)..\externals\vs2012\include\GL;$(SolutionDir)..\externals\vs2012\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\externals\vs2012\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;SDLmain.lib;SDL.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\Camera.cpp" />
+    <ClCompile Include="..\..\source\Config.cpp" />
     <ClCompile Include="..\..\source\Device.cpp" />
     <ClCompile Include="..\..\source\geo\Mesh.cpp" />
     <ClCompile Include="..\..\source\geo\VertexAttribute.cpp" />
     <ClCompile Include="..\..\source\Log.cpp" />
     <ClCompile Include="..\..\source\main.cpp" />
+    <ClCompile Include="..\..\source\RenderClient.cpp" />
     <ClCompile Include="..\..\source\renderer\Blending.cpp" />
     <ClCompile Include="..\..\source\renderer\BufferHint.cpp" />
     <ClCompile Include="..\..\source\renderer\ClearState.cpp" />
@@ -104,8 +118,11 @@
     <ClCompile Include="..\..\source\renderer\GraphicsDevice.cpp" />
     <ClCompile Include="..\..\source\renderer\GraphicsDeviceCreator.cpp" />
     <ClCompile Include="..\..\source\renderer\IndexBuffer.cpp" />
+    <ClCompile Include="..\..\source\renderer\Indices.cpp" />
+    <ClCompile Include="..\..\source\renderer\Material.cpp" />
     <ClCompile Include="..\..\source\renderer\PrimitiveRestart.cpp" />
     <ClCompile Include="..\..\source\renderer\ProgramPointSize.cpp" />
+    <ClCompile Include="..\..\source\renderer\RenderContext.cpp" />
     <ClCompile Include="..\..\source\renderer\RenderWindow.cpp" />
     <ClCompile Include="..\..\source\renderer\SceneState.cpp" />
     <ClCompile Include="..\..\source\renderer\ScissorTest.cpp" />
@@ -120,11 +137,15 @@
     <ClCompile Include="..\..\source\renderer\VertexBuffer.cpp" />
     <ClCompile Include="..\..\source\renderer\VertexBufferAttrib.cpp" />
     <ClCompile Include="..\..\source\renderer\WindingOrder.cpp" />
+    <ClCompile Include="..\..\source\SceneObject.cpp" />
+    <ClCompile Include="..\..\source\SimplexNoise.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Agi12P2.h" />
+    <ClInclude Include="..\..\source\BoundingVolume.h" />
     <ClInclude Include="..\..\source\Camera.h" />
     <ClInclude Include="..\..\source\Color.h" />
+    <ClInclude Include="..\..\source\Config.h" />
     <ClInclude Include="..\..\source\Device.h" />
     <ClInclude Include="..\..\source\geo\Mesh.h" />
     <ClInclude Include="..\..\source\geo\Rectangle.h" />
@@ -143,6 +164,8 @@
     <ClInclude Include="..\..\source\math\Vector2.h" />
     <ClInclude Include="..\..\source\math\Vector3.h" />
     <ClInclude Include="..\..\source\math\Vector4.h" />
+    <ClInclude Include="..\..\source\Octree.h" />
+    <ClInclude Include="..\..\source\RenderClient.h" />
     <ClInclude Include="..\..\source\renderer\Blending.h" />
     <ClInclude Include="..\..\source\renderer\BufferHint.h" />
     <ClInclude Include="..\..\source\renderer\ClearState.h" />
@@ -154,12 +177,14 @@
     <ClInclude Include="..\..\source\renderer\FacetCulling.h" />
     <ClInclude Include="..\..\source\renderer\FragmentOutput.h" />
     <ClInclude Include="..\..\source\renderer\Framebuffer.h" />
+    <ClInclude Include="..\..\source\renderer\gl\FramebufferGL.h" />
     <ClInclude Include="..\..\source\renderer\gl\GraphicsDeviceGL.h" />
     <ClInclude Include="..\..\source\renderer\gl\IndexBufferGL.h" />
     <ClInclude Include="..\..\source\renderer\gl\RenderContextGL.h" />
     <ClInclude Include="..\..\source\renderer\gl\RenderWindowGL.h" />
     <ClInclude Include="..\..\source\renderer\gl\ShaderObjectGL.h" />
     <ClInclude Include="..\..\source\renderer\gl\ShaderProgramGL.h" />
+    <ClInclude Include="..\..\source\renderer\gl\Texture2DGL.h" />
     <ClInclude Include="..\..\source\renderer\gl\TextureSamplerGL.h" />
     <ClInclude Include="..\..\source\renderer\gl\TextureUnitGL.h" />
     <ClInclude Include="..\..\source\renderer\gl\UniformGL.h" />
@@ -172,6 +197,7 @@
     <ClInclude Include="..\..\source\renderer\GraphicsDeviceCreator.h" />
     <ClInclude Include="..\..\source\renderer\IndexBuffer.h" />
     <ClInclude Include="..\..\source\renderer\Indices.h" />
+    <ClInclude Include="..\..\source\renderer\Material.h" />
     <ClInclude Include="..\..\source\renderer\PrimitiveRestart.h" />
     <ClInclude Include="..\..\source\renderer\PrimitiveType.h" />
     <ClInclude Include="..\..\source\renderer\ProgramPointSize.h" />
@@ -193,6 +219,8 @@
     <ClInclude Include="..\..\source\renderer\VertexBufferAttrib.h" />
     <ClInclude Include="..\..\source\renderer\VertexComponent.h" />
     <ClInclude Include="..\..\source\renderer\WindingOrder.h" />
+    <ClInclude Include="..\..\source\SceneObject.h" />
+    <ClInclude Include="..\..\source\SimplexNoise.h" />
     <ClInclude Include="..\..\source\StopWatch.h" />
     <ClInclude Include="..\..\source\Types.h" />
   </ItemGroup>
