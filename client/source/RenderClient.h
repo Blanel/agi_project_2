@@ -1,3 +1,6 @@
+#ifndef RENDERCLIENT_H_
+#define RENDERCLIENT_H_
+
 #include "renderer/RenderWindow.h"
 #include "Scene.h"
 #include <memory>
@@ -27,3 +30,5 @@ public:
 
 
 }
+
+#endif // RENDERCLIENT_H_
