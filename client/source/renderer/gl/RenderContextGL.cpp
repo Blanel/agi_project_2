@@ -112,22 +112,25 @@ RenderContextGL::create_vertex_array()
 void
 RenderContextGL::draw(PrimitiveType type, const std::shared_ptr<DrawState>& drawstate, const std::shared_ptr<SceneState>& scenestate)
 {
-
+    R_LOG_ERR("Not yet implemented");
 }
 
 void
 RenderContextGL::draw(const std::shared_ptr<geo::Mesh> &mesh)
 {
+    R_LOG_ERR("Not yet implemented");
 }
 
 void
 RenderContextGL::draw(const std::shared_ptr<VertexBuffer>& vbo)
 {
-    vbo->bind();
+    R_LOG_ERR("Not yet implemented");
 
-    ::glDrawArrays(GL_POINTS, 0, 8);
+    //vbo->bind();
 
-    vbo->unbind();
+    //::glDrawArrays(GL_POINTS, 0, 8);
+
+    //vbo->unbind();
 }
 
 } // ::revel::renderer::gl
