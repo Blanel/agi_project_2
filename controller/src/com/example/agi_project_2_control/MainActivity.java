@@ -133,6 +133,7 @@ public final class MainActivity extends Activity
 		 */
 		backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
 		//backgroundMusic.setLooping(true);
+		backgroundMusic.setVolume(2.8f, 2.8f);
 		backgroundMusic.start();
 		
 		
@@ -297,7 +298,7 @@ public final class MainActivity extends Activity
 	private int motorsEndSoundPtr = 0;
 	private int motorsSoundPtr = 0;
 	
-	private MediaPlayer[] fireSoundPool = new MediaPlayer[10];
+	private MediaPlayer[] fireSoundPool = new MediaPlayer[20];
 	private MediaPlayer[] motorsStartSoundPool = new MediaPlayer[3];
 	private MediaPlayer[] motorsEndPool = new MediaPlayer[3];
 	private MediaPlayer[] motorsSoundPool = new MediaPlayer[3];
