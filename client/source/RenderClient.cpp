@@ -33,6 +33,8 @@ using namespace revel::math;
 using namespace revel::renderer;
 //using namespace boost::asio;
 
+#include "Terrain.h"
+
 namespace revel
 {
 
@@ -83,7 +85,6 @@ RenderClient::run()
     auto va = ctx->create_vertex_array(mesh);
 
     // Load assets
-
     // Manually create a mesh
     auto quad = std::make_shared<geo::Mesh>();
     
@@ -133,27 +134,26 @@ RenderClient::run()
 	//Light sun(LightType::DIRECTIONAL);
 	//sun.set_direction(vec3(0, -1, 0));
 
+	sp->use();
 	auto& mvp = sp->uniform<mat4>("r_MVP");
-	mvp = mat4::Identity;
+	auto p = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 100.0f) * Transform::translate(1, 0, -50);
+	//mvp.set_value();
+	mvp = p;
+
+	R_LOG_INFO(p);
 
     Scene scene(ctx);
     scene.set_camera(camera);
 
     //scene.root().add_child(GeoNode(mesh));
 
-    Image2D<pixel::Gray_f32> heightmap(128, 128);
 
-	f32 factor = 64.0f;
+    auto heightmap = Terrain::generate_heightmap(128, 128);
+    auto tmesh = Terrain::heightmap_to_mesh(heightmap);
+	auto tmeshva = ctx->create_vertex_array(tmesh);
 
-    for (u32 i = 0; i < 128; ++i)
-    {
-    	for (u32 j = 0; j < 128; ++j)
-    	{
-			heightmap(i, j) = (SimplexNoise::noise(i / factor, j / factor) + 1.0f) / 2;
-    	}
-    }
+	R_LOG_INFO("MESH: " << tmesh->indices<u32>()->data().size());
 
-    Image2D<pixel::RGBA_u8> terrain(heightmap);
 
     //TGA::write("D:/hello.tga", terrain);
 
@@ -161,9 +161,9 @@ RenderClient::run()
     //Set render target
     //std::vector<Texture2D> cloud;
 
-    mat4 projection = Transform::perspective(60.0f, 16.0/9.0, 0.1, 100.0);
-    mat4 viewmatrix = mat4::Identity;
-    mat4 modelmatrix = mat4::Identity;
+    // mat4 projection = Transform::perspective(60.0f, 16.0/9.0, 0.1, 1000.0);
+    // mat4 viewmatrix = Transform::translate(1, 0, -10);
+    // mat4 modelmatrix = mat4::Identity;
 
 	while (this->is_running())
 	{
@@ -212,9 +212,17 @@ RenderClient::run()
 
 		quadva->bind();
 		sp->use();
-		::glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		::glDrawElements(GL_POINTS, 6, GL_UNSIGNED_INT, 0);
+		
+		tmeshva->bind();
+		sp->use();
+
+		::glDrawElements(GL_TRIANGLES, tmesh->indices<u32>()->data().size(), GL_UNSIGNED_INT, 0);
+		//::glDrawElements(GL_POINTS, tmeshp->data().size(), GL_UNSIGNED_INT, 0);
     	//va->bind();
     	//::glDrawElements(GL_POINTS, 24, GL_UNSIGNED_INT, 0);
+
+
 
     	//ctx->draw(PrimitiveType::TRIANGLES, drawstate, scenestate);
 
