@@ -57,6 +57,7 @@ public:
     {}
 
     virtual Uniform& operator=(const T& value) = 0;
+    virtual void set_value(const T& value) = 0;
 };
 
 
