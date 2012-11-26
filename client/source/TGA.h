@@ -1,3 +1,6 @@
+#ifndef TGA_H_
+#define TGA_H_
+
 #include "Image2D.h"
 
 namespace revel
@@ -121,3 +124,5 @@ public:
 };
 
 }
+
+#endif // TGA_H_
