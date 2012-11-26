@@ -75,16 +75,15 @@ GraphicsDeviceGL::create_shader_program(const std::string& vs, const std::string
     ShaderObjectGL fragment(ShaderType::FRAGMENT, fs);
     ShaderObjectGL geometry(ShaderType::GEOMETRY, gs);
 
+    R_LOG_ERR("Not yet implementet");
+
     return nullptr;
 }
 
 std::shared_ptr<ShaderProgram>
 GraphicsDeviceGL::create_shader_program(const std::string& vs, const std::string& fs)
 {
-    ShaderObjectGL vertex(ShaderType::VERTEX, vs);
-    ShaderObjectGL fragment(ShaderType::FRAGMENT, fs);
-
-    return nullptr;
+    return std::make_shared<ShaderProgramGL>(vs, fs);
 }
 
 std::shared_ptr<ShaderProgram>
