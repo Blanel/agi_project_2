@@ -12,6 +12,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,6 +22,9 @@ import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.MediaController;
+import android.widget.VideoView;
+
 import java.io.*;
 import java.net.*;
 
@@ -39,7 +43,8 @@ public final class MainActivity extends Activity
 	 */
 	private ImageView fireImage;
 	private ImageView gasImage;
-	public ImageView viewBKImage;
+	//public ImageView viewBKImage;
+
 	public ImageView viewLifeImage;
 	public ImageView imageRedFlash; 
 	public ImageView imageViewNavigation;
@@ -72,13 +77,18 @@ public final class MainActivity extends Activity
 	private int lastGas = -1;
 	private final Object touchMutex = new Object();
 	
-
+	/**
+	 * Video
+	 */
+	public VideoView viewBKVideo;
 	/**
 	 * Sound
 	 */
-	private static MediaPlayer fireSounds;// = MediaPlayer.create(this, R.raw.shot);
-	private static MediaPlayer backgroundMusic;// = MediaPlayer.create(this, R.raw.roxcity);// = MediaPlayer.create(this, R.raw.shot);
-	
+	private static MediaPlayer fireSounds;
+	private static MediaPlayer backgroundMusic;
+	private static MediaPlayer motorsStartSound;
+	private static MediaPlayer motorsSound;
+	private static MediaPlayer motorsEndSound;
 
 	/**
 	 * Starting Threads
@@ -110,6 +120,17 @@ public final class MainActivity extends Activity
 		setContentView(R.layout.activity_main);
 		new GestureDetector(this);
 		
+		showVideo();
+		
+		
+		//viewBKVideo = (VideoView) findViewById(R.id.videoViewBK);
+		//viewBKVideo = MediaPlayer.create(this, R.raw.introvideo);
+		//viewBKVideo.start();
+		
+		
+		/**
+		 * Sounds 
+		 */
 		backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
 		//backgroundMusic.setLooping(true);
 		backgroundMusic.start();
@@ -145,7 +166,7 @@ public final class MainActivity extends Activity
 		 */
 		this.fireImage 				= (ImageView)findViewById(R.id.imageFire);
 		this.gasImage 				= (ImageView)findViewById(R.id.imageGas);
-		this.viewBKImage 			= (ImageView)findViewById(R.id.imageViewBK);
+		//this.viewBKImage 			= (ImageView)findViewById(R.id.imageViewBK);
 		this.viewLifeImage 			= (ImageView)findViewById(R.id.imageViewLife);
 		this.imageRedFlash 			= (ImageView)findViewById(R.id.imageRedFlash);
 		this.imageViewNavigation 	= (ImageView)findViewById(R.id.imageViewNavigation);
@@ -233,7 +254,10 @@ public final class MainActivity extends Activity
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
 	}
-	
+	/**
+	 * Checking the accelerometer sensor for change and sends the change to the server and rotates the 
+	 * arrow image at the screen.
+	 */
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		float x = event.values[0];
@@ -261,21 +285,23 @@ public final class MainActivity extends Activity
 		int off = (rot.getWidth() - myImg.getWidth()) / 2;
 		Bitmap result = Bitmap.createBitmap(rot, off, off, myImg.getWidth(), myImg.getHeight());
 		circle.setImageBitmap(result);
-		
-		/*float R[] = {(float) Math.cos(radian), (float) -Math.sin(radian),
-		             (float) Math.sin(radian), (float) Math.cos(radian)};
-		*//*
-		this.imageViewArrow.
-		this.imageViewArrow.setImageDrawable(drawable);
-		Matrix matrix = this.imageViewArrow.getImageMatrix();
-		matrix.postRotate(degree);
-		this.imageViewArrow.setImageMatrix(matrix);
-		*/	
-		
-		
 	}
+/*
+	private static MediaPlayer motorsStartSound;
+	private static MediaPlayer motorsSound;
+	private static MediaPlayer motorsEndSound;
+*/
+	
 	private int fireSoundPtr = 0;
+	private int motorsStartSoundPtr = 0;
+	private int motorsEndSoundPtr = 0;
+	private int motorsSoundPtr = 0;
+	
 	private MediaPlayer[] fireSoundPool = new MediaPlayer[10];
+	private MediaPlayer[] motorsStartSoundPool = new MediaPlayer[3];
+	private MediaPlayer[] motorsEndPool = new MediaPlayer[3];
+	private MediaPlayer[] motorsSoundPool = new MediaPlayer[3];
+	
 	@Override
     public boolean onTouchEvent(MotionEvent e){
 
@@ -288,6 +314,13 @@ public final class MainActivity extends Activity
 			    if (x < (int)(this.screenWidth*0.5)){
 			    	gasImage.setBackgroundColor(Color.parseColor("#86E0AC00"));
 			    	gas = i;
+				    	if (this.motorsSoundPool[this.motorsSoundPtr] == null){
+				    		this.motorsSoundPool[this.motorsSoundPtr] = MediaPlayer.create(this, R.raw.motors);
+				    	}
+			    		if(!motorsSoundPool[this.motorsSoundPtr].isPlaying()){
+			    			this.motorsSoundPool[this.motorsSoundPtr++].start();
+			    		}
+						this.motorsSoundPtr %= this.motorsSoundPool.length;
 			    }
 			    else {
 			    	fire = i;
@@ -313,6 +346,20 @@ public final class MainActivity extends Activity
 			}
 			if (gas != this.lastGas){
 				msg += gas != -1 ? "+gas"+e.getY()+"\n" : "-gas\n";
+				/*
+				if (msg.equals("+gas")){
+			    	if (this.motorsStartSoundPool[this.motorsStartSoundPtr] == null)
+						this.motorsStartSoundPool[this.motorsStartSoundPtr] = MediaPlayer.create(this, R.raw.motorsstart);
+					this.motorsStartSoundPool[this.motorsStartSoundPtr++].start();
+					this.motorsStartSoundPtr %= this.motorsStartSoundPool.length;
+				}
+				if (msg.equals("-gas")){
+					this.motorsStartSoundPool[this.motorsStartSoundPtr-1].stop();
+			    	if (this.motorsEndPool[this.motorsEndSoundPtr] == null)
+						this.motorsEndPool[this.motorsEndSoundPtr] = MediaPlayer.create(this, R.raw.motorsend);
+					this.motorsEndPool[this.motorsEndSoundPtr++].start();
+					this.motorsEndSoundPtr %= this.motorsEndPool.length;
+				}*/
 			}
 			if (msg.isEmpty() == false){
 				try {
@@ -399,6 +446,18 @@ public final class MainActivity extends Activity
 	}
 	public void  setRenderer(GLSurfaceView.Renderer renderer){	
 	}
+
+	private String srcPath = "android.resource://com.example.agi_project_2_control/raw/introvideo";
+	private void showVideo(){
+		VideoView vd = (VideoView)findViewById(R.id.videoViewBK);
+		Uri uri = Uri.parse(srcPath);
+		//Uri uri = Uri.parse("android.resource://package/"+R.raw.introvideo);
+		vd.setVideoURI(uri);
+		vd.start();;
+	}
+	
+	
+	
 	public Handler mainHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             if (msg.what == 0) {
