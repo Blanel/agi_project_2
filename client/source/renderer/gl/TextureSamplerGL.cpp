@@ -20,6 +20,18 @@ TextureSamplerGL::TextureSamplerGL(TextureMinFilter min, TextureMagFilter mag, T
     set_texture_wrap_t(t);
 }
 
+TextureSamplerGL::TextureSamplerGL(TextureMinFilter min, TextureMagFilter mag, TextureWrap s, TextureWrap t, TextureWrap r, f32 ani)
+    : TextureSampler(min, mag, s, t, r, ani)
+{
+    ::glGenSamplers(1, &m_Identifier);
+
+    set_min_filter(min);
+    set_mag_filter(mag);
+    set_texture_wrap_s(s);
+    set_texture_wrap_t(t);
+    set_texture_wrap_r(r);
+}
+
 TextureSamplerGL::~TextureSamplerGL()
 {
     ::glDeleteSamplers(1, &m_Identifier);
@@ -82,6 +94,22 @@ TextureSamplerGL::set_texture_wrap_t(TextureWrap wrap)
         ::glSamplerParameteri(m_Identifier, GL_TEXTURE_WRAP_T, GL_REPEAT); break;
     case TextureWrap::MIRRORED_REPEAT:
         ::glSamplerParameteri(m_Identifier, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT); break;
+    }
+}
+
+void
+TextureSamplerGL::set_texture_wrap_r(TextureWrap wrap)
+{
+    m_WrapR = wrap;
+
+    switch (wrap)
+    {
+    case TextureWrap::CLAMP:
+        ::glSamplerParameteri(m_Identifier, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE); break;
+    case TextureWrap::REPEAT:
+        ::glSamplerParameteri(m_Identifier, GL_TEXTURE_WRAP_R, GL_REPEAT); break;
+    case TextureWrap::MIRRORED_REPEAT:
+        ::glSamplerParameteri(m_Identifier, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT); break;
     }
 }
 

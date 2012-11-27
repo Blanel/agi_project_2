@@ -14,6 +14,17 @@ TextureSampler::TextureSampler(TextureMinFilter min, TextureMagFilter mag, Textu
 {
 }
 
+TextureSampler::TextureSampler(TextureMinFilter min, TextureMagFilter mag, TextureWrap s, TextureWrap t, TextureWrap r, f32 ani)
+    : m_MinFilter(min)
+    , m_MagFilter(mag)
+    , m_WrapS(s)
+    , m_WrapT(t)
+    , m_WrapR(r)
+    , m_MaxAnistropy(ani)
+{
+}
+
+
 TextureSampler::~TextureSampler()
 {
 
@@ -39,6 +50,12 @@ TextureSampler::wrap_s() const
 
 TextureWrap
 TextureSampler::wrap_t() const
+{
+    return m_WrapT;
+}
+
+TextureWrap
+TextureSampler::wrap_r() const
 {
     return m_WrapT;
 }

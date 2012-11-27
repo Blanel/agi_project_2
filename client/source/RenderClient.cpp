@@ -38,6 +38,9 @@ using namespace revel::renderer;
 #include "Terrain.h"
 #include "Plane.h"
 
+
+#include "Image3D.h"
+
 namespace revel
 {
 
@@ -145,10 +148,14 @@ RenderClient::run()
 	//Light sun(LightType::DIRECTIONAL);
 	//sun.set_direction(vec3(0, -1, 0));
 
+	Image3D<pixel::Gray_f32> image3d(16, 16, 16);
+
 	sp->use();
 	auto& mvp = sp->uniform<mat4>("r_MVP");
 	//auto p = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::translate(1, 0, -100) * Transform::rotate_x(math::PI * 2);
 	//mvp.set_value();
+
+	auto framebuffer = ctx->create_framebuffer();
 	
 
 	//R_LOG_INFO(p);
