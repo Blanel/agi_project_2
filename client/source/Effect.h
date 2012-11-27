@@ -15,6 +15,7 @@ class Effect
 {
 	class Technique
 	{
+		std::vector<RenderPass> m_RenderPasses;
 
 	};
 	
