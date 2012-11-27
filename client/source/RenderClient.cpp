@@ -6,6 +6,7 @@
 #include "renderer/RenderState.h"
 #include "renderer/DrawState.h"
 #include "renderer/RenderContext.h"
+#include "renderer/ShaderProgram.h"
 #include "geo/Mesh.h"
 
 #include "Color.h"
@@ -17,8 +18,24 @@
 #include <string>
 #include "SDL.h"
 
+//#include <boost/array.hpp>
+//#include <boost/asio.hpp>
+
+#include "Image2D.h"
+#include "SimplexNoise.h"
+
+#include "TGA.h"
+
+#include "math/Matrix4x4.h"
+
+#include "SDL_Image.h"
+
 using namespace std;
+using namespace revel::math;
 using namespace revel::renderer;
+//using namespace boost::asio;
+
+#include "TerrainTile.h"
 
 namespace revel
 {
@@ -53,6 +70,11 @@ RenderClient::run()
 {
 	m_Running = true;
 
+	//TODO: Check boost sockets
+	//boost::asio::io_service io_service;
+	//boost::asio::ip::tcp::resolver resolver(io_service);
+	//resolver::query query()
+
 	auto& ctx = active_window()->context();
 
     auto clearstate = std::make_shared<ClearState>();
@@ -63,14 +85,95 @@ RenderClient::run()
     auto renderstate = std::make_shared<RenderState>();
     auto mesh = geo::Mesh::create_cube();
     auto va = ctx->create_vertex_array(mesh);
+
+    // Load assets
+    // Manually create a mesh
+    auto quad = std::make_shared<geo::Mesh>();
     
-    R_LOG_INFO("MESH index count: " << mesh->indices<u32>()->count());
-    R_LOG_INFO("VA index count: " << va->index_count());
+    auto quadp = quad->create_vertex_attrib<point3>("position");
+	auto quadn = quad->create_vertex_attrib<vec3>("normal");
+    auto quadt = quad->create_vertex_attrib<vec2>("texcoord");
+
+    quadp->data().push_back(point3(-0.5, -0.5, 0));
+    quadp->data().push_back(point3( 0.5, -0.5, 0));
+    quadp->data().push_back(point3( 0.5,  0.5, 0));
+    quadp->data().push_back(point3(-0.5,  0.5, 0));
+
+    quadn->data().push_back(vec3(0, 0, 1));
+    quadn->data().push_back(vec3(0, 0, 1));
+    quadn->data().push_back(vec3(0, 0, 1));
+    quadn->data().push_back(vec3(0, 0, 1));
+
+    quadt->data().push_back(vec2(0, 0));
+    quadt->data().push_back(vec2(1, 0));
+    quadt->data().push_back(vec2(1, 1));
+    quadt->data().push_back(vec2(0, 1));
+
+    auto quadi = quad->indices<u32>();
+    quadi->data().push_back(0);
+    quadi->data().push_back(1);
+    quadi->data().push_back(2);
+
+    quadi->data().push_back(0);
+    quadi->data().push_back(2);
+    quadi->data().push_back(3);
+
+
+    SDL_Surface* image = IMG_Load("E:/ground_grass_1024_tile.jpg");
+
+    //auto text = Device::graphics()->create_texture_2d();
+
+    auto quadva = ctx->create_vertex_array(quad);
 
     auto sp = Device::graphics()->create_shader_program_from_file("passthrough_vs.glsl", 
     															  "passthrough_fs.glsl"); 
     
-    auto drawstate = std::make_shared<DrawState>(renderstate, sp, va);
+    //auto drawstate = std::make_shared<DrawState>(renderstate, sp, va);
+
+    //Create and setup scene
+	auto camera = std::make_shared<PerspectiveCamera>();
+
+	//ctx->texture_unit(0).set_texture();
+
+	//Only use one (dynamic?) light source
+	//Light sun(LightType::DIRECTIONAL);
+	//sun.set_direction(vec3(0, -1, 0));
+
+	sp->use();
+	auto& mvp = sp->uniform<mat4>("r_MVP");
+	//auto p = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::translate(1, 0, -100) * Transform::rotate_x(math::PI * 2);
+	//mvp.set_value();
+	
+
+	//R_LOG_INFO(p);
+
+    Scene scene(ctx);
+    scene.set_camera(camera);
+
+    //scene.root().add_child(GeoNode(mesh));
+
+
+    //auto heightmap 	= Terrain::generate_heightmap(128, 128, 24.0f, 2.5f);
+    //auto tmesh 		= Terrain::heightmap_to_mesh(heightmap);
+	TerrainTile tt(0,0,128,10, 2.5);
+	auto tmesh = tt.mesh;
+	auto tmeshva 	= ctx->create_vertex_array(tmesh);
+
+	R_LOG_INFO("MESH: " << tmesh->indices<u32>()->data().size());
+
+
+    //TGA::write("D:/hello.tga", terrain);
+
+    //Generate clouds
+    //Set render target
+    //std::vector<Texture2D> cloud;
+
+    // mat4 projection = Transform::perspective(60.0f, 16.0/9.0, 0.1, 1000.0);
+    // mat4 viewmatrix = Transform::translate(1, 0, -10);
+    // mat4 modelmatrix = mat4::Identity;
+
+	StopWatch timer;
+
 
 	while (this->is_running())
 	{
@@ -109,15 +212,31 @@ RenderClient::run()
 	        }
 
     	}
-
     	//update data
+    	//poll socket
 
 
     	//draw data
-    	ctx->clear(clearstate);
+		ctx->clear(clearstate);
+		//ctx->render(scene);
 
-    	va->bind();
-    	::glDrawElements(GL_POINTS, 24, GL_UNSIGNED_INT, 0);
+		mvp = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::rotate_x(-math::PI/6) * Transform::translate(0, 0, -75);
+
+		quadva->bind();
+		sp->use();
+		::glDrawElements(GL_POINTS, 6, GL_UNSIGNED_INT, 0);
+		
+		
+		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+		tmeshva->bind();
+		sp->use();
+		::glDrawElements(GL_TRIANGLES, tmesh->indices<u32>()->data().size(), GL_UNSIGNED_INT, 0);
+		
+
+		//::glDrawElements(GL_POINTS, tmeshp->data().size(), GL_UNSIGNED_INT, 0);
+    	//va->bind();
+    	//::glDrawElements(GL_POINTS, 24, GL_UNSIGNED_INT, 0);
 
     	//ctx->draw(PrimitiveType::TRIANGLES, drawstate, scenestate);
 

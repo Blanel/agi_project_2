@@ -169,17 +169,17 @@ ShaderProgramGL::setup_uniforms()
         switch (type)
         {
         case GL_FLOAT:
-            m_Uniforms[name] = std::unique_ptr<UniformGL_f32>(new UniformGL_f32(loc, name, 0)); break;
+            m_Uniforms[name] = std::unique_ptr<UniformGL<f32>>(new UniformGL<f32>(loc, name, 0)); break;
         case GL_FLOAT_VEC2:
-            m_Uniforms[name] = std::unique_ptr<UniformGL_vec2>(new UniformGL_vec2(loc, name, vec2::Zero)); break;
+            m_Uniforms[name] = std::unique_ptr<UniformGL<vec2>>(new UniformGL<vec2>(loc, name, vec2::Zero)); break;
         case GL_FLOAT_VEC3:
-            m_Uniforms[name] = std::unique_ptr<UniformGL_vec3>(new UniformGL_vec3(loc, name, vec3::Zero)); break;
+            m_Uniforms[name] = std::unique_ptr<UniformGL<vec3>>(new UniformGL<vec3>(loc, name, vec3::Zero)); break;
         case GL_FLOAT_VEC4:
-            m_Uniforms[name] = std::unique_ptr<UniformGL_vec4>(new UniformGL_vec4(loc, name, vec4::Zero)); break;
+            m_Uniforms[name] = std::unique_ptr<UniformGL<vec4>>(new UniformGL<vec4>(loc, name, vec4::Zero)); break;
         case GL_FLOAT_MAT3:
-            m_Uniforms[name] = std::unique_ptr<UniformGL_mat3>(new UniformGL_mat3(loc, name, math::mat3::Identity)); break;
+            m_Uniforms[name] = std::unique_ptr<UniformGL<math::mat3>>(new UniformGL<math::mat3>(loc, name, math::mat3::Identity)); break;
         case GL_FLOAT_MAT4:
-            m_Uniforms[name] = std::unique_ptr<UniformGL_mat4>(new UniformGL_mat4(loc, name, math::mat4::Identity)); break;
+            m_Uniforms[name] = std::unique_ptr<UniformGL<math::mat4>>(new UniformGL<math::mat4>(loc, name, math::mat4::Identity)); break;
 
         default:
             throw GpuException("Unknown type in OpenGL GLSL Uniform");

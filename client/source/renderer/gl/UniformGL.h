@@ -27,165 +27,110 @@ class UniformBlock
 };
 
 
-
-class UniformGL_f32
-    : public UniformT<f32>
+template <typename T>
+class UniformGL : public Uniform<T>
 {
     i32 m_Location;
 
 public:
-    UniformGL_f32(i32 loc, const std::string& name, f32 value)
-        : UniformT<f32>(name, UniformDatatype::FLOAT32)
+    UniformGL(i32 loc, const std::string& name, const T& value)
+        : Uniform<T>(name, UniformDatatype::UNDEFINED)
         , m_Location(loc)
     {
-        m_Value = value;
+        set_value(value);
     }
 
-    UniformGL_f32& operator=(const f32& value)
-    {
-        if (value != m_Value)
-        {
-            m_Value = value;
-            ::glUniform1f(m_Location, m_Value);
-        }
-
-        return *this;
-    }
-
+    void set_value(const T& value);
+    UniformGL& operator=(const T& value);
 };
-
-class UniformGL_vec2
-    : public UniformT<vec2>
+ 
+template <>   
+UniformGL<f32>::UniformGL(i32 loc, const std::string& name, const f32& value)
+    : Uniform<f32>(name, UniformDatatype::FLOAT32)
+    , m_Location(loc)
 {
-    i32 m_Location;
-
-public:
-    UniformGL_vec2(i32 loc, const std::string& name, const vec2& value)
-        : UniformT<vec2>(name, UniformDatatype::VEC2_F32)
-        , m_Location(loc)
-    {
-        m_Value = value;
-    }
-
-    UniformGL_vec2& operator=(const vec2& value)
-    {
-        if (value != m_Value)
-        {
-            m_Value = value;
-            ::glUniform2f(m_Location, m_Value.x, m_Value.y);
-        }
-
-        return *this;
-    }
-};
-
-
-class UniformGL_vec3
-    : public UniformT<vec3>
-{
-    i32 m_Location;
-
-public:
-    UniformGL_vec3(i32 loc, const std::string& name, const vec3& value)
-        : UniformT<vec3>(name, UniformDatatype::VEC3_F32)
-        , m_Location(loc)
-    {
-        m_Value = value;
-    }
-
-    UniformGL_vec3& operator=(const vec3& value)
-    {
-        if (value != m_Value)
-        {
-            m_Value = value;
-            ::glUniform3f(m_Location, m_Value.x, m_Value.y, m_Value.z);
-        }
-
-        return *this;
-    }
-
-};
-
-
-class UniformGL_vec4
-    : public UniformT<vec4>
-{
-    i32 m_Location;
-
-public:
-    UniformGL_vec4(i32 loc, const std::string& name, const vec4& value)
-        : UniformT<vec4>(name, UniformDatatype::VEC4_F32)
-        , m_Location(loc)
-    {
-        m_Value = value;
-    }
-
-    UniformGL_vec4& operator=(const vec4& value)
-    {
-        if (value != m_Value)
-        {
-            m_Value = value;
-            ::glUniform4f(m_Location, m_Value.x, m_Value.y, m_Value.z, m_Value.w);
-        }
-
-        return *this;
-    }
-};
-
-class UniformGL_mat3
-    : public UniformT<math::mat3>
-{
-    i32 m_Location;
-
-public:
-    UniformGL_mat3(i32 loc, const std::string& name, const math::mat3_f32& value = math::mat3_f32::Identity)
-        : UniformT<math::mat3_f32>(name, UniformDatatype::MAT3_F32)
-        , m_Location(loc)
-    {
-        m_Value = value;
-        ::glUniformMatrix3fv(m_Location, 1, GL_TRUE, &value.e[0]);
-    }
-
-    UniformGL_mat3& operator=(const math::mat3& value)
-    {
-        if (value != m_Value)
-        {
-            m_Value = value;
-            ::glUniformMatrix3fv(m_Location, 1, GL_TRUE, &value.e[0]);
-        }
-
-        return *this;
-    }
-};
-
-class UniformGL_mat4
-    : public UniformT<math::mat4>
-{
-    i32 m_Location;
-
-public:
-    UniformGL_mat4(i32 loc, const std::string& name, const math::mat4& value)
-        : UniformT<math::mat4>(name, UniformDatatype::MAT4_F32)
-        , m_Location(loc)
-    {
-    }
-
-    UniformGL_mat4& operator=(const math::mat4& value)
-    {
-        if (value != m_Value)
-        {
-            m_Value = value;
-            ::glUniformMatrix4fv(m_Location, 1, GL_TRUE, &value.e[0]);    
-        }
-        
-        return *this;
-    }
-};
-
-
+    set_value(value);
 }
+
+template <>   
+UniformGL<vec2>::UniformGL(i32 loc, const std::string& name, const vec2& value)
+    : Uniform<vec2>(name, UniformDatatype::VEC2_F32)
+    , m_Location(loc)
+{
+    set_value(value);
 }
+
+template <>   
+UniformGL<vec3>::UniformGL(i32 loc, const std::string& name, const vec3& value)
+    : Uniform<vec3>(name, UniformDatatype::VEC3_F32)
+    , m_Location(loc)
+{
+    set_value(value);
 }
+
+template <>   
+UniformGL<vec4>::UniformGL(i32 loc, const std::string& name, const vec4& value)
+    : Uniform<vec4>(name, UniformDatatype::VEC4_F32)
+    , m_Location(loc)
+{
+    set_value(value);
+}
+
+template <>   
+UniformGL<math::mat3>::UniformGL(i32 loc, const std::string& name, const math::mat3& value)
+    : Uniform<math::mat3>(name, UniformDatatype::MAT3_F32)
+    , m_Location(loc)
+{
+    set_value(value);
+}
+
+template <>   
+UniformGL<math::mat4>::UniformGL(i32 loc, const std::string& name, const math::mat4& value)
+    : Uniform<math::mat4>(name, UniformDatatype::MAT4_F32)
+    , m_Location(loc)
+{
+    set_value(value);
+}
+
+template<>
+UniformGL<f32>& UniformGL<f32>::operator=(const f32& value);
+
+template<>
+UniformGL<vec2>& UniformGL<vec2>::operator=(const vec2& value);
+
+template<>
+UniformGL<vec3>& UniformGL<vec3>::operator=(const vec3& value);
+
+template<>
+UniformGL<vec4>& UniformGL<vec4>::operator=(const vec4& value);
+
+template<>
+UniformGL<math::mat3>& UniformGL<math::mat3>::operator=(const math::mat3& value);
+
+template<>
+UniformGL<math::mat4>& UniformGL<math::mat4>::operator=(const math::mat4& value);
+
+template<>
+void UniformGL<f32>::set_value(const f32& value);
+
+template<>
+void UniformGL<vec2>::set_value(const vec2& value);
+
+template<>
+void UniformGL<vec3>::set_value(const vec3& value);
+
+template<>
+void UniformGL<vec4>::set_value(const vec4& value);
+
+template<>
+void UniformGL<math::mat3>::set_value(const math::mat3& value);
+
+template<>
+void UniformGL<math::mat4>::set_value(const math::mat4& value);
+
+} // ::revel::renderer::gl
+} // ::revel::renderer
+} // ::revel
 
 
 #endif // UNIFORMGL_H

@@ -42,7 +42,7 @@
     <SourcePath>$(SolutionDir)..\source</SourcePath>
     <IncludePath>$(SolutionDir)..\source;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)..\..\bin\</OutDir>
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <TargetName>client</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -77,7 +77,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)..\externals\vs2012\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;SDLmain.lib;SDL.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;SDLmain.lib;SDL.lib;OpenGL32.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -85,8 +85,11 @@
     <ClCompile Include="..\..\source\Camera.cpp" />
     <ClCompile Include="..\..\source\Config.cpp" />
     <ClCompile Include="..\..\source\Device.cpp" />
+    <ClCompile Include="..\..\source\GameState.cpp" />
     <ClCompile Include="..\..\source\geo\Mesh.cpp" />
     <ClCompile Include="..\..\source\geo\VertexAttribute.cpp" />
+    <ClCompile Include="..\..\source\Image2D.cpp" />
+    <ClCompile Include="..\..\source\Light.cpp" />
     <ClCompile Include="..\..\source\Log.cpp" />
     <ClCompile Include="..\..\source\main.cpp" />
     <ClCompile Include="..\..\source\RenderClient.cpp" />
@@ -137,20 +140,26 @@
     <ClCompile Include="..\..\source\renderer\VertexBuffer.cpp" />
     <ClCompile Include="..\..\source\renderer\VertexBufferAttrib.cpp" />
     <ClCompile Include="..\..\source\renderer\WindingOrder.cpp" />
+    <ClCompile Include="..\..\source\Scene.cpp" />
     <ClCompile Include="..\..\source\SceneObject.cpp" />
     <ClCompile Include="..\..\source\SimplexNoise.cpp" />
+    <ClCompile Include="..\..\source\TerrainManager.cpp" />
+    <ClCompile Include="..\..\source\TerrainTile.cpp" />
+    <ClCompile Include="..\..\source\TGA.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\Agi12P2.h" />
     <ClInclude Include="..\..\source\BoundingVolume.h" />
     <ClInclude Include="..\..\source\Camera.h" />
     <ClInclude Include="..\..\source\Color.h" />
     <ClInclude Include="..\..\source\Config.h" />
     <ClInclude Include="..\..\source\Device.h" />
+    <ClInclude Include="..\..\source\Effect.h" />
+    <ClInclude Include="..\..\source\GameState.h" />
     <ClInclude Include="..\..\source\geo\Mesh.h" />
     <ClInclude Include="..\..\source\geo\Rectangle.h" />
     <ClInclude Include="..\..\source\geo\VertexAttribute.h" />
     <ClInclude Include="..\..\source\Image2D.h" />
+    <ClInclude Include="..\..\source\Light.h" />
     <ClInclude Include="..\..\source\Log.h" />
     <ClInclude Include="..\..\source\math\Constants.h" />
     <ClInclude Include="..\..\source\math\Matrix3x3.h" />
@@ -165,6 +174,7 @@
     <ClInclude Include="..\..\source\math\Vector3.h" />
     <ClInclude Include="..\..\source\math\Vector4.h" />
     <ClInclude Include="..\..\source\Octree.h" />
+    <ClInclude Include="..\..\source\Plane.h" />
     <ClInclude Include="..\..\source\RenderClient.h" />
     <ClInclude Include="..\..\source\renderer\Blending.h" />
     <ClInclude Include="..\..\source\renderer\BufferHint.h" />
@@ -219,9 +229,13 @@
     <ClInclude Include="..\..\source\renderer\VertexBufferAttrib.h" />
     <ClInclude Include="..\..\source\renderer\VertexComponent.h" />
     <ClInclude Include="..\..\source\renderer\WindingOrder.h" />
+    <ClInclude Include="..\..\source\Scene.h" />
     <ClInclude Include="..\..\source\SceneObject.h" />
     <ClInclude Include="..\..\source\SimplexNoise.h" />
     <ClInclude Include="..\..\source\StopWatch.h" />
+    <ClInclude Include="..\..\source\TerrainManager.h" />
+    <ClInclude Include="..\..\source\TerrainTile.h" />
+    <ClInclude Include="..\..\source\TGA.h" />
     <ClInclude Include="..\..\source\Types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -44,11 +44,13 @@ public:
     virtual void bind() = 0;
     virtual void unbind() = 0;
 
-    virtual const std::unique_ptr<VertexBufferAttrib>& create_attrib(const std::shared_ptr<VertexBuffer>& buffer,
+    virtual const std::unique_ptr<VertexBufferAttrib>& create_attrib(u32 index,
+                                                                     const std::shared_ptr<VertexBuffer>& buffer,
                                                                      ComponentDatatype type,
                                                                      u32 ncomponents) = 0;
 
-    virtual const std::unique_ptr<VertexBufferAttrib>& create_attrib(const std::string& name,
+    virtual const std::unique_ptr<VertexBufferAttrib>& create_attrib(u32 index,
+                                                                     const std::string& name,
                                                                      const std::shared_ptr<VertexBuffer>& buffer,
                                                                      ComponentDatatype type,
                                                                      u32 ncomponents) = 0;

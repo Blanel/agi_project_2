@@ -12,6 +12,7 @@ namespace renderer
 
 class VertexBufferAttrib
 {
+    u32 m_Index;
     std::shared_ptr<VertexBuffer> m_pBuffer;
     ComponentDatatype m_ComponentType;
     u32 m_NumOfComponents;
@@ -20,8 +21,9 @@ class VertexBufferAttrib
     u32 m_StrideInBytes;
 
 public:
-    VertexBufferAttrib(const std::shared_ptr<VertexBuffer>& pBuffer, ComponentDatatype type, u32 numOfComponents)
-        : m_pBuffer(pBuffer)
+    VertexBufferAttrib(u32 index, const std::shared_ptr<VertexBuffer>& pBuffer, ComponentDatatype type, u32 numOfComponents)
+        : m_Index(index)
+        , m_pBuffer(pBuffer)
         , m_ComponentType(type)
         , m_NumOfComponents(numOfComponents)
     {
@@ -30,6 +32,7 @@ public:
 
     virtual ~VertexBufferAttrib() {}
 
+    u32 index() const { return m_Index; }
     virtual void enable_array(bool enable = true) = 0;
 };
 

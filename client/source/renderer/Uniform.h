@@ -24,58 +24,42 @@ enum class UniformDatatype
     MAT3X4_F32,
     MAT4X2_F32,
     MAT4X3_F32,
-    MAT4_F32
+    MAT4_F32,
+    UNDEFINED
 };
 
-
-class Uniform
+class UniformBase
 {
-public:
-
-protected:
     std::string m_Name;
     UniformDatatype m_Datatype;
 
-    Uniform(const std::string& name, UniformDatatype type);
-
 public:
-    virtual ~Uniform();
+    UniformBase(const std::string& name, UniformDatatype type = UniformDatatype::UNDEFINED);
+    virtual ~UniformBase();
 
-    UniformDatatype datatype() const
-    {
-        return m_Datatype;
-    }
-
-    const std::string& name() const
-    {
-        return m_Name;
-    }
-
+    UniformDatatype datatype() const;
+    const std::string& name() const;
 };
 
 
 template <typename T>
-class UniformT
-    : public Uniform
+class Uniform : public UniformBase
 {
-protected:    
+protected:
     T m_Value;
-
+  
 public:
-    UniformT(const std::string& name, UniformDatatype type)
-        : Uniform(name, type)
-    {
+    Uniform(const std::string& name, UniformDatatype type = UniformDatatype::UNDEFINED)
+        : UniformBase(name, type)
+    {}
 
-    }
+    virtual ~Uniform()
+    {}
 
-    virtual ~UniformT()
-    {
-
-    }
-
-public:
-    virtual UniformT& operator=(const T& value) = 0;
+    virtual Uniform& operator=(const T& value) = 0;
+    virtual void set_value(const T& value) = 0;
 };
+
 
 }
 }

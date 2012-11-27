@@ -19,7 +19,9 @@ public:
     TextureUnitGL(u32 n);
 
     void set_texture(const std::shared_ptr<Texture2D> &tex);
-    void set_texture_sampler(const std::shared_ptr<TextureSampler> &sampler);
+    void set_sampler(const std::shared_ptr<TextureSampler> &sampler);
+    const std::shared_ptr<Texture2D>& texture();
+    const std::shared_ptr<TextureSampler>& sampler();
 };
 
 }

@@ -91,6 +91,7 @@ public:
 
 };
 
+/*
 class OrthographicCamera : public Camera
 {
 public:
@@ -101,6 +102,8 @@ public:
 
     math::mat4 projection_matrix() const;
 };
+*/
+
 
 }
 

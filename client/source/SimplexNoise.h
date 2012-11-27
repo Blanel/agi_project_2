@@ -1,3 +1,5 @@
+#ifndef SIMPLEXNOISE_H_
+#define SIMPLEXNOISE_H_
 #include "Types.h"
 #include <array>
 #include <vector>
@@ -85,3 +87,5 @@ public:
 };
 	
 } // ::revel
+
+#endif

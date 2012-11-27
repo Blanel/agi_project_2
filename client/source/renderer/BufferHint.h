@@ -8,9 +8,9 @@ namespace renderer
 
 enum class BufferHint
 {
-    STATIC_DRAW,
-    STREAM_DRAW,
-    DYNAMIC_DRAW
+    STATIC,
+    STREAM,
+    DYNAMIC
 };
 
 
