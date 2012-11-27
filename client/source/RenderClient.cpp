@@ -35,7 +35,7 @@ using namespace revel::math;
 using namespace revel::renderer;
 //using namespace boost::asio;
 
-#include "Terrain.h"
+#include "TerrainTile.h"
 
 namespace revel
 {
@@ -153,8 +153,10 @@ RenderClient::run()
     //scene.root().add_child(GeoNode(mesh));
 
 
-    auto heightmap 	= Terrain::generate_heightmap(128, 128, 24.0f, 2.5f);
-    auto tmesh 		= Terrain::heightmap_to_mesh(heightmap);
+    //auto heightmap 	= Terrain::generate_heightmap(128, 128, 24.0f, 2.5f);
+    //auto tmesh 		= Terrain::heightmap_to_mesh(heightmap);
+	TerrainTile tt(0,0,128,10, 2.5);
+	auto tmesh = tt.mesh;
 	auto tmeshva 	= ctx->create_vertex_array(tmesh);
 
 	R_LOG_INFO("MESH: " << tmesh->indices<u32>()->data().size());
