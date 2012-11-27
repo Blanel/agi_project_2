@@ -50,12 +50,12 @@ public:
 	 * @param p Point
 	 * @return True if the points are equal.
 	 */
-    bool operator==(const Point3& p)
+    bool operator==(const Point3& p) const
     { 
         return (x == p.x && y == p.y && z == p.z); 
     }
 
-    bool operator!=(const Point3& p)
+    bool operator!=(const Point3& p) const
     { 
         return !(*this == p);
     }

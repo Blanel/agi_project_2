@@ -8,6 +8,38 @@ namespace gl
 {
 
 
+template <>   
+UniformGL<vec4>::UniformGL(i32 loc, const std::string& name, const vec4& value)
+    : Uniform<vec4>(name, UniformDatatype::VEC4_F32)
+    , m_Location(loc)
+{
+    set_value(value);
+}
+
+template <>   
+UniformGL<point3>::UniformGL(i32 loc, const std::string& name, const point3& value)
+    : Uniform<point3>(name, UniformDatatype::VEC3_F32)
+    , m_Location(loc)
+{
+    set_value(value);
+}
+
+
+template <>   
+UniformGL<math::mat3>::UniformGL(i32 loc, const std::string& name, const math::mat3& value)
+    : Uniform<math::mat3>(name, UniformDatatype::MAT3_F32)
+    , m_Location(loc)
+{
+    set_value(value);
+}
+
+template <>   
+UniformGL<math::mat4>::UniformGL(i32 loc, const std::string& name, const math::mat4& value)
+    : Uniform<math::mat4>(name, UniformDatatype::MAT4_F32)
+    , m_Location(loc)
+{
+    set_value(value);
+}
 
 
 template<>
@@ -49,6 +81,17 @@ UniformGL<vec4>& UniformGL<vec4>::operator=(const vec4& value)
     if (value != m_Value)
     {
  		set_value(value);
+    }
+
+    return *this;
+}
+
+template<>
+UniformGL<point3>& UniformGL<point3>::operator=(const point3& value)
+{
+    if (value != m_Value)
+    {
+        set_value(value);
     }
 
     return *this;
@@ -102,6 +145,13 @@ void UniformGL<vec4>::set_value(const vec4& value)
 {
 	m_Value = value;
     ::glUniform4f(m_Location, m_Value.x, m_Value.y, m_Value.z, m_Value.w);
+}
+
+template<>
+void UniformGL<point3>::set_value(const point3& value)
+{
+    m_Value = value;
+    ::glUniform3f(m_Location, m_Value.x, m_Value.y, m_Value.z);
 }
 
 template<>

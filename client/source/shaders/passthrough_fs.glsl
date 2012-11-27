@@ -1,8 +1,8 @@
-#version 400
+#version 410
 
 out vec4 FragmentColor;
 
 void main()
 {
-    FragmentColor = vec4(.8, 0.7, 0.9, 1.0);
+    FragmentColor = vec4(0.5, 0.6, 0.4, 1.0);
 }
