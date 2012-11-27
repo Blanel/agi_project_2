@@ -4,12 +4,14 @@
 
 namespace revel
 {
-	TerrainManager::TerrainManager(int optimalChunks, int minChunks, int chunkRes, int chunkLen)
+	TerrainManager::TerrainManager(std::shared_ptr<revel::renderer::RenderContext> ctx, int optimalChunks, int minChunks, int chunkRes, float chunkLen, float chunkHei)
 	{
 		TerrainManager::optimalChunks = optimalChunks;
 		TerrainManager::chunkLen = chunkLen;
 		TerrainManager::chunkRes = chunkRes;
 		TerrainManager::minChunks = minChunks;
+		TerrainManager::ctx = ctx;
+		TerrainManager::chunkHei = chunkHei;
 	}
 
 	TerrainManager::~TerrainManager()
@@ -23,7 +25,7 @@ namespace revel
 		//tiles.insert(std::make_pair(vec2_i32(0,0), test));
 		if(tiles.size() == 0)
 		{
-			std::cout<<"Herp";
+			tiles.insert(std::make_pair(vec2_i32(0,0), std::make_shared<TerrainTile>(TerrainTile(ctx,0,0,chunkRes,chunkLen,chunkHei))));
 			//GetSpawn from server
 			//Generate chunks around spawn
 		}
@@ -35,6 +37,16 @@ namespace revel
 			//		If false, generate new chunk and add to list.
 		}
 
+	}
+
+	std::shared_ptr<renderer::VertexArray> TerrainManager::get_chunk(int x, int y)
+	{
+		std::map<vec2_i32, std::shared_ptr<TerrainTile>>::iterator it;
+		it = tiles.find(vec2_i32(x,y));
+		if(it != tiles.end())
+			return it->second->va;
+		else
+			return false;
 	}
 
 	void TerrainManager::prune()

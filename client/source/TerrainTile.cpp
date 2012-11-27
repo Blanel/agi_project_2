@@ -1,11 +1,12 @@
 #include "TerrainTile.h"
 #include "SimplexNoise.h"
+#include "geo/Mesh.h"
 
 namespace revel
 {
-	TerrainTile::TerrainTile(float x, float y, int res, float len, float hei)
+	TerrainTile::TerrainTile(std::shared_ptr<renderer::RenderContext> ctx, float x, float y, int res, float len, float hei)
 	{
-		mesh = std::make_shared<geo::Mesh>();    
+		auto mesh = std::make_shared<geo::Mesh>();    
 	    auto meshp = mesh->create_vertex_attrib<point3>("position");
 	    auto meshi = mesh->indices<u32>();
 		
@@ -31,6 +32,7 @@ namespace revel
 	    		meshi->add_triangle(i*res+j+1, i*res+j, i*res+j+res);
 			}
 		}
+		va = ctx->create_vertex_array(mesh);
 	}
 
 	TerrainTile::~TerrainTile()

@@ -36,6 +36,7 @@ using namespace revel::renderer;
 //using namespace boost::asio;
 
 #include "TerrainTile.h"
+#include "TerrainManager.h"
 #include "Plane.h"
 
 
@@ -145,11 +146,13 @@ RenderClient::run()
 
     //auto heightmap 	= Terrain::generate_heightmap(128, 128, 24.0f, 2.5f);
     //auto tmesh 		= Terrain::heightmap_to_mesh(heightmap);
-	TerrainTile tt(0,0,128,10, 2.5);
-	auto tmesh = tt.mesh;
-	auto tmeshva 	= ctx->create_vertex_array(tmesh);
+	TerrainManager tm(ctx, 4, 1, 128, 10, 2.5);
+	tm.generate();
+	auto tmeshva1  = tm.get_chunk(0,0);
+	
+	
 
-	R_LOG_INFO("MESH: " << tmesh->indices<u32>()->data().size());
+	//R_LOG_INFO("MESH: " << tmesh1->indices<u32>()->data().size());
 
 
     //TGA::write("D:/hello.tga", terrain);
@@ -225,10 +228,10 @@ RenderClient::run()
 		
 		::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-		tmeshva->bind();
+		tmeshva1->bind();
 		sp->use();
 		mvp = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::rotate_x(-math::PI/12) * Transform::translate(0, 0, -75);
-		::glDrawElements(GL_TRIANGLES, tmesh->indices<u32>()->data().size(), GL_UNSIGNED_INT, 0);
+		::glDrawElements(GL_TRIANGLES, tmeshva1->index_count(), GL_UNSIGNED_INT, 0);
 		
 
 		//::glDrawElements(GL_POINTS, tmeshp->data().size(), GL_UNSIGNED_INT, 0);

@@ -5,6 +5,9 @@
 #include "Types.h"
 #include "math/Vector2.h"
 #include "TerrainTile.h"
+#include "renderer/RenderContext.h"
+
+
 
 namespace revel
 {
@@ -12,15 +15,20 @@ namespace revel
 	{
 		int optimalChunks;
 		int minChunks;
-		std::map<vec2_i32, TerrainTile*> tiles;
+		std::map<vec2_i32, std::shared_ptr<TerrainTile>> tiles;
 		int chunkRes;
-		int chunkLen;
+		float chunkLen;
+		float chunkHei;
+		std::shared_ptr<renderer::RenderContext> ctx;
+		
 
 	public:
-		TerrainManager(int optimalChunks, int minChunks, int chunkRes, int chunkLen);
+		TerrainManager(std::shared_ptr<renderer::RenderContext> ctx, int optimalChunks, int minChunks, int chunkRes, float chunkLen, float chunkHei);
 		~TerrainManager();
 		void prune();
 		void generate();
+		
+		std::shared_ptr<renderer::VertexArray> TerrainManager::get_chunk(int x, int y);
 	};
 }
 #endif
