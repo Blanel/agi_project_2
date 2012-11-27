@@ -28,6 +28,8 @@
 
 #include "math/Matrix4x4.h"
 
+#include "SDL_Image.h"
+
 using namespace std;
 using namespace revel::math;
 using namespace revel::renderer;
@@ -116,6 +118,9 @@ RenderClient::run()
     quadi->data().push_back(2);
     quadi->data().push_back(3);
 
+
+    SDL_Surface* image = IMG_Load("E:/ground_grass_1024_tile.jpg");
+
     //auto text = Device::graphics()->create_texture_2d();
 
     auto quadva = ctx->create_vertex_array(quad);
@@ -136,11 +141,11 @@ RenderClient::run()
 
 	sp->use();
 	auto& mvp = sp->uniform<mat4>("r_MVP");
-	auto p = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 100.0f) * Transform::translate(1, 0, -50);
+	//auto p = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::translate(1, 0, -100) * Transform::rotate_x(math::PI * 2);
 	//mvp.set_value();
-	mvp = p;
+	
 
-	R_LOG_INFO(p);
+	//R_LOG_INFO(p);
 
     Scene scene(ctx);
     scene.set_camera(camera);
@@ -148,9 +153,9 @@ RenderClient::run()
     //scene.root().add_child(GeoNode(mesh));
 
 
-    auto heightmap = Terrain::generate_heightmap(128, 128);
-    auto tmesh = Terrain::heightmap_to_mesh(heightmap);
-	auto tmeshva = ctx->create_vertex_array(tmesh);
+    auto heightmap 	= Terrain::generate_heightmap(128, 128, 24.0f, 2.5f);
+    auto tmesh 		= Terrain::heightmap_to_mesh(heightmap);
+	auto tmeshva 	= ctx->create_vertex_array(tmesh);
 
 	R_LOG_INFO("MESH: " << tmesh->indices<u32>()->data().size());
 
@@ -164,6 +169,9 @@ RenderClient::run()
     // mat4 projection = Transform::perspective(60.0f, 16.0/9.0, 0.1, 1000.0);
     // mat4 viewmatrix = Transform::translate(1, 0, -10);
     // mat4 modelmatrix = mat4::Identity;
+
+	StopWatch timer;
+
 
 	while (this->is_running())
 	{
@@ -202,27 +210,31 @@ RenderClient::run()
 	        }
 
     	}
-
     	//update data
+    	//poll socket
 
 
     	//draw data
 		ctx->clear(clearstate);
 		//ctx->render(scene);
 
+		mvp = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::rotate_x(-math::PI/6) * Transform::translate(0, 0, -75);
+
 		quadva->bind();
 		sp->use();
 		::glDrawElements(GL_POINTS, 6, GL_UNSIGNED_INT, 0);
 		
+		
+		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
 		tmeshva->bind();
 		sp->use();
-
 		::glDrawElements(GL_TRIANGLES, tmesh->indices<u32>()->data().size(), GL_UNSIGNED_INT, 0);
+		
+
 		//::glDrawElements(GL_POINTS, tmeshp->data().size(), GL_UNSIGNED_INT, 0);
     	//va->bind();
     	//::glDrawElements(GL_POINTS, 24, GL_UNSIGNED_INT, 0);
-
-
 
     	//ctx->draw(PrimitiveType::TRIANGLES, drawstate, scenestate);
 
