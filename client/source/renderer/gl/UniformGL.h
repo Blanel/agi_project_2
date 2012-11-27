@@ -43,7 +43,32 @@ public:
     void set_value(const T& value);
     UniformGL& operator=(const T& value);
 };
- 
+
+#ifndef _MSC_VER
+
+template <>   
+UniformGL<f32>::UniformGL(i32 loc, const std::string& name, const f32& value);
+
+template <>   
+UniformGL<vec2>::UniformGL(i32 loc, const std::string& name, const vec2& value);
+
+template <>   
+UniformGL<vec3>::UniformGL(i32 loc, const std::string& name, const vec3& value);
+
+template <>   
+UniformGL<vec4>::UniformGL(i32 loc, const std::string& name, const vec4& value);
+
+template <>   
+UniformGL<point3>::UniformGL(i32 loc, const std::string& name, const point3& value);
+
+template <>   
+UniformGL<math::mat3>::UniformGL(i32 loc, const std::string& name, const math::mat3& value);
+
+template <>   
+UniformGL<math::mat4>::UniformGL(i32 loc, const std::string& name, const math::mat4& value);
+
+#else 
+
 template <>   
 UniformGL<f32>::UniformGL(i32 loc, const std::string& name, const f32& value)
     : Uniform<f32>(name, UniformDatatype::FLOAT32)
@@ -99,6 +124,8 @@ UniformGL<math::mat4>::UniformGL(i32 loc, const std::string& name, const math::m
 {
     set_value(value);
 }
+#endif
+
 
 template<>
 UniformGL<f32>& UniformGL<f32>::operator=(const f32& value);
