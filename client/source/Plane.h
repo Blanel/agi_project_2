@@ -2,7 +2,9 @@
 #define PLANE_H_
 
 #include "math/Vector3.h"
+#include "math/Point3.h"
 #include "renderer/RenderContext.h"
+#include "renderer/ShaderProgram.h"
 #include "Camera.h"
 
 namespace revel
@@ -19,7 +21,10 @@ class Plane
 
 	f32 m_Angle;
 
-	Plane(const std::shared_ptr<renderer::VertexArray>& va, std::shared_ptr<renderer::ShaderProgram>& sp, const point3& p = point3::(0, 0, 30), f32 angle = 0)	
+	Plane(const std::shared_ptr<renderer::VertexArray>& va, 
+		  const std::shared_ptr<renderer::ShaderProgram>& sp, 
+		  const point3& p = point3(0, 0, 30), 
+		  f32 angle = 0)
 		: m_pVertexArray(va)
 		, m_pGpuProgram(sp)
 		, m_Position(p)
