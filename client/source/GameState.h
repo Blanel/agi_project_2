@@ -1,3 +1,5 @@
+#ifndef GAMESTATE_H_
+#define GAMESTATE_H_
 namespace revel
 {
 	class GameState
@@ -7,3 +9,4 @@ namespace revel
 		~GameState();
 	};
 }
+#endif

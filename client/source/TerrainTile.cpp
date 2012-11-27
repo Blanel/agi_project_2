@@ -1,6 +1,5 @@
 #include "TerrainTile.h"
 #include "SimplexNoise.h"
-#include "geo/Mesh.h"
 
 namespace revel
 {

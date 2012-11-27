@@ -1,3 +1,5 @@
+#ifndef TERRAINTILE_H_
+#define TERRAINTILE_H_
 #include "geo/Mesh.h"
 namespace revel
 {
@@ -12,3 +14,5 @@ public:
 };
 
 }
+
+#endif

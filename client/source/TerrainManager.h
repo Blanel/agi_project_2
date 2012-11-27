@@ -1,3 +1,5 @@
+#ifndef TERRAINMANAGER_H_
+#define TERRAINMANAGER_H_
 #include <map>
 
 #include "Types.h"
@@ -13,6 +15,7 @@ namespace revel
 		std::map<vec2_i32, TerrainTile*> tiles;
 		int chunkRes;
 		int chunkLen;
+
 	public:
 		TerrainManager(int optimalChunks, int minChunks, int chunkRes, int chunkLen);
 		~TerrainManager();
@@ -20,3 +23,4 @@ namespace revel
 		void generate();
 	};
 }
+#endif
