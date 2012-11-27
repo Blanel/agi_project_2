@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Source Files\geo">
       <UniqueIdentifier>{b5c5da53-d243-4e98-a944-c2cffe925661}</UniqueIdentifier>
     </Filter>
@@ -36,6 +32,10 @@
     </Filter>
     <Filter Include="Header Files\math">
       <UniqueIdentifier>{821df163-0626-437d-a697-5af30672a916}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -210,16 +210,25 @@
     <ClCompile Include="..\..\source\renderer\RenderContext.cpp">
       <Filter>Source Files\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Image2D.cpp">
+    <ClCompile Include="..\..\source\TerrainTile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Light.cpp">
+    <ClCompile Include="..\..\source\TerrainManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\GameState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Image2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\TGA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -419,9 +428,6 @@
     <ClInclude Include="..\..\source\geo\VertexAttribute.h">
       <Filter>Header Files\geo</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Agi12P2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -470,22 +476,25 @@
     <ClInclude Include="..\..\source\renderer\gl\Texture2DGL.h">
       <Filter>Header Files\renderer\gl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Effect.h">
+    <ClInclude Include="..\..\source\TerrainTile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\TerrainManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\GameState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Plane.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Terrain.h">
+    <ClInclude Include="..\..\source\TGA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\TGA.h">
+    <ClInclude Include="..\..\source\Effect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

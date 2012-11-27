@@ -85,6 +85,7 @@
     <ClCompile Include="..\..\source\Camera.cpp" />
     <ClCompile Include="..\..\source\Config.cpp" />
     <ClCompile Include="..\..\source\Device.cpp" />
+    <ClCompile Include="..\..\source\GameState.cpp" />
     <ClCompile Include="..\..\source\geo\Mesh.cpp" />
     <ClCompile Include="..\..\source\geo\VertexAttribute.cpp" />
     <ClCompile Include="..\..\source\Image2D.cpp" />
@@ -142,16 +143,18 @@
     <ClCompile Include="..\..\source\Scene.cpp" />
     <ClCompile Include="..\..\source\SceneObject.cpp" />
     <ClCompile Include="..\..\source\SimplexNoise.cpp" />
+    <ClCompile Include="..\..\source\TerrainManager.cpp" />
+    <ClCompile Include="..\..\source\TerrainTile.cpp" />
     <ClCompile Include="..\..\source\TGA.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\Agi12P2.h" />
     <ClInclude Include="..\..\source\BoundingVolume.h" />
     <ClInclude Include="..\..\source\Camera.h" />
     <ClInclude Include="..\..\source\Color.h" />
     <ClInclude Include="..\..\source\Config.h" />
     <ClInclude Include="..\..\source\Device.h" />
     <ClInclude Include="..\..\source\Effect.h" />
+    <ClInclude Include="..\..\source\GameState.h" />
     <ClInclude Include="..\..\source\geo\Mesh.h" />
     <ClInclude Include="..\..\source\geo\Rectangle.h" />
     <ClInclude Include="..\..\source\geo\VertexAttribute.h" />
@@ -230,7 +233,8 @@
     <ClInclude Include="..\..\source\SceneObject.h" />
     <ClInclude Include="..\..\source\SimplexNoise.h" />
     <ClInclude Include="..\..\source\StopWatch.h" />
-    <ClInclude Include="..\..\source\Terrain.h" />
+    <ClInclude Include="..\..\source\TerrainManager.h" />
+    <ClInclude Include="..\..\source\TerrainTile.h" />
     <ClInclude Include="..\..\source\TGA.h" />
     <ClInclude Include="..\..\source\Types.h" />
   </ItemGroup>
