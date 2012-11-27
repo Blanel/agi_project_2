@@ -94,36 +94,7 @@ RenderClient::run()
 
     // Load assets
     // Manually create a mesh
-    auto quad = std::make_shared<geo::Mesh>();
-    
-    auto quadp = quad->create_vertex_attrib<point3>("position");
-	auto quadn = quad->create_vertex_attrib<vec3>("normal");
-    auto quadt = quad->create_vertex_attrib<vec2>("texcoord");
-
-    quadp->data().push_back(point3(-0.5, -0.5, 0));
-    quadp->data().push_back(point3( 0.5, -0.5, 0));
-    quadp->data().push_back(point3( 0.5,  0.5, 0));
-    quadp->data().push_back(point3(-0.5,  0.5, 0));
-
-    quadn->data().push_back(vec3(0, 0, 1));
-    quadn->data().push_back(vec3(0, 0, 1));
-    quadn->data().push_back(vec3(0, 0, 1));
-    quadn->data().push_back(vec3(0, 0, 1));
-
-    quadt->data().push_back(vec2(0, 0));
-    quadt->data().push_back(vec2(1, 0));
-    quadt->data().push_back(vec2(1, 1));
-    quadt->data().push_back(vec2(0, 1));
-
-    auto quadi = quad->indices<u32>();
-    quadi->data().push_back(0);
-    quadi->data().push_back(1);
-    quadi->data().push_back(2);
-
-    quadi->data().push_back(0);
-    quadi->data().push_back(2);
-    quadi->data().push_back(3);
-
+    auto quad = geo::Mesh::create_quad();
 
     //SDL_Surface* image = IMG_Load("E:/ground_grass_1024_tile.jpg");
     //SDL_FreeSurface(image);
@@ -136,6 +107,9 @@ RenderClient::run()
 
     auto sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/passthrough_vs.glsl", 
     															  "../client/source/shaders/passthrough_fs.glsl"); 
+
+    auto player_sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/plane.vs", 
+    				  													 "../client/source/shaders/plane.fs"); 
     
     //auto drawstate = std::make_shared<DrawState>(renderstate, sp, va);
 
@@ -152,6 +126,9 @@ RenderClient::run()
 
 	sp->use();
 	auto& mvp = sp->uniform<mat4>("r_MVP");
+
+	player_sp->use();
+	auto& player_mvp = player_sp->uniform<mat4>("r_MVP");
 	//auto p = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::translate(1, 0, -100) * Transform::rotate_x(math::PI * 2);
 	//mvp.set_value();
 
@@ -187,12 +164,14 @@ RenderClient::run()
 
 	StopWatch timer;
 
-	std::vector<Plane> planes;
+	std::vector<Plane> players;
 	//planes.push_back(Plane());
 
+	//StopWatch frametimer;
 	while (this->is_running())
 	{
 		SDL_Event e;
+
 
 		//Poll events
 	    while (SDL_PollEvent(&e))
@@ -235,17 +214,20 @@ RenderClient::run()
 		ctx->clear(clearstate);
 		//ctx->render(scene);
 
-		mvp = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::rotate_x(-math::PI/6) * Transform::translate(0, 0, -75);
+		
+		player_mvp = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::rotate_x(0) * Transform::translate(0, 0, -75);
 
+		::glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		quadva->bind();
-		sp->use();
-		::glDrawElements(GL_POINTS, 6, GL_UNSIGNED_INT, 0);
+		player_sp->use();
+		::glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		
 		
-		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+		::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 		tmeshva->bind();
 		sp->use();
+		mvp = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::rotate_x(-math::PI/12) * Transform::translate(0, 0, -75);
 		::glDrawElements(GL_TRIANGLES, tmesh->indices<u32>()->data().size(), GL_UNSIGNED_INT, 0);
 		
 

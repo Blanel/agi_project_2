@@ -7,6 +7,29 @@ namespace renderer
 namespace gl
 {
 
+template <>   
+UniformGL<f32>::UniformGL(i32 loc, const std::string& name, const f32& value)
+    : Uniform<f32>(name, UniformDatatype::FLOAT32)
+    , m_Location(loc)
+{
+    set_value(value);
+}
+
+template <>   
+UniformGL<vec2>::UniformGL(i32 loc, const std::string& name, const vec2& value)
+    : Uniform<vec2>(name, UniformDatatype::VEC2_F32)
+    , m_Location(loc)
+{
+    set_value(value);
+}
+
+template <>   
+UniformGL<vec3>::UniformGL(i32 loc, const std::string& name, const vec3& value)
+    : Uniform<vec3>(name, UniformDatatype::VEC3_F32)
+    , m_Location(loc)
+{
+    set_value(value);
+}
 
 template <>   
 UniformGL<vec4>::UniformGL(i32 loc, const std::string& name, const vec4& value)
@@ -23,7 +46,6 @@ UniformGL<point3>::UniformGL(i32 loc, const std::string& name, const point3& val
 {
     set_value(value);
 }
-
 
 template <>   
 UniformGL<math::mat3>::UniformGL(i32 loc, const std::string& name, const math::mat3& value)
