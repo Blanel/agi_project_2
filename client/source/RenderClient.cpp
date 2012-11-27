@@ -36,6 +36,7 @@ using namespace revel::renderer;
 //using namespace boost::asio;
 
 #include "Terrain.h"
+#include "Plane.h"
 
 namespace revel
 {
@@ -52,6 +53,8 @@ RenderClient::RenderClient()
 	m_pWindow = Device::graphics()->create_window(screenw, screenh, title);
 
 	m_Running = false;
+
+	::glEnable(GL_TEXTURE_2D);
 }
 
 RenderClient::~RenderClient()
@@ -119,14 +122,17 @@ RenderClient::run()
     quadi->data().push_back(3);
 
 
-    SDL_Surface* image = IMG_Load("E:/ground_grass_1024_tile.jpg");
+    //SDL_Surface* image = IMG_Load("E:/ground_grass_1024_tile.jpg");
+    //SDL_FreeSurface(image);
+
+    //auto imgtest = Image2D<pixel::RGBA_u8>("E:/ground_grass_1024_tile.jpg");
 
     //auto text = Device::graphics()->create_texture_2d();
 
     auto quadva = ctx->create_vertex_array(quad);
 
-    auto sp = Device::graphics()->create_shader_program_from_file("passthrough_vs.glsl", 
-    															  "passthrough_fs.glsl"); 
+    auto sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/passthrough_vs.glsl", 
+    															  "../client/source/shaders/passthrough_fs.glsl"); 
     
     //auto drawstate = std::make_shared<DrawState>(renderstate, sp, va);
 
@@ -172,6 +178,8 @@ RenderClient::run()
 
 	StopWatch timer;
 
+	std::vector<Plane> planes;
+	//planes.push_back(Plane());
 
 	while (this->is_running())
 	{

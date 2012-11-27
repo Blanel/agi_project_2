@@ -8,6 +8,10 @@
 #include <fstream>
 #include <cstring>
 
+#include "SDL_Image.h"
+
+#include <iterator>
+
 namespace revel
 {
 
@@ -120,6 +124,35 @@ public:
 		, m_PixelFormat(T::pixel_format())	
 	{
 		assert(w * h == pixeldata.size());
+	}
+
+	Image2D(const std::string& filename)
+	{
+		SDL_Surface* image = IMG_Load(filename.c_str());
+		SDL_PixelFormat* format = image->format;
+
+		auto dataptr = static_cast<T*>(image->pixels);
+
+/*
+		if (image)
+		{
+			m_Width = image->w;
+			m_Height = image->h;
+			m_PixelFormat = T::pixel_format();
+
+			u32 pixelcount = m_Width * m_Height;
+
+			m_Pixels.reserve(pixelcount);
+
+			//std::copy(&dataptr, &dataptr + pixelcount, std::back_inserter(m_Pixels));			
+
+			SDL_FreeSurface(image);
+		}
+		else
+		{
+			throw std::exception();
+		}
+		*/
 	}
 
 /*

@@ -16,11 +16,12 @@ class Plane
 	std::shared_ptr<renderer::VertexArray>		m_pVertexArray;
 	std::shared_ptr<renderer::ShaderProgram> 	m_pGpuProgram;
 	
-	point3 		m_Position;
+	point3 			m_Position;
 	//math::quat 	m_Orientation;
 
 	f32 m_Angle;
 
+public:
 	Plane(const std::shared_ptr<renderer::VertexArray>& va, 
 		  const std::shared_ptr<renderer::ShaderProgram>& sp, 
 		  const point3& p = point3(0, 0, 30), 
