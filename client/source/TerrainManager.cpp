@@ -22,10 +22,10 @@ namespace revel
 	{
 		//TerrainTile* test;
 		//tiles.insert(std::make_pair(vec2_i32(0,0), test));
-		/*
-		if(tiles.size() == 0)
+		
+		if(m_Tiles.size() == 0)
 		{
-			tiles.insert(std::make_pair(vec2_i32(0,0), std::make_shared<TerrainTile>(TerrainTile(ctx,0,0,chunkRes,chunkLen,chunkHei))));
+			m_Tiles.insert(std::make_pair(vec2_i32(0,0), std::make_shared<TerrainTile>(TerrainTile(m_Context,0,0,m_ChunkRes,m_ChunkLen,m_ChunkHei))));
 			//GetSpawn from server
 			//Generate chunks around spawn
 		}
@@ -36,7 +36,7 @@ namespace revel
 			//	For each player, check so adjacent chunks have been generated.
 			//		If false, generate new chunk and add to list.
 		}
-		*/
+		
 
 	}
 
