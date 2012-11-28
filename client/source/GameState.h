@@ -8,5 +8,16 @@ namespace revel
 		GameState();
 		~GameState();
 	};
+
+	class AirPlane
+	{
+
+	};
+
+	class Bullet
+	{
+
+	};
+
 }
 #endif
