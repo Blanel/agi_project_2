@@ -17,7 +17,7 @@ namespace revel
 
 		int m_OptimalChunks;
 		int m_MinChunks;
-		std::map<vec2_i32, std::shared_ptr<TerrainTile>> m_Tiles;
+		std::map<std::pair<i32,i32>, std::shared_ptr<TerrainTile>> m_Tiles;
 		int m_ChunkRes;
 		float m_ChunkLen;
 		float m_ChunkHei;

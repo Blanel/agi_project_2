@@ -25,7 +25,8 @@ namespace revel
 		
 		if(m_Tiles.size() == 0)
 		{
-			m_Tiles.insert(std::make_pair(vec2_i32(0,0), std::make_shared<TerrainTile>(m_Context,0,0,m_ChunkRes,m_ChunkLen,m_ChunkHei)));
+			m_Tiles.insert(std::make_pair(std::make_pair<i32,i32>(0,0), std::make_shared<TerrainTile>(TerrainTile(m_Context,0,0,m_ChunkRes,m_ChunkLen,m_ChunkHei))));
+			m_Tiles.insert(std::make_pair(std::make_pair<i32,i32>(0,1), std::make_shared<TerrainTile>(TerrainTile(m_Context,0,128,m_ChunkRes,m_ChunkLen,m_ChunkHei))));
 			//GetSpawn from server
 			//Generate chunks around spawn
 		}
@@ -42,7 +43,7 @@ namespace revel
 
 	std::shared_ptr<renderer::VertexArray> TerrainManager::get_chunk(int x, int y)
 	{	
-		auto it = m_Tiles.find(vec2_i32(x,y));
+		auto it = m_Tiles.find(std::make_pair(x,y));
 
 		if(it != m_Tiles.end())
 			return it->second->va;
