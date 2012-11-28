@@ -3,6 +3,7 @@
 
 #include "math/Vector3.h"
 #include "math/Point3.h"
+#include "math/Transform.h"
 #include "renderer/RenderContext.h"
 #include "renderer/ShaderProgram.h"
 #include "Camera.h"
@@ -31,7 +32,6 @@ public:
 		, m_Position(p)
 		, m_Angle(angle)
 	{
-
 	}
 
 	virtual ~Plane()
@@ -44,7 +44,12 @@ public:
 		m_pVertexArray->bind();
 		m_pGpuProgram->use();
 
+		math::mat4 model = Transform::translate(m_Position.x, m_Position.y, m_Position.z) * Transform::rotate_y(0);
+		math::mat4 view = cam->view_matrix();
+		math::mat4 projection = cam->projection_matrix();
 
+		auto& mv = m_pGpuProgram->uniform<mat4>("r_ModelView");
+		auto& p = m_pGpuProgram->uniform<mat4>("r_Projection");
 
 		m_pVertexArray->unbind();
 	}

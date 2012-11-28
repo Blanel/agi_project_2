@@ -30,6 +30,8 @@ public:
     virtual std::shared_ptr<VertexBuffer> create_vertex_buffer(BufferHint hint, u32 size) override;
     virtual std::shared_ptr<IndexBuffer> create_index_buffer(BufferHint hint, u32 size) override;
     virtual std::shared_ptr<Texture2D> create_texture_2d(const Texture2DDesc& description) override;
+    virtual std::shared_ptr<Texture2D> create_texture_2d() override;
+    virtual std::shared_ptr<Texture3D> create_texture_3d() override;
 
     virtual std::shared_ptr<ShaderProgram> create_shader_program(const std::string& fs, const std::string& vs, const std::string& gs) override;
     virtual std::shared_ptr<ShaderProgram> create_shader_program(const std::string& fs, const std::string& vs) override;

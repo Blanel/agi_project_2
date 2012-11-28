@@ -824,7 +824,6 @@ Matrix4x4<T>::inversed(const T epsilon) const
     //    return Identity;
 
 
-
     //Cofactors
     T a0 = e00*e11 - e01*e10;
     T a1 = e00*e12 - e02*e10;

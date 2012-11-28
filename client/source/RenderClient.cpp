@@ -94,8 +94,6 @@ RenderClient::run()
 
     // Load assets
     // Manually create a mesh
-    auto quad = geo::Mesh::create_quad();
-
     //SDL_Surface* image = IMG_Load("E:/ground_grass_1024_tile.jpg");
     //SDL_FreeSurface(image);
 
@@ -103,13 +101,18 @@ RenderClient::run()
 
     //auto text = Device::graphics()->create_texture_2d();
 
-    auto quadva = ctx->create_vertex_array(quad);
+    
 
     auto sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/passthrough_vs.glsl", 
     															  "../client/source/shaders/passthrough_fs.glsl"); 
 
-    auto player_sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/plane.vs", 
-    				  													 "../client/source/shaders/plane.fs"); 
+
+
+	auto planemesh = geo::Mesh::create_quad();
+	auto planemeshva = ctx->create_vertex_array(planemesh);
+
+    auto planesp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/plane.vs", 
+	    	    												  	   "../client/source/shaders/plane.fs");
     
     //auto drawstate = std::make_shared<DrawState>(renderstate, sp, va);
 
@@ -127,8 +130,6 @@ RenderClient::run()
 	sp->use();
 	auto& mvp = sp->uniform<mat4>("r_MVP");
 
-	player_sp->use();
-	auto& player_mvp = player_sp->uniform<mat4>("r_MVP");
 	//auto p = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::translate(1, 0, -100) * Transform::rotate_x(math::PI * 2);
 	//mvp.set_value();
 
@@ -141,6 +142,9 @@ RenderClient::run()
     scene.set_camera(camera);
 
     //scene.root().add_child(GeoNode(mesh));
+
+    auto texture = Device::graphics()->create_texture_2d();
+    auto tex3d = Device::graphics()->create_texture_3d();
 
 
     //auto heightmap 	= Terrain::generate_heightmap(128, 128, 24.0f, 2.5f);
@@ -168,6 +172,10 @@ RenderClient::run()
 	//planes.push_back(Plane());
 
 	//StopWatch frametimer;
+	//camera->set_eye(0, 0, -75);
+
+	camera->set_eye(0, 0, 100);
+
 	while (this->is_running())
 	{
 		SDL_Event e;
@@ -199,6 +207,8 @@ RenderClient::run()
 	        case SDL_KEYDOWN:
 	        	if (e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 	        		m_Running = false;
+	        	if (e.key.keysym.scancode == SDL_SCANCODE_A);
+	        		camera->set_eye(0, 0, 120);
 	        	break;
 
 	        case SDL_QUIT:
@@ -214,21 +224,24 @@ RenderClient::run()
 		ctx->clear(clearstate);
 		//ctx->render(scene);
 
-		
+		/*
 		player_mvp = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::rotate_x(0) * Transform::translate(0, 0, -75);
 
 		::glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		quadva->bind();
 		player_sp->use();
 		::glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		
+		*/
 		
 		::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 		tmeshva->bind();
 		sp->use();
-		mvp = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::rotate_x(-math::PI/12) * Transform::translate(0, 0, -75);
-		::glDrawElements(GL_TRIANGLES, tmesh->indices<u32>()->data().size(), GL_UNSIGNED_INT, 0);
+		
+		//mvp = camera->projection_matrix() * (Transform::rotate_z(0.1 * timer.elapsed_time()) * Transform::translate(0, 0, 100)).inversed() * Transform::translate(0, 0, -1*timer.elapsed_time());
+		mvp = camera->projection_matrix() * camera->view_matrix() * Transform::translate(0, 0, 0);
+
+		::glDrawElements(GL_TRIANGLES, tmeshva->index_count(), GL_UNSIGNED_INT, 0);
 		
 
 		//::glDrawElements(GL_POINTS, tmeshp->data().size(), GL_UNSIGNED_INT, 0);

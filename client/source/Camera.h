@@ -29,6 +29,8 @@ protected:
     f32 m_NearPlaneDistance;
     f32 m_FarPlaneDistance;
 
+    math::mat4 m_Projection;
+
 public:
     Camera();
     virtual ~Camera();
@@ -64,17 +66,35 @@ public:
     }
 */
 
-    virtual math::mat4 projection_matrix() const = 0;
-
-    virtual math::mat4 view_matrix() const
+    const math::mat4& projection_matrix() const 
     {
-        return math::mat4(math::mat3(m_Rotation)) * math::Transform::translate(-m_Eye);
+        return m_Projection;
+    }
+
+    math::mat4 view_matrix()
+    {
+        //return look_at(m_Eye, m_Target, m_Up).inversed();
+        return (math::Transform::translate(m_Eye) * math::Transform::rotate_x(math::PI/18)).inversed();
     }
 
     math::mat4 look_at(point3 eye, point3 target, vec3 up = vec3(0, 1, 0))
     {
+        vec3 campos(eye);
+
+        math::normalize(up);
+
         vec3 forward = target - eye;
         math::normalize(forward);
+
+        vec3 right = math::cross(forward, up);
+        math::normalize(right);
+
+        math::mat4 m(right.x, up.x, forward.x, -dot(right, campos),
+                     right.y, up.y, forward.y, -dot(up, campos),
+                     right.z, up.z, forward.z, -dot(forward, campos),
+                     0,       0,    0,         1);
+
+        return m;
     }
 };
 
@@ -84,11 +104,8 @@ class PerspectiveCamera : public Camera
 public:
     PerspectiveCamera()
     {
-
+        m_Projection = math::Transform::perspective(60.0f, 16.0/9.0, 0.1, 1000.0);
     }
-
-    math::mat4 projection_matrix() const;
-
 };
 
 /*

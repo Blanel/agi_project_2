@@ -32,14 +32,17 @@ public:
 		::glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	virtual void copy_raw_from_sys_mem()
+	virtual void copy_raw_from_sys_mem(void* data, u32 w, u32)
 	{
+		R_LOG_INFO("Not Yet implemented");
 		this->bind();
+		//::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, G_RGBA, GL_UN)
+
 
 	}
 
 };
 
-}
-}
-}
+} // ::revel::texture::gl
+} // ::revel::texture
+} // ::revel

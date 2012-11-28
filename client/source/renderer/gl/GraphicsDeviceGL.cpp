@@ -6,6 +6,7 @@
 #include "renderer/gl/ShaderProgramGL.h"
 #include "renderer/gl/TextureSamplerGL.h"
 #include "renderer/gl/Texture2DGL.h"
+#include "renderer/gl/Texture3DGL.h"
 
 #include <stdexcept>
 #include <fstream>
@@ -65,7 +66,20 @@ GraphicsDeviceGL::create_texture_2d(const Image2D<T>& img)
 std::shared_ptr<Texture2D>
 GraphicsDeviceGL::create_texture_2d(const Texture2DDesc& description)
 {
+    R_LOG_ERR("Not yet implemented");
     return nullptr;
+}
+
+std::shared_ptr<Texture2D>
+GraphicsDeviceGL::create_texture_2d()
+{
+    return std::make_shared<Texture2DGL>();
+}
+
+std::shared_ptr<Texture3D>
+GraphicsDeviceGL::create_texture_3d()
+{
+    return std::make_shared<Texture3DGL>();
 }
 
 std::shared_ptr<ShaderProgram>
@@ -75,7 +89,7 @@ GraphicsDeviceGL::create_shader_program(const std::string& vs, const std::string
     ShaderObjectGL fragment(ShaderType::FRAGMENT, fs);
     ShaderObjectGL geometry(ShaderType::GEOMETRY, gs);
 
-    R_LOG_ERR("Not yet implementet");
+    R_LOG_ERR("Not yet implemented");
 
     return nullptr;
 }
