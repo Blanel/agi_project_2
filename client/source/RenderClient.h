@@ -28,7 +28,6 @@ public:
 	
 };
 
-
-}
+} // ::revel
 
 #endif // RENDERCLIENT_H_

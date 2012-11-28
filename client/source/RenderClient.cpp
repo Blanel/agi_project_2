@@ -153,7 +153,7 @@ RenderClient::run()
 	auto tmesh = tt.mesh;
 	auto tmeshva 	= ctx->create_vertex_array(tmesh);
 
-	R_LOG_INFO("MESH: " << tmesh->indices<u32>()->data().size());
+	R_LOG_INFO("MESH: " << tmeshva->index_count());
 
 
     //TGA::write("D:/hello.tga", terrain);
@@ -169,10 +169,9 @@ RenderClient::run()
 	StopWatch timer;
 
 	std::vector<Plane> players;
-	//planes.push_back(Plane());
+	players.push_back(Plane(planemeshva, planesp, 0.0f, 0.0f));
 
 	//StopWatch frametimer;
-	//camera->set_eye(0, 0, -75);
 
 	camera->set_eye(0, 0, 100);
 
@@ -207,7 +206,7 @@ RenderClient::run()
 	        case SDL_KEYDOWN:
 	        	if (e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 	        		m_Running = false;
-	        	if (e.key.keysym.scancode == SDL_SCANCODE_A);
+	        	else if (e.key.keysym.scancode == SDL_SCANCODE_A);
 	        		camera->set_eye(0, 0, 120);
 	        	break;
 
@@ -238,11 +237,20 @@ RenderClient::run()
 		tmeshva->bind();
 		sp->use();
 		
+		
+
+
+
 		//mvp = camera->projection_matrix() * (Transform::rotate_z(0.1 * timer.elapsed_time()) * Transform::translate(0, 0, 100)).inversed() * Transform::translate(0, 0, -1*timer.elapsed_time());
 		mvp = camera->projection_matrix() * camera->view_matrix() * Transform::translate(0, 0, 0);
 
 		::glDrawElements(GL_TRIANGLES, tmeshva->index_count(), GL_UNSIGNED_INT, 0);
-		
+
+		for (auto& plane : players)
+		{
+			//plane.update(...);
+			plane.draw(ctx, camera);
+		}		
 
 		//::glDrawElements(GL_POINTS, tmeshp->data().size(), GL_UNSIGNED_INT, 0);
     	//va->bind();

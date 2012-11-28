@@ -22,7 +22,6 @@ public:
 	virtual ~Texture3DGL()
 	{
 		::glDeleteTextures(1, &m_Identifier);
-
 	}
 
 	void bind()

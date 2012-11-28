@@ -25,11 +25,11 @@ class Plane
 public:
 	Plane(const std::shared_ptr<renderer::VertexArray>& va, 
 		  const std::shared_ptr<renderer::ShaderProgram>& sp, 
-		  const point3& p = point3(0, 0, 30), 
+		  f32 x, f32 y,
 		  f32 angle = 0)
 		: m_pVertexArray(va)
 		, m_pGpuProgram(sp)
-		, m_Position(p)
+		, m_Position(point3(x, y, 50))
 		, m_Angle(angle)
 	{
 	}
@@ -48,10 +48,20 @@ public:
 		math::mat4 view = cam->view_matrix();
 		math::mat4 projection = cam->projection_matrix();
 
-		auto& mv = m_pGpuProgram->uniform<mat4>("r_ModelView");
-		auto& p = m_pGpuProgram->uniform<mat4>("r_Projection");
+		//auto& mv = m_pGpuProgram->uniform<mat4>("r_ModelView");
+		//auto& p = m_pGpuProgram->uniform<mat4>("r_Projection");
+		auto& mvp = m_pGpuProgram->uniform<mat4>("r_MVP");
+
+		mvp = projection * view * model;
+
+		::glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		m_pVertexArray->unbind();
+	}
+
+	void update()
+	{
+
 	}
 };
 

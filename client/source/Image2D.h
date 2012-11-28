@@ -133,7 +133,6 @@ public:
 
 		auto dataptr = static_cast<T*>(image->pixels);
 
-/*
 		if (image)
 		{
 			m_Width = image->w;
@@ -141,6 +140,29 @@ public:
 			m_PixelFormat = T::pixel_format();
 
 			u32 pixelcount = m_Width * m_Height;
+
+			/*
+			u32 nOfColors = surface->format->BytesPerPixel;
+
+	        if (nOfColors == 4)     // contains an alpha channel
+	        {
+                if (surface->format->Rmask == 0x000000ff)
+                        texture_format = GL_RGBA;
+                else
+                        texture_format = GL_BGRA;
+	        } 
+	        else if (nOfColors == 3)     // no alpha channel
+	        {
+                if (surface->format->Rmask == 0x000000ff)
+                        texture_format = GL_RGB;
+                else
+                        texture_format = GL_BGR;
+	        } 
+	        else 
+	        {
+	            R_LOG_ERR("warning: the image is not truecolor..  this will probably break");
+	        }
+	        */
 
 			m_Pixels.reserve(pixelcount);
 
@@ -152,7 +174,7 @@ public:
 		{
 			throw std::exception();
 		}
-		*/
+		
 	}
 
 /*
