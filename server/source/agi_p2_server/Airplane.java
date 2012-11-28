@@ -8,14 +8,30 @@ public class Airplane extends Entity{
 	private String name;
 	private boolean isShooting;
 	private boolean isSwitchingGears;
-	private final static float INITIAL_SPEED = 1;
+	private final static double INITIAL_SPEED = 1;
 	
-	public Airplane(float x, float y, float angle, String name)
+	public Airplane(double x, double y, double angle, String name)
 	{
 		super(x,y,angle, INITIAL_SPEED);
 		
 		this.name = name;
 		life = 5;
+	}
+	
+	public boolean hit()
+	{
+		if(--life==0)
+			return true;
+		return false;
+	}
+	
+	public void incrementHits()
+	{
+		hits++;
+	}
+	public void incrementKills()
+	{
+		kills++;
 	}
 
 	
