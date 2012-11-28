@@ -25,7 +25,7 @@ namespace revel
 		
 		if(m_Tiles.size() == 0)
 		{
-			m_Tiles.insert(std::make_pair(vec2_i32(0,0), std::make_shared<TerrainTile>(TerrainTile(m_Context,0,0,m_ChunkRes,m_ChunkLen,m_ChunkHei))));
+			m_Tiles.insert(std::make_pair(vec2_i32(0,0), std::make_shared<TerrainTile>(m_Context,0,0,m_ChunkRes,m_ChunkLen,m_ChunkHei)));
 			//GetSpawn from server
 			//Generate chunks around spawn
 		}

@@ -212,6 +212,20 @@ public:
 			return false;
 	}
 
+	bool
+	operator>(const Vector2& v) const
+	{
+		if (x > v.x)
+			return true;
+		else if (x == v.x)
+		{
+			if (y > v.y)
+				return true;
+		}
+		else
+			return false;
+	}
+
     /**
      * Multiply vector elements with a scalar.
      *

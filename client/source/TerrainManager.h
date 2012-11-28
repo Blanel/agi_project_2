@@ -9,7 +9,6 @@
 #include "renderer/VertexArray.h"
 
 
-
 namespace revel
 {
 	class TerrainManager
