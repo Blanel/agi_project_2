@@ -6,23 +6,31 @@ public class Bullet extends Entity {
 	private final static double INITIAL_SPEED = 10; 
 	private final static double ttl = 10;
 	private double life=0;
-	private boolean exists=true;
 	
-	public Bullet(Airplane owner)
+	/*
+	 * Statuses for bullets:
+	 * 1 spawned
+	 * 0 alive
+	 * -1 hit
+	 * -2 dead
+	 */
+	
+	public Bullet(int id, Airplane owner)
 	{
-		super(owner.getX(), owner.getY(), owner.getAngle(), owner.getSpeed()+INITIAL_SPEED);
+		super(id,owner.getX(), owner.getY(), owner.getAngle(), owner.getSpeed()+INITIAL_SPEED);
 		
 		this.owner = owner;
 	}
 	
 	public void move()
 	{
-		super.move();
-		life++;
-		if(life == ttl)
-			exists=false;
-			
+		if(++life == ttl)
+		{
+			setStatus(-2);
+		}
+		super.move();			
 	}
+	
 	
 	public Airplane getOwner()
 	{
