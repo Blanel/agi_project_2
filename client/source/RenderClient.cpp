@@ -146,9 +146,9 @@ RenderClient::run()
 
     //auto heightmap 	= Terrain::generate_heightmap(128, 128, 24.0f, 2.5f);
     //auto tmesh 		= Terrain::heightmap_to_mesh(heightmap);
-	GameState gm;
+	GameState gs;
 	TerrainManager tm(ctx, 100, 3, 128, 10, 2.5);
-	tm.generate(gm);
+	tm.generate(gs);
 	auto tmeshva1  = tm.get_chunk(0,0);
 	
 	
@@ -212,8 +212,8 @@ RenderClient::run()
     	}
     	//update data
     	//poll socket
-
-
+		tm.generate(gs);
+		
     	//draw data
 		ctx->clear(clearstate);
 		//ctx->render(scene);

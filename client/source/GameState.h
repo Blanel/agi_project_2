@@ -3,6 +3,7 @@
 
 #include "Types.h"
 #include <vector>
+#include <string>
 
 namespace revel
 {
@@ -17,29 +18,31 @@ namespace revel
 		~GameState();
 
 		std::pair<f32,f32> getCentre();
+		std::pair<std::pair<f32,f32>,std::pair<f32,f32>> GameState::getBoundingBox();
 
 	};
 
 	class AirPlane
 	{
+	public:
 		f32 x; 
 		f32 y;
 		f32 angle;
+		std::string name;
 		bool alive;
 
-	public:
 		AirPlane();
 		~AirPlane();
 	};
 
 	class Bullet
 	{
+	public:
 		f32 x; 
 		f32 y;
 		f32 angle;
 		bool hit;
 
-	public:
 		Bullet();
 		~Bullet();
 	};

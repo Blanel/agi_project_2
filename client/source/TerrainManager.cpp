@@ -22,32 +22,19 @@ namespace revel
 
 	void TerrainManager::generate(GameState gs)
 	{
-		//TerrainTile* test;
-		//tiles.insert(std::make_pair(vec2_i32(0,0), test));
 		std::pair<f32,f32> centre = gs.getCentre();
-		R_LOG_INFO("Starting Generation:");
 		for(i32 i= math::ffloor(centre.first/m_ChunkRes)-m_RadiusChunks ; i< math::ffloor(centre.first/m_ChunkRes)+m_RadiusChunks ; i++)
 		{
 			for(i32 j= math::ffloor(centre.second/m_ChunkRes)-m_RadiusChunks ; j< math::ffloor(centre.second/m_ChunkRes)+m_RadiusChunks ; j++)
 			{
-				R_LOG_INFO("\tChunk: "<<i<<" "<<j);
 				auto it = m_Tiles.find(std::make_pair(i,j));
 				if(it == m_Tiles.end())
 				{
 					m_Tiles.insert(std::make_pair(std::make_pair(i,j), std::make_shared<TerrainTile>(TerrainTile(m_Context, i,j, m_ChunkRes, m_ChunkLen, m_ChunkHei))));
-					R_LOG_INFO("\t\tNEW");
-				}
-				else
-				{
-					R_LOG_INFO("\t\tOLD");
-				}
-					
+					R_LOG_INFO("NEW CHUNK: "<<i<<" "<<j);
+				}					
 			}
-			R_LOG_INFO("Done Generating");
 		}
-		
-		
-
 	}
 
 	std::shared_ptr<renderer::VertexArray> TerrainManager::get_chunk(int x, int y)
