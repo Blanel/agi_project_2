@@ -9,5 +9,9 @@ public class AndroidClient {
 	private boolean isShooting;
 	private double rotation;
 	
+	public AndroidClient()
+	{
+	}
+	
 
 }

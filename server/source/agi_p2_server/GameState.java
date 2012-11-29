@@ -47,6 +47,8 @@ public class GameState {
 		}
 	}
 	
+
+	
 	
 	/**
 	 * Calculates collisions between shots and airplanes.
@@ -62,7 +64,7 @@ public class GameState {
 			{
 				if(airplanes.get(i).getStatus()==-1)
 					break;
-				if(bullets.get(j).getStatus()>=0 && airplanes.get(i)!=bullets.get(j).getOwner() && airplanes.get(i).distance(bullets.get(j))<planeHitbox)
+				if(bullets.get(j).getStatus()>=0 && airplanes.get(i)!=bullets.get(j).getOwner() && airplanes.get(i).getPos().distance(bullets.get(j).getPos())<planeHitbox)
 				{
 					if(airplanes.get(i).hit())
 					{

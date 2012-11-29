@@ -36,17 +36,21 @@ public class Entity {
 		this.id=id;
 	}
 	
-	public double getX() {
-		return pos.x;
+	public Coord getPos()
+	{
+		return pos;
 	}
-	public void setX(double x) {
-		pos.x = x;
+	
+	public void setPos(double x, double y)
+	{
+		pos.x=x;
+		pos.y=y;
 	}
-	public double getY() {
-		return pos.y;
-	}
-	public void setY(double y) {
-		pos.y = y;
+	
+	public void setPos(Coord p)
+	{
+		pos.x = p.x;
+		pos.y = p.y;
 	}
 	public double getAngle() {
 		return angle;
@@ -61,16 +65,9 @@ public class Entity {
 		this.speed = speed;
 	}
 	
-	private class Coord
-	{
-		public double x;
-		public double y;
-	}
 	
-	public double distance(Entity point)
-	{
-		return Math.sqrt((point.pos.x-pos.x)*(point.pos.x-pos.x)+(point.pos.y-pos.y)*(point.pos.y-pos.y));
-	}
+	
+	
 	
 
 	

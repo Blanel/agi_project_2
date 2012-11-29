@@ -17,7 +17,7 @@ public class Bullet extends Entity {
 	
 	public Bullet(int id, Airplane owner)
 	{
-		super(id,owner.getX(), owner.getY(), owner.getAngle(), owner.getSpeed()+INITIAL_SPEED);
+		super(id,owner.getPos().x, owner.getPos().y, owner.getAngle(), owner.getSpeed()+INITIAL_SPEED);
 		
 		this.owner = owner;
 	}

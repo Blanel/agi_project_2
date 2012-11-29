@@ -48,11 +48,11 @@ public class RenderClient {
 				p.setAttributeNode(id);
 
 				Element x = doc.createElement("x");
-				x.appendChild(doc.createTextNode(""+gs.airplanes.get(i).getX()));
+				x.appendChild(doc.createTextNode(""+gs.airplanes.get(i).getPos().x));
 				p.appendChild(x);
 
 				Element y = doc.createElement("y");
-				y.appendChild(doc.createTextNode(""+gs.airplanes.get(i).getY()));
+				y.appendChild(doc.createTextNode(""+gs.airplanes.get(i).getPos().y));
 				p.appendChild(y);
 
 				Element a = doc.createElement("a");
@@ -81,11 +81,11 @@ public class RenderClient {
 				b.setAttributeNode(id);
 				
 				Element x = doc.createElement("x");
-				x.appendChild(doc.createTextNode(""+gs.bullets.get(i).getX()));
+				x.appendChild(doc.createTextNode(""+gs.bullets.get(i).getPos().x));
 				b.appendChild(x);
 
 				Element y = doc.createElement("y");
-				y.appendChild(doc.createTextNode(""+gs.bullets.get(i).getY()));
+				y.appendChild(doc.createTextNode(""+gs.bullets.get(i).getPos().y));
 				b.appendChild(y);
 
 				Element a = doc.createElement("a");
