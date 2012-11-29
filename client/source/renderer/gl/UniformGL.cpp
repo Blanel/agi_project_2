@@ -17,6 +17,14 @@ UniformGL<f32>::UniformGL(i32 loc, const std::string& name, const f32& value)
 }
 
 template <>   
+UniformGL<i32>::UniformGL(i32 loc, const std::string& name, const i32& value)
+    : Uniform<i32>(name, UniformDatatype::INT32)
+    , m_Location(loc)
+{
+    set_value(value);
+}
+
+template <>   
 UniformGL<vec2>::UniformGL(i32 loc, const std::string& name, const vec2& value)
     : Uniform<vec2>(name, UniformDatatype::VEC2_F32)
     , m_Location(loc)
@@ -72,6 +80,17 @@ UniformGL<f32>& UniformGL<f32>::operator=(const f32& value)
     if (value != m_Value)
     {
  		set_value(value);
+    }
+
+    return *this;
+}
+
+template<>
+UniformGL<i32>& UniformGL<i32>::operator=(const i32& value)
+{
+    if (value != m_Value)
+    {
+        set_value(value);
     }
 
     return *this;
@@ -148,6 +167,13 @@ void UniformGL<f32>::set_value(const f32& value)
 {
 	m_Value = value;
     ::glUniform1f(m_Location, m_Value);
+}
+
+template<>
+void UniformGL<i32>::set_value(const i32& value)
+{
+    m_Value = value;
+    ::glUniform1i(m_Location, m_Value);
 }
 
 template<>

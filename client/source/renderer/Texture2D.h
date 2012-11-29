@@ -33,13 +33,14 @@ public:
     bool build_mipmap() { return m_BuildMipMap; }
     TextureFormat format() const { return m_InternalFormat; }
 
-    //virtual void copy_raw_from_sys_mem() = 0;
+    virtual void copy_raw_from_sys_mem(void* dataptr, u32 w, u32 h) = 0;
 
     template <typename T>
     void copy_from_sys_mem(const Image2D<T>& img)
     {
-        this->bind();
+        u32 size = sizeof(T) * img.data().size();
 
+        copy_raw_from_sys_mem((void*)&img.data()[0], img.width(), img.height());
     }
 
     virtual void bind() = 0;

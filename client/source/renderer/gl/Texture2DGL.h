@@ -32,13 +32,20 @@ public:
 		::glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	virtual void copy_raw_from_sys_mem(void* data, u32 w, u32)
+	virtual void copy_raw_from_sys_mem(void* data, u32 w, u32 h)
 	{
-		R_LOG_INFO("Not Yet implemented");
+		//R_LOG_INFO("Not Yet implemented");
 		this->bind();
-		//::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, G_RGBA, GL_UN)
-
-
+		
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    	
+		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    	
+		
+		::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, data);		
+		this->unbind();
 	}
 
 };
