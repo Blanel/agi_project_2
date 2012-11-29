@@ -77,13 +77,6 @@ public class RenderClient {
 				Element status = doc.createElement("status");
 				status.appendChild(doc.createTextNode(""+gs.airplanes.get(i).getStatus()));
 				p.appendChild(status);
-				if(gs.airplanes.get(i).getStatus()==1)
-					gs.airplanes.get(i).setStatus(0);
-				else if(gs.airplanes.get(i).getStatus() == -1)
-				{
-					gs.airplanes.remove(i);
-					i--;
-				}
 			}
 			Element bullets = doc.createElement("bullets");
 			rootElement.appendChild(bullets);
@@ -110,13 +103,6 @@ public class RenderClient {
 				Element status = doc.createElement("status");
 				status.appendChild(doc.createTextNode(""+gs.bullets.get(i).getStatus()));
 				b.appendChild(status);
-				if(gs.bullets.get(i).getStatus()==1)
-					gs.bullets.get(i).setStatus(0);
-				else if(gs.bullets.get(i).getStatus() < 0)
-				{
-					gs.bullets.remove(i);
-					i--;
-				}
 			}
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();

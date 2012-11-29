@@ -47,7 +47,7 @@ public class GameState implements Runnable {
 			// TODO Send data to renderclients and androids
 			srv.androidSend();
 			srv.rendererSend();
-			
+			purgeDead();
 			
 			end = System.currentTimeMillis();
 			//System.err.println(((end-start))+" ms");
@@ -151,6 +151,25 @@ public class GameState implements Runnable {
 	public int nextAId()
 	{
 		return planeIdPool++;
+	}
+	
+	public int nextBId()
+	{
+		return bulletIdPool++;
+	}
+	
+	public void purgeDead()
+	{
+		for(int i = 0 ; i<airplanes.size(); i++)
+		{
+			if(airplanes.get(i).getStatus()<0)
+				airplanes.remove(i--);
+		}
+		for(int i=0 ; i<bullets.size(); i++)
+		{
+			if(bullets.get(i).getStatus()<0)
+				bullets.remove(i--);
+		}
 	}
 
 

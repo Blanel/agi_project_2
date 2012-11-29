@@ -6,7 +6,6 @@ public class Airplane extends Entity{
 	private int hits;
 	private int kills;
 	private String name;
-	//private final static double INITIAL_SPEED = 1;
 	private int gear;
 	private final static double[] speeds = {1,2,3,4};
 	private AndroidClient owner;
