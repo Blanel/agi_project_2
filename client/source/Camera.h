@@ -75,6 +75,7 @@ public:
     {
         //return look_at(m_Eye, m_Target, m_Up).inversed();
         return (math::Transform::translate(m_Eye) * math::Transform::rotate_x(math::PI/18)).inversed();
+        //return (math::Transform::rotate_x(math::PI/2) * math::Transform::translate(m_Eye)).inversed();
     }
 
     math::mat4 look_at(point3 eye, point3 target, vec3 up = vec3(0, 1, 0))
