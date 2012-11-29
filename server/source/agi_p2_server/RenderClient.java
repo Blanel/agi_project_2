@@ -36,6 +36,10 @@ public class RenderClient {
 		
 	}
 
+	public boolean isOpen()
+	{
+		return !soc.isClosed();
+	}
 	public void send()
 	{
 		try
@@ -108,16 +112,27 @@ public class RenderClient {
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource source = new DOMSource(doc);
 			
-			//StreamResult result = new StreamResult(soc.getOutputStream());
 			StreamResult result = new StreamResult(os);
 			transformer.transform(source,result);
 		}
 		catch (ParserConfigurationException pce) {
 			// TODO Fix better exception handling.
-			pce.printStackTrace();
+			System.err.println("Parser exception! Did a renderer disconnect?");
+			try {
+				soc.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.err.println("... and an IOException to boot!");
+			}
 		} catch (TransformerException tfe) {
 			// TODO Fix better exception handling.
-			tfe.printStackTrace();
+			System.err.println("Transformer Exception! Did a renderer disconnect?");
+			try {
+				soc.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.err.println("... and an IOException to boot!");
+			}
 		} 
 	}
 }

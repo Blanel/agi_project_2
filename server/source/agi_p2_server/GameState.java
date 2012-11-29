@@ -54,7 +54,7 @@ public class GameState implements Runnable {
 			if(end-start < UPDATEFREQUENCY)
 			{
 				try {
-					Thread.sleep(end-start);
+					Thread.sleep(UPDATEFREQUENCY-(end-start));
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

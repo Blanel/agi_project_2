@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Server implements Runnable{
 	
 	private ArrayList<AndroidClient> androids;
-	private ArrayList<RenderClient> renderers;
+	public ArrayList<RenderClient> renderers;
 	private GameState gs;
 	private ServerSocket androidServsoc;
 	private ServerSocket renderServsoc;
@@ -71,7 +71,7 @@ public class Server implements Runnable{
 	
 	public static void main(String[] args)
 	{
-		 new Server(1337, 10, 1338, 10);
+		 new Server(1337, 10, 1234, 10);
 	}
 
 	public void run() {
@@ -105,7 +105,10 @@ public class Server implements Runnable{
 	{
 		for(int i=0 ; i<renderers.size(); i++)
 		{
-			renderers.get(i).send();
+			if(renderers.get(i).isOpen())
+				renderers.get(i).send();
+			else
+				renderers.remove(i--);
 		}
 	}
 
