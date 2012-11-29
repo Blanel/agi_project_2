@@ -18,10 +18,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class RenderClient {
+	
+	private Socket soc;
 
 	public void send(GameState gs)
 	{
-		Socket soc = new Socket();
 		try
 		{
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -111,10 +112,16 @@ public class RenderClient {
 			transformer.transform(source,result);
 		}
 		catch (ParserConfigurationException pce) {
+			// TODO Fix better exception handling.
 			pce.printStackTrace();
 		} catch (TransformerException tfe) {
+			// TODO Fix better exception handling.
 			tfe.printStackTrace();
 		} 
+		/*catch (IOException e) {
+			// TODO Fix better exception handling.
+			e.printStackTrace();
+		} */
 	}
 
 }

@@ -17,20 +17,24 @@ public class GameState {
 	
 	public void update()
 	{
-		// Get changes from all clients.
+		// TODO Get changes from all clients.
 		
-		// Apply all changes from all clients.
+		// TODO Apply all changes from all clients. This includes updating rotations for planes, speeds for planes and spawning new bullets and/or planes.
 		
-		// Move all bullets and planes
+		// Move all bullets and planes (Seems to work as expected)
 		moveEverything();
 		
-		// Calculate all collisions
+		// Calculate all collisions (Seems to work as expected)
 		calculateCollisions();
 		
-		// Send data to renderclients
+		// TODO Send data to renderclients
 		
 	}
 	
+	/**
+	 * Moves all entities according to their properties.
+	 * 
+	 */
 	public void moveEverything()
 	{
 		for(int i = 0 ; i<airplanes.size() ; i++)
@@ -44,7 +48,12 @@ public class GameState {
 	}
 	
 	
-	
+	/**
+	 * Calculates collisions between shots and airplanes.
+	 * Disregards collisions between airplanes.
+	 * Disregards collisions between owned bullets.
+	 * Disregards collisions between bullets that already have hit something or are queued for despawn
+	 */
 	public void calculateCollisions()
 	{
 		for(int i = 0 ; i<airplanes.size(); i++)

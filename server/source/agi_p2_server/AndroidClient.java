@@ -1,7 +1,13 @@
 package agi_p2_server;
 
+import java.net.Socket;
+
 public class AndroidClient {
 	
-	Airplane plane;
+	private Airplane plane;
+	private Socket soc;
+	private boolean isShooting;
+	private double rotation;
+	
 
 }
