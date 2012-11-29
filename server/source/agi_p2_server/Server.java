@@ -15,7 +15,14 @@ public class Server {
 	private ServerSocket androidServsoc;
 	private ServerSocket renderServsoc;
 	
-	
+	public static void main(String[] args)
+	{
+		if(args.length<2)
+		{
+			System.out.println("No valid input given!");
+		}
+		 new Server(Integer.parseInt(args[0]), Integer.parseInt(args[2]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+	}
 	
 	public Server(int aport, int abacklog, int rport, int rbacklog)
 	{
@@ -86,17 +93,7 @@ public class Server {
 		System.out.println("Server startup success!");
 		
 	}
-	
-	
-	public static void main(String[] args)
-	{
-		if(args.length<2)
-		{
-			System.out.println("No valid input given!");
-		}
-		 new Server(Integer.parseInt(args[0]), Integer.parseInt(args[2]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
-	}
-	
+		
 	public void androidSync()
 	{
 		for(int i=0 ; i < androids.size() ; i++)
