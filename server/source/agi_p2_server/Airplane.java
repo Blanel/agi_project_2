@@ -7,6 +7,7 @@ public class Airplane extends Entity{
 	private int kills;
 	private String name;
 	private final static double INITIAL_SPEED = 1;
+	private AndroidClient owner;
 	
 	/*
 	 * Statuses for planes:
@@ -15,21 +16,23 @@ public class Airplane extends Entity{
 	 * -1 = dead
 	 */
 	
-	public Airplane(int id, double x, double y, double angle, String name)
+	public Airplane(int id, double x, double y, double angle,AndroidClient owner, String name)
 	{
 		
 		super(id, x,y,angle, INITIAL_SPEED);
 		
 		this.name = name;
 		life = 5;
+		this.owner = owner;
 	}
-	public Airplane(int id, double x, double y, double angle)
+	public Airplane(int id, double x, double y, double angle, AndroidClient owner)
 	{
 		
 		super(id, x,y,angle, INITIAL_SPEED);
 		
 		name = "John Doe";
 		life = 5;
+		this.owner = owner;
 	}
 	
 

@@ -1,32 +1,80 @@
 package agi_p2_server;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 
-public class Server {
+public class Server implements Runnable{
 	
 	private ArrayList<AndroidClient> androids;
 	private ArrayList<RenderClient> renderers;
+	private GameState gs;
+	private ServerSocket androidServsoc;
+	private ServerSocket renderServsoc;
 	
 	
-	public Server(int port)
+	
+	public Server(int aport, int abacklog, int rport, int rbacklog)
 	{
 		androids = new ArrayList<AndroidClient>();
 		renderers = new ArrayList<RenderClient>();
+		
+		gs = new GameState();
+		new Thread(gs).start();
+		
+		try 
+		{
+			androidServsoc = new ServerSocket(aport,abacklog);
+			renderServsoc = new ServerSocket(rport, rbacklog);
+		} catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		/*
+		 * Android client connect listener
+		 */
+		(new Thread() {	public void run(){
+				while(true)
+				{
+					try {
+						Socket soc = androidServsoc.accept();
+						AndroidClient temp = new AndroidClient(soc, gs);
+						androids.add(temp);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}}).start();
+		
+		/*
+		 * Renderer client connect listener
+		 */
+		(new Thread() {	public void run(){
+				while(true)
+				{
+					try {
+						Socket soc = renderServsoc.accept();
+						renderers.add(new RenderClient(soc,gs));
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}}).start();
 	}
 	
 	public static void main(String[] args)
 	{
-		GameState gs = new GameState();
 		
-		gs.airplanes.add(new Airplane(1, 2, 3, 4, "hello"));
-		gs.airplanes.add(new Airplane(5, 6.6, 7.7, 8.8, "world"));
-		gs.bullets.add(new Bullet(1, gs.airplanes.get(0)));
-		gs.bullets.add(new Bullet(5, gs.airplanes.get(0)));
+	}
+
+	public void run() {
+		// TODO Auto-generated method stub
 		
-		RenderClient rc = new RenderClient();
-		
-		rc.send(gs);
-		rc.send(gs);
 	}
 
 }

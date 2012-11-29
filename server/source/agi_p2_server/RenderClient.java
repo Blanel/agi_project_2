@@ -19,8 +19,16 @@ import org.w3c.dom.Element;
 public class RenderClient {
 	
 	private Socket soc;
+	private GameState gs;
+	
+	public RenderClient(Socket soc, GameState gs)
+	{
+		this.soc = soc;
+		this.gs = gs;
+		
+	}
 
-	public void send(GameState gs)
+	public void send()
 	{
 		try
 		{

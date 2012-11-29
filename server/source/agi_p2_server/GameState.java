@@ -1,17 +1,18 @@
 package agi_p2_server;
 import java.util.ArrayList;
 
-public class GameState {
-	
-	
+public class GameState implements Runnable {
+
+
 	public ArrayList<Airplane> airplanes;
 	public ArrayList<Bullet> bullets;
 	private int planeIdPool;
 	private int bulletIdPool;
 	private final double MAX_DISTANCE = 128;
-	
+	private final long UPDATEFREQUENCY = 17;
+
 	private static final double planeHitbox = 0.5f;
-	
+
 	public GameState()
 	{
 		airplanes = new ArrayList<Airplane>();
@@ -19,26 +20,47 @@ public class GameState {
 		planeIdPool = 0;
 		bulletIdPool = 0;
 	}
-	
+
 	/**
 	 * Updates gamestate
 	 */
-	public void update()
+	public void run()
 	{
-		// TODO Get changes from all clients.
-		
-		// TODO Apply all changes from all clients. This includes updating rotations for planes, speeds for planes and spawning new bullets and/or planes.
-		
-		// Move all bullets and planes (Seems to work as expected)
-		moveEverything();
-		
-		// Calculate all collisions (Seems to work as expected)
-		calculateCollisions();
-		
-		// TODO Send data to renderclients
-		
-	}
+		long start;
+		long end;
+		while(true)
+		{
+			start = System.currentTimeMillis();
+			// TODO Get changes from all clients.
 	
+			// TODO Apply all changes from all clients. This includes updating rotations for planes, speeds for planes and spawning new bullets and/or planes.
+			
+			// Move all bullets and planes (Seems to work as expected)
+			moveEverything();
+	
+			// Calculate all collisions (Seems to work as expected)
+			calculateCollisions();
+	
+			// TODO Send data to renderclients
+			
+			end = System.currentTimeMillis();
+			if(end-start < UPDATEFREQUENCY)
+			{
+				try {
+					Thread.sleep(end-start);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			else
+			{
+				System.err.println("Server can't keep up! "+(UPDATEFREQUENCY-(end-start))+" ms too slow");
+			}
+		}
+
+	}
+
 	/**
 	 * Moves all entities according to their properties.
 	 * 
@@ -65,10 +87,10 @@ public class GameState {
 			}
 		}
 	}
-	
 
-	
-	
+
+
+
 	/**
 	 * Calculates collisions between shots and airplanes.
 	 * Disregards collisions between airplanes.
@@ -97,25 +119,33 @@ public class GameState {
 			}
 		}
 	}
-	
+
 	/**
 	 * Gets centre of all airplanes.
 	 * @return Coordinates for centre
 	 */
-	private Coord getCentre()
+	public Coord getCentre()
 	{
 		Coord temp = new Coord();
-		for(int i=0 ; i<airplanes.size(); i++)
+		if(airplanes.size() !=0)
 		{
-			temp.x += airplanes.get(i).getPos().x;
-			temp.y += airplanes.get(i).getPos().y;
+			for(int i=0 ; i<airplanes.size(); i++)
+			{
+				temp.x += airplanes.get(i).getPos().x;
+				temp.y += airplanes.get(i).getPos().y;
+			}
+			temp.x /= airplanes.size();
+			temp.y /= airplanes.size();
 		}
-		temp.x /= airplanes.size();
-		temp.y /= airplanes.size();
 		return temp;
 	}
 	
-	
-	
+	public int nextAId()
+	{
+		return planeIdPool++;
+	}
+
+
+
 
 }
