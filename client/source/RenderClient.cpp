@@ -38,6 +38,7 @@ using namespace revel::renderer;
 #include "TerrainTile.h"
 #include "Plane.h"
 
+#include <pugixml.hpp>
 
 #include "Image3D.h"
 
@@ -101,6 +102,7 @@ RenderClient::run()
 
     //auto text = Device::graphics()->create_texture_2d();
 
+    pugi::xml_document doc;
     
 
     auto sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/passthrough_vs.glsl", 
@@ -143,18 +145,17 @@ RenderClient::run()
 
     //scene.root().add_child(GeoNode(mesh));
 
-    auto texture = Device::graphics()->create_texture_2d();
+    
     auto tex3d = Device::graphics()->create_texture_3d();
 
 
     //auto heightmap 	= Terrain::generate_heightmap(128, 128, 24.0f, 2.5f);
     //auto tmesh 		= Terrain::heightmap_to_mesh(heightmap);
-	TerrainTile tt(0,0,128,10, 2.5);
-	auto tmesh = tt.mesh;
+	TerrainTile tt(0,0,128,10, 5);
+	auto tmesh 		= tt.mesh;
 	auto tmeshva 	= ctx->create_vertex_array(tmesh);
 
 	R_LOG_INFO("MESH: " << tmeshva->index_count());
-
 
     //TGA::write("D:/hello.tga", terrain);
 
@@ -245,6 +246,8 @@ RenderClient::run()
 		mvp = camera->projection_matrix() * camera->view_matrix() * Transform::translate(0, 0, 0);
 
 		::glDrawElements(GL_TRIANGLES, tmeshva->index_count(), GL_UNSIGNED_INT, 0);
+
+		::glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 		for (auto& plane : players)
 		{

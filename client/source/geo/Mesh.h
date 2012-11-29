@@ -69,23 +69,24 @@ public:
         auto quad = std::make_shared<Mesh>();
 
         auto quadp = quad->create_vertex_attrib<point3>("position");
-        auto quadn = quad->create_vertex_attrib<vec3>("normal");
         auto quadt = quad->create_vertex_attrib<vec2>("texcoord");
+        auto quadn = quad->create_vertex_attrib<vec3>("normal");
+        
 
         quadp->data().push_back(point3(-0.5, -0.5, 0));
         quadp->data().push_back(point3( 0.5, -0.5, 0));
         quadp->data().push_back(point3( 0.5,  0.5, 0));
         quadp->data().push_back(point3(-0.5,  0.5, 0));
 
-        quadn->data().push_back(vec3(0, 0, 1));
-        quadn->data().push_back(vec3(0, 0, 1));
-        quadn->data().push_back(vec3(0, 0, 1));
-        quadn->data().push_back(vec3(0, 0, 1));
-
         quadt->data().push_back(vec2(0, 0));
         quadt->data().push_back(vec2(1, 0));
         quadt->data().push_back(vec2(1, 1));
         quadt->data().push_back(vec2(0, 1));
+
+        quadn->data().push_back(vec3(0, 0, 1));
+        quadn->data().push_back(vec3(0, 0, 1));
+        quadn->data().push_back(vec3(0, 0, 1));
+        quadn->data().push_back(vec3(0, 0, 1));
 
         auto quadi = quad->indices<u32>();
         quadi->data().push_back(0);
