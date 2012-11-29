@@ -29,6 +29,7 @@ public class GameState implements Runnable {
 	 */
 	public void run()
 	{
+		System.out.println("Gamestate loop started");
 		long start;
 		long end;
 		while(true)

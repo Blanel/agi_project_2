@@ -135,4 +135,9 @@ public class RenderClient {
 			}
 		} 
 	}
+	
+	public Socket getSocket()
+	{
+		return soc;
+	}
 }

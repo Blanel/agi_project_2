@@ -85,6 +85,10 @@ public class AndroidClient implements Runnable{
 	{
 		return soc.isClosed();
 	}
+	public Socket getSocket()
+	{
+		return soc;
+	}
 	
 
 }
