@@ -1,7 +1,9 @@
 package com.example.agi_project_2_control;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -16,10 +18,13 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Editable;
+import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.VideoView;
@@ -47,6 +52,8 @@ public final class MainActivity extends Activity
 	public ImageView imageRedFlash; 
 	public ImageView imageViewNavigation;
 	public ImageView circle;
+	
+	
 	
 	/**
 	 * Used for sensor usage
@@ -87,20 +94,12 @@ public final class MainActivity extends Activity
 	 */
 	private Thread threadImage;
 	private Thread threadInput;
+	private Thread threadInputAlert;
 	
-	/**
-	 * Server connect
-	 */
-	static{
-		try {
-			client.connect();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
+	static boolean inititialised = false;
+	public String host = "192.168.0.16";
+	static boolean getHost = false;
+		
 	/**
 	 * Called when the activity first creates.
 	 */
@@ -108,99 +107,148 @@ public final class MainActivity extends Activity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		new GestureDetector(this);	
-		showVideo();
+		/*
+		if (getHost == false){
+			final Context context = this;
+	    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+	    			context);
+	    	
+	    	// set title
+	    	alertDialogBuilder.setTitle("Enter IP:");
+	    	
+	    	final EditText input = new EditText(this);
+	    	alertDialogBuilder.setView(input);
+	    	
+	    	// set dialog message
+	    	alertDialogBuilder
+	    		.setCancelable(false)
+	    		.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+	    			public void onClick(DialogInterface dialog,int id) {
+	    				Editable hosttemp = input.getText();
+	    				host = hosttemp.toString();
+	    				MainActivity.getHost = true;
+	    			}
+	    		  });
 
-		/**
-		 * Sounds 
-		 */
-		backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
-		backgroundMusic.setVolume(2.8f, 2.8f);
-		backgroundMusic.start();
-		
-		
-		/**
-		 * Sending Image size to server and client type in this case Android.
-		 */
-		Display display = getWindowManager().getDefaultDisplay(); 
-		this.screenWidth = display.getWidth();
-		this.screenHeight = display.getHeight();
-		try {
-			client.sendAction("Android");
-			client.sendAction("screenWidth" + screenWidth);
-			client.sendAction("screenHeight" + screenHeight);
-		} catch (IOException e) {
-			e.printStackTrace();
+	    	// create alert dialog
+	    	AlertDialog alertDialog = alertDialogBuilder.create();
+
+	    	// show it
+	    	alertDialog.show();
+	    	Log.d("MyApp","1");
+	    	MainActivity.getHost = true;
+	    	
+		}
+		else{*/
+			//Log.d("MyApp","1.5\n");
+			if(inititialised == false){
+				//Log.d("MyApp","2\n");
+				try {
+					client.connect(host);
+				} catch (UnknownHostException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				inititialised = true;
+			}
+			//Log.d("MyApp","3\n");
+			new GestureDetector(this);	
+			showVideo();
+	
+			/**
+			 * Sounds 
+			 */
+			backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
+			backgroundMusic.setVolume(2.8f, 2.8f);
+			backgroundMusic.start();
+			
+			
+			/**
+			 * Sending Image size to server and client type in this case Android.
+			 */
+			Display display = getWindowManager().getDefaultDisplay(); 
+			this.screenWidth = display.getWidth();
+			this.screenHeight = display.getHeight();
+			try {
+				client.sendAction("Android");
+				client.sendAction("screenWidth" + screenWidth);
+				client.sendAction("screenHeight" + screenHeight);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			/**
+			 * Images
+			 */
+			this.fireImage 				= (ImageView)findViewById(R.id.imageFire);
+			this.gasImage 				= (ImageView)findViewById(R.id.imageGas);
+			this.viewLifeImage 			= (ImageView)findViewById(R.id.imageViewLife);
+			this.imageRedFlash 			= (ImageView)findViewById(R.id.imageRedFlash);
+			this.imageViewNavigation 	= (ImageView)findViewById(R.id.imageViewNavigation);
+	
+			/**
+			 * Accelerometer
+			 */
+			mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+			mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+			mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+			
+			threadInput = new Thread(){
+				@Override
+				public void run(){
+					while(true){
+						try {
+							client.reciveAction(airplane);
+						}
+						catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			};
+			/**
+			 * Vad fan är det som händer egentligen
+			 */
+			threadImage = new Thread(){
+				@Override
+				public void run(){
+					while(true){
+						try {
+							Thread.sleep(100);
+							//(Message.obtain(MainActivity.this.mainHandler, 0)).sendToTarget();
+							
+							if (!backgroundMusic.isPlaying())
+								backgroundMusic.start();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			};
+	        
+			threadImage.setDaemon(true);
+			threadImage.start();
+			threadInput.setDaemon(true);
+			threadInput.start();
 		}
 		
-		/**
-		 * Images
-		 */
-		this.fireImage 				= (ImageView)findViewById(R.id.imageFire);
-		this.gasImage 				= (ImageView)findViewById(R.id.imageGas);
-		this.viewLifeImage 			= (ImageView)findViewById(R.id.imageViewLife);
-		this.imageRedFlash 			= (ImageView)findViewById(R.id.imageRedFlash);
-		this.imageViewNavigation 	= (ImageView)findViewById(R.id.imageViewNavigation);
-
-		/**
-		 * Accelerometer
-		 */
-		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-		
-		threadInput = new Thread(){
-			@Override
-			public void run(){
-				while(true){
-					try {
-						client.reciveAction(airplane);
-					}
-					catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		};
-		/**
-		 * Vad fan är det som händer egentligen
-		 */
-		threadImage = new Thread(){
-			@Override
-			public void run(){
-				while(true){
-					try {
-						Thread.sleep(100);
-						//(Message.obtain(MainActivity.this.mainHandler, 0)).sendToTarget();
-						
-						if (!backgroundMusic.isPlaying())
-							backgroundMusic.start();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		};
-        
-		threadImage.setDaemon(true);
-		threadImage.start();
-		threadInput.setDaemon(true);
-		threadInput.start();
-
-	}
+	//}
 	/**
 	 *	What should happen when the program needs to be resumed.
 	 */
 	protected void onResume() {
 		super.onResume();
-		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+		if(inititialised)
+			mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 	}
 	/**
 	 *	What should happen when the program is stopped being paused.
 	 */
 	protected void onPause() {
 		super.onPause();
-		mSensorManager.unregisterListener(this);
+		if(inititialised)
+			mSensorManager.unregisterListener(this);
 	}
 	
 	/**
@@ -227,7 +275,7 @@ public final class MainActivity extends Activity
 	public void onSensorChanged(SensorEvent event) {
 		float x = event.values[0];
 		float y = event.values[1];
-		float z = event.values[2];
+		//float z = event.values[2];
 		
 		try {
 			client.sendAction("x"+Float.toString(x));
@@ -384,6 +432,7 @@ public final class MainActivity extends Activity
 
 	private String srcPath = "android.resource://com.example.agi_project_2_control/raw/introvideo";
 	private void showVideo(){
+		//Log.d("MyApp","ShowVideo\n");
 		VideoView vd = (VideoView)findViewById(R.id.videoViewBK);
 		Uri uri = Uri.parse(srcPath);
 		vd.setVideoURI(uri);
@@ -400,8 +449,43 @@ public final class MainActivity extends Activity
             if (msg.what == 1) {
             	endFlash();
             }
+            if (msg.what == 2) {
+            	inputhostID();
+            }
         };
-    };  
+    }; 
+    
+    public void inputhostID(){
+    	final Context context = this;
+    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+    			context);
+    	
+    	// set title
+    	alertDialogBuilder.setTitle("Enter IP:");
+    	
+    	final EditText input = new EditText(this);
+    	alertDialogBuilder.setView(input);
+    	
+    	// set dialog message
+    	alertDialogBuilder
+    		.setCancelable(false)
+    		.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog,int id) {
+    				Editable hosttemp = input.getText();
+    				host = hosttemp.toString();
+    				MainActivity.getHost = true;
+    			}
+    		  });
+
+    	// create alert dialog
+    	AlertDialog alertDialog = alertDialogBuilder.create();
+
+    	// show it
+    	alertDialog.show();
+    	Log.d("MyApp","1");
+    	MainActivity.getHost = true;
+    }
+    
 }
 
 

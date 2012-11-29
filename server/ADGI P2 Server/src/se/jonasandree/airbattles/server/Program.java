@@ -10,7 +10,7 @@ public class Program implements Runnable {
 	private static OutputStream[] clientOuts = new OutputStream[1024];
 	private static String action = "die";
 	final ArrayList<Client> renderingClients = new ArrayList<>();
-	
+	final ArrayList<Client> androidClients = new ArrayList<>();
 	
 	/**
 	 * @param args
@@ -35,7 +35,6 @@ public class Program implements Runnable {
 	@Override
 	public void run(){
 		final ArrayList<Client> clients = new ArrayList<>();
-
 		try (ServerSocket server = new ServerSocket(15003, 20)) {
 			for(;;){
 				final Socket socket = server.accept();
@@ -74,10 +73,12 @@ public class Program implements Runnable {
 								e.printStackTrace();
 							}
 							for (Client client : clients){
-								if (!client.getClientType()){
+								if (client.getClientType() == false && client.isAClient == true){
 									renderingClients.add(client);
+									//System.out.println("AndroidClient: "+client.getClientType()+"");
 								}
-								else{
+								else if (client.isAClient == true){
+									//System.out.println("AndroidClient: "+client.getClientType()+"");
 									try {
 										String alivetemp = "no";
 										if (client.airplane.getAlive()){
@@ -86,18 +87,20 @@ public class Program implements Runnable {
 										else {
 											alivetemp = "no";
 										}
+										//System.out.println("Amount of rendering clients: "+ renderingClients.size());
 										for (Client client1 :renderingClients){
 											System.out.println("aireplane: " + client.getIndex()+"\n"+"alive: " + alivetemp+"\n");
 											client1.write(("aireplane: " + client.getIndex()+"\n" + "alive: "+alivetemp+"\n").getBytes("UTF-8"));
 											if (client.android){
 												if(client.airplane.getAlive()){
 													System.out.println("x: "+client.airplane.getPositionX()+"\n"+"y: "+client.airplane.getPositionY()+"\n"+"rotation: "+client.airplane.getRotation()+"\n");
+													
 													client1.write(("x: "+client.airplane.getPositionX()+"\n"+"y: "+client.airplane.getPositionY()+"\n"+"rotation: "+client.airplane.getRotation()+"\n").getBytes("UTF-8"));	
 												}
 											}
 										}
 									} catch (UnsupportedEncodingException e) {
-										e.printStackTrace();
+										;
 									}
 										ArrayList<Bullet> bullets = client.airplane.getBullets();
 										if (bullets.isEmpty()){
@@ -113,23 +116,21 @@ public class Program implements Runnable {
 												}
 												
 												System.out.println("bullet: "+ bindex + "\n"+ "x: "+ bullets.get(bindex).getPositionX()+"\n"+ "y: "+ bullets.get(bindex).getPositionY()+"\n"+ "rotation: "+ bullets.get(bindex).getRotation()+"\n" + "exists: "+bexists);
-												
-												if (!bullets.get(bindex).getExist()){
+												if (bullets.get(bindex).getExist()){
+													for (Client client1 :renderingClients){
+														try {
+															System.out.println(("bullet: "+ bindex + "\n"+ "x: "+ bullets.get(bindex).getPositionX()+"\n"+ "y: "+ bullets.get(bindex).getPositionY()+"\n"+ "rotation: "+ bullets.get(bindex).getRotation()+"\n" + "exists: "+bexists));
+															
+															client1.write(("bullet: "+ bindex + "\n"+ "x: "+ bullets.get(bindex).getPositionX()+"\n"+ "y: "+ bullets.get(bindex).getPositionY()+"\n"+ "rotation: "+ bullets.get(bindex).getRotation()+"\n" + "exists: "+bexists).getBytes("UTF-8"));
+														}catch (UnsupportedEncodingException e) {
+															;
+														}
+													}
+												}
+												if (bullets.get(bindex).getExist() == false){
 													System.out.println("Bullet Removed:");
 													client.airplane.removeBullet(bindex);
 												}
-												
-												/*
-												try {
-													client.write(("b" + client.airplane.getIndex()+ "bi"+  "e" + client.airplane.getBullets(i).getExist()).getBytes("UTF-8"));
-													if(client.airplane.getBullets(i).getExist()){
-														client.write(("b" + client.airplane.getIndex()+ "bi"+"x" + client.airplane.getBullets(i).getPositionX()+"\n\n").getBytes("UTF-8"));
-														client.write(("b" + client.airplane.getIndex()+ "bi"+ "y" + client.airplane.getBullets(i).getPositionY()+"\n\n").getBytes("UTF-8"));	
-													} 	
-												}catch (UnsupportedEncodingException e) {
-													// TODO Auto-generated catch block
-													e.printStackTrace();
-												}*/
 											}
 										}
 									}
@@ -147,5 +148,4 @@ public class Program implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
 }

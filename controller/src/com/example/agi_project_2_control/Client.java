@@ -3,6 +3,12 @@ import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.text.Editable;
+import android.view.View;
+
 public class Client {
 	protected Socket socket = null;
 	protected InputStream inputStream = null;
@@ -11,14 +17,14 @@ public class Client {
 	public Scanner scanner;
 	
 	
-	public void connect() throws UnknownHostException, IOException{
-			this.socket = new Socket("192.168.0.16", 15003);
-			//this.socket = new Socket("127.0.0.1", 55003);
-			
-			this.inputStream =  this.socket.getInputStream();
-			this.outputStream = this.socket.getOutputStream();
-			
-			this.scanner = new Scanner(this.inputStream);
+	public void connect(String host) throws UnknownHostException, IOException{
+		this.socket = new Socket(host, 15003);
+		//this.socket = new Socket("127.0.0.1", 55003);
+		
+		this.inputStream =  this.socket.getInputStream();
+		this.outputStream = this.socket.getOutputStream();
+		
+		this.scanner = new Scanner(this.inputStream);
 	}
 	public void disconnect() {
 			if (this.socket != null){
