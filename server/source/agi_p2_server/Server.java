@@ -84,7 +84,6 @@ public class Server implements Runnable{
 		for(int i=0 ; i < androids.size() ; i++)
 		{
 			androids.get(i).update();
-
 		}
 	}
 	
@@ -92,7 +91,7 @@ public class Server implements Runnable{
 	{
 		for(int i=0 ; i<androids.size() ; i++)
 		{
-			
+			androids.get(i).sendEvents();
 		}
 	}
 	
@@ -100,7 +99,7 @@ public class Server implements Runnable{
 	{
 		for(int i=0 ; i<renderers.size(); i++)
 		{
-			
+			renderers.get(i).send();
 		}
 	}
 

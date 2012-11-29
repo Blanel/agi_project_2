@@ -123,7 +123,7 @@ public class RenderClient {
 			DOMSource source = new DOMSource(doc);
 			
 			//StreamResult result = new StreamResult(soc.getOutputStream());
-			StreamResult result = new StreamResult(System.out);
+			StreamResult result = new StreamResult(os);
 			transformer.transform(source,result);
 		}
 		catch (ParserConfigurationException pce) {
@@ -133,10 +133,5 @@ public class RenderClient {
 			// TODO Fix better exception handling.
 			tfe.printStackTrace();
 		} 
-		/*catch (IOException e) {
-			// TODO Fix better exception handling.
-			e.printStackTrace();
-		} */
 	}
-
 }

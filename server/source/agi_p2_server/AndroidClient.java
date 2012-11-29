@@ -47,5 +47,10 @@ public class AndroidClient implements Runnable{
 		
 	}
 	
+	public void sendEvents()
+	{
+		
+	}
+	
 
 }
