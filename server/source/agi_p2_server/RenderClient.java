@@ -1,6 +1,5 @@
 package agi_p2_server;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 

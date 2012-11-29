@@ -6,7 +6,6 @@ public class Entity {
 	private double angle;
 	
 	private double speed;
-	private final static double INITIAL_SPEED=0;
 	
 	private int status;
 	
@@ -20,6 +19,11 @@ public class Entity {
 		this.speed = speed;
 		status =1;
 	}
+	
+	
+	/**
+	 * Moves entity according to inherent properties.
+	 */
 	public void move()
 	{
 		pos.x += speed*Math.cos(angle);
@@ -52,25 +56,27 @@ public class Entity {
 		pos.x = p.x;
 		pos.y = p.y;
 	}
-	public double getAngle() {
+	public double getAngle() 
+	{
 		return angle;
 	}
-	public void setAngle(double angle) {
+	public void setAngle(double angle) 
+	{
 		this.angle = angle;
 	}
-	public double getSpeed() {
+	
+	public void addAngle(double angle)
+	{
+		this.angle += angle;
+	}
+	public double getSpeed() 
+	{
 		return speed;
 	}
-	public void setSpeed(double speed) {
+	public void setSpeed(double speed) 
+	{
 		this.speed = speed;
 	}
-	
-	
-	
-	
-	
-
-	
 	public int getStatus()
 	{
 		return status;

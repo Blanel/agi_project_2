@@ -1,6 +1,18 @@
 package agi_p2_server;
 
-public class MainServer {
+import java.util.ArrayList;
+
+public class Server {
+	
+	private ArrayList<AndroidClient> androids;
+	private ArrayList<RenderClient> renderers;
+	
+	
+	public Server(int port)
+	{
+		androids = new ArrayList<AndroidClient>();
+		renderers = new ArrayList<RenderClient>();
+	}
 	
 	public static void main(String[] args)
 	{

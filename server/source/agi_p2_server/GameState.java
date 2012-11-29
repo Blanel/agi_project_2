@@ -6,6 +6,9 @@ public class GameState {
 	
 	public ArrayList<Airplane> airplanes;
 	public ArrayList<Bullet> bullets;
+	private int planeIdPool;
+	private int bulletIdPool;
+	private final double MAX_DISTANCE = 128;
 	
 	private static final double planeHitbox = 0.5f;
 	
@@ -13,8 +16,13 @@ public class GameState {
 	{
 		airplanes = new ArrayList<Airplane>();
 		bullets = new ArrayList<Bullet>();
+		planeIdPool = 0;
+		bulletIdPool = 0;
 	}
 	
+	/**
+	 * Updates gamestate
+	 */
 	public void update()
 	{
 		// TODO Get changes from all clients.
@@ -37,13 +45,24 @@ public class GameState {
 	 */
 	public void moveEverything()
 	{
+		// Move all planes
 		for(int i = 0 ; i<airplanes.size() ; i++)
 		{
 			airplanes.get(i).move();
 		}
+		// Move all bullets
 		for(int i=0 ; i<bullets.size() ; i++)
 		{
 			bullets.get(i).move();
+		}
+		//Find centre of all planes and turn any planes that are too far away into the centre again
+		Coord centre = getCentre();
+		for(int i=0 ; i<airplanes.size() ; i++)
+		{
+			if(airplanes.get(i).getPos().distance(centre)>=MAX_DISTANCE)
+			{
+				airplanes.get(i).setAngle(airplanes.get(i).getPos().getAngle(centre));
+			}
 		}
 	}
 	
@@ -62,22 +81,39 @@ public class GameState {
 		{
 			for(int j = 0 ; j<bullets.size() ; j++)
 			{
-				if(airplanes.get(i).getStatus()==-1)
+				// If plane is already dead, skip consequent calculations on plane
+				if(airplanes.get(i).getStatus()==-1) 
 					break;
+				// For every bullet that is still alive and not owned by the current plane, check for collision.
 				if(bullets.get(j).getStatus()>=0 && airplanes.get(i)!=bullets.get(j).getOwner() && airplanes.get(i).getPos().distance(bullets.get(j).getPos())<planeHitbox)
 				{
-					if(airplanes.get(i).hit())
+					if(airplanes.get(i).hit()) // Register a hit, if true plane has been killed.
 					{
 						bullets.get(j).getOwner().incrementKills();
-						airplanes.get(i).setStatus(-1);
 					}
 					bullets.get(j).getOwner().incrementHits();
-					bullets.get(j).setStatus(-1);
+					bullets.get(j).setStatus(-1); // Set status of bullet as a hit. (Not alive anymore)
 				}
 			}
 		}
 	}
 	
+	/**
+	 * Gets centre of all airplanes.
+	 * @return Coordinates for centre
+	 */
+	private Coord getCentre()
+	{
+		Coord temp = new Coord();
+		for(int i=0 ; i<airplanes.size(); i++)
+		{
+			temp.x += airplanes.get(i).getPos().x;
+			temp.y += airplanes.get(i).getPos().y;
+		}
+		temp.x /= airplanes.size();
+		temp.y /= airplanes.size();
+		return temp;
+	}
 	
 	
 	
