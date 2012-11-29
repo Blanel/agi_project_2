@@ -23,16 +23,12 @@ public class RenderClient {
 	private OutputStream os;
 	private GameState gs;
 	
-	public RenderClient(Socket soc, GameState gs)
+	public RenderClient(Socket soc, GameState gs) throws IOException
 	{
 		this.soc = soc;
 		this.gs = gs;
-		try {
-			os = soc.getOutputStream();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		os = soc.getOutputStream();
+
 		
 	}
 
@@ -116,22 +112,23 @@ public class RenderClient {
 			transformer.transform(source,result);
 		}
 		catch (ParserConfigurationException pce) {
-			// TODO Fix better exception handling.
 			System.err.println("Parser exception! Did a renderer disconnect?");
 			try {
 				soc.close();
+				return;
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				System.err.println("... and an IOException to boot!");
+				return;
 			}
 		} catch (TransformerException tfe) {
-			// TODO Fix better exception handling.
 			System.err.println("Transformer Exception! Did a renderer disconnect?");
 			try {
 				soc.close();
+				return;
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				System.err.println("... and an IOException to boot!");
+				return;
 			}
 		} 
 	}

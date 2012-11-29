@@ -40,8 +40,7 @@ public class Server {
 		try {
 			ip = InetAddress.getLocalHost().getHostAddress();
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("Unable to find local ip. Continuing without, but may be unpredictable.");
 		}
 		System.out.println("Android Adress:"+ip+":"+androidServsoc.getLocalPort());
 		System.out.println("Render Adress:"+ip+":"+renderServsoc.getLocalPort());
@@ -65,8 +64,7 @@ public class Server {
 						androids.add(temp);
 						System.out.println("Android Client Connected: "+soc.getInetAddress().getHostAddress());
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.err.println("Connection of android failed!");
 					}
 				}
 			}}).start();
@@ -83,8 +81,7 @@ public class Server {
 						renderers.add(new RenderClient(soc,gs));
 						System.out.println("Render Client Connected: "+soc.getInetAddress().getHostAddress());
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.err.println("Connection of android failed!");
 					}
 				}
 			}}).start();

@@ -11,11 +11,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -36,25 +36,37 @@ public class AndroidClient implements Runnable{
 	private int cachedLife;
 	
 	
-	public AndroidClient(Socket soc, GameState gs)
+	public AndroidClient(Socket soc, GameState gs) throws IOException
 	{
 		
 		this.soc = soc;
-		try {
-			is = soc.getInputStream();
-			os = soc.getOutputStream();
-			sc = new Scanner(is);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		is = soc.getInputStream();
+		os = soc.getOutputStream();
+		sc = new Scanner(is);
+		
 		isShooting = false;
 		rotation = 0;
 		double angle = new Random().nextDouble()*Math.PI*2;
 		Coord centre = gs.getCentre();
-		plane = new Airplane(gs.nextAId(),centre.x+Math.cos(angle+Math.PI), centre.y+Math.sin(angle+Math.PI),angle,this);
+		plane = new Airplane(gs.nextAId(),centre.x+Math.cos(angle+Math.PI), centre.y+Math.sin(angle+Math.PI),angle);
 		gs.airplanes.add(plane);
 		cachedLife = plane.getLife();
+	}
+	
+	public void update()
+	{
+		plane.addAngle(rotation);
+		if(isGearUp)
+		{
+			plane.gearUp();
+			isGearUp=false;
+		}
+		if(isShooting)
+		{
+			gs.bullets.add(new Bullet(gs.nextBId(), plane));
+			isShooting=false;
+		}
+
 	}
 
 	
@@ -90,27 +102,13 @@ public class AndroidClient implements Runnable{
 			}
 		}
 	}
-	public void update()
-	{
-		plane.addAngle(rotation);
-		if(isGearUp)
-		{
-			plane.gearUp();
-			isGearUp=false;
-		}
-		if(isShooting)
-		{
-			gs.bullets.add(new Bullet(gs.nextBId(), plane));
-			isShooting=false;
-		}
 
-	}
 	
 	public void sendEvents()
 	{
 		if(plane.getLife()<cachedLife)
 		{
-			// TODO Send hit info to android
+			// Send hit info to android
 			try {
 				DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 				DocumentBuilder docBuilder = docFactory.newDocumentBuilder();

@@ -36,7 +36,7 @@ public class GameState implements Runnable {
 		{
 			//System.err.println("Gamestate!");
 			start = System.currentTimeMillis();
-			// TODO Get changes from all clients.
+			// Get changes from all clients.
 			srv.androidSync();
 			
 			// Move all bullets and planes (Seems to work as expected)
@@ -45,7 +45,7 @@ public class GameState implements Runnable {
 			// Calculate all collisions (Seems to work as expected)
 			calculateCollisions();
 	
-			// TODO Send data to renderclients and androids
+			// Send data to renderclients and androids
 			srv.androidSend();
 			srv.rendererSend();
 			purgeDead();
@@ -57,8 +57,7 @@ public class GameState implements Runnable {
 				try {
 					Thread.sleep(UPDATEFREQUENCY-(end-start));
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.err.println("GameState sleep was interupted!");
 				}
 			}
 			else
