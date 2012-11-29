@@ -22,6 +22,7 @@ public class Client {
 	public boolean android = false;
 	public boolean renderingClient = false;
 	public int bIndex = 0;
+	public boolean isAClient = false;
 	
 	public void start() throws IOException{
 		for (String line; this.scanner.hasNextLine();){
@@ -31,14 +32,16 @@ public class Client {
 				System.out.flush();
 			}
 			else{
-				if (!this.android && !renderingClient){
+				if (this.android == false && renderingClient == false){
 					if (line.substring(0, 7).equals("Android")){
 						this.airplane = new Airplane(index);
+						this.isAClient = true;
 						this.android = true;
 						System.out.println("\n Android "+this.android);
 					}
-					else if (line.substring(0, 15).equals("renderingClient")){
+					else{
 						this.renderingClient = true;
+						this.isAClient = true;
 					}
 				}
 				else if(this.android){
