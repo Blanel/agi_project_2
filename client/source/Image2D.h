@@ -9,6 +9,7 @@
 #include <cstring>
 
 #include "SDL_Image.h"
+#include "Log.h"
 
 #include <iterator>
 
@@ -131,7 +132,7 @@ public:
 		SDL_Surface* image = IMG_Load(filename.c_str());
 		SDL_PixelFormat* format = image->format;
 
-		auto dataptr = static_cast<T*>(image->pixels);
+		auto dataptr = (T*)image->pixels;
 
 		if (image)
 		{
@@ -164,14 +165,17 @@ public:
 	        }
 	        */
 
+	        T* dataptr = (T*)image->pixels;
+
 			m_Pixels.reserve(pixelcount);
 
-			//std::copy(&dataptr, &dataptr + pixelcount, std::back_inserter(m_Pixels));			
+			m_Pixels = std::vector<T>(dataptr, dataptr + pixelcount);
 
 			SDL_FreeSurface(image);
 		}
 		else
 		{
+			R_LOG_ERR("SDL Image" << IMG_GetError());
 			throw std::exception();
 		}
 		
