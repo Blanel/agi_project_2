@@ -20,7 +20,7 @@ public class Server implements Runnable{
 		androids = new ArrayList<AndroidClient>();
 		renderers = new ArrayList<RenderClient>();
 		
-		gs = new GameState();
+		gs = new GameState(this);
 		new Thread(gs).start();
 		
 		try 
@@ -39,6 +39,7 @@ public class Server implements Runnable{
 		(new Thread() {	public void run(){
 				while(true)
 				{
+					System.err.println("AndroidConnectionWait!");
 					try {
 						Socket soc = androidServsoc.accept();
 						AndroidClient temp = new AndroidClient(soc, gs);
@@ -56,6 +57,7 @@ public class Server implements Runnable{
 		(new Thread() {	public void run(){
 				while(true)
 				{
+					System.err.println("RendererClientWait!");
 					try {
 						Socket soc = renderServsoc.accept();
 						renderers.add(new RenderClient(soc,gs));
@@ -69,12 +71,37 @@ public class Server implements Runnable{
 	
 	public static void main(String[] args)
 	{
-		
+		 new Server(1337, 10, 1338, 10);
 	}
 
 	public void run() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void androidSync()
+	{
+		for(int i=0 ; i < androids.size() ; i++)
+		{
+			androids.get(i).update();
+
+		}
+	}
+	
+	public void androidSend()
+	{
+		for(int i=0 ; i<androids.size() ; i++)
+		{
+			
+		}
+	}
+	
+	public void rendererSend()
+	{
+		for(int i=0 ; i<renderers.size(); i++)
+		{
+			
+		}
 	}
 
 }

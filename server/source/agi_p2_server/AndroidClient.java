@@ -1,5 +1,6 @@
 package agi_p2_server;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -11,6 +12,7 @@ public class AndroidClient implements Runnable{
 	private Socket soc;
 	private boolean isShooting;
 	private double rotation;
+	private boolean isAccelerating;
 	private InputStream is;
 	private OutputStream os;
 	
@@ -18,6 +20,13 @@ public class AndroidClient implements Runnable{
 	{
 		
 		this.soc = soc;
+		try {
+			is = soc.getInputStream();
+			os = soc.getOutputStream();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		isShooting = false;
 		rotation = 0;
 		double angle = new Random().nextDouble()*Math.PI*2;
@@ -32,6 +41,10 @@ public class AndroidClient implements Runnable{
 		{
 			
 		}
+	}
+	public void update()
+	{
+		
 	}
 	
 

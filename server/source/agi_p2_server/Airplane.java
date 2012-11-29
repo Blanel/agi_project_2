@@ -6,7 +6,9 @@ public class Airplane extends Entity{
 	private int hits;
 	private int kills;
 	private String name;
-	private final static double INITIAL_SPEED = 1;
+	//private final static double INITIAL_SPEED = 1;
+	private int gear;
+	private final static double[] speeds = {1,2,3,4};
 	private AndroidClient owner;
 	
 	/*
@@ -19,8 +21,8 @@ public class Airplane extends Entity{
 	public Airplane(int id, double x, double y, double angle,AndroidClient owner, String name)
 	{
 		
-		super(id, x,y,angle, INITIAL_SPEED);
-		
+		super(id, x,y,angle, speeds[0]);
+		gear = 0;
 		this.name = name;
 		life = 5;
 		this.owner = owner;
@@ -28,7 +30,7 @@ public class Airplane extends Entity{
 	public Airplane(int id, double x, double y, double angle, AndroidClient owner)
 	{
 		
-		super(id, x,y,angle, INITIAL_SPEED);
+		super(id, x,y,angle, speeds[0]);
 		
 		name = "John Doe";
 		life = 5;
@@ -80,6 +82,12 @@ public class Airplane extends Entity{
 	public String getName() 
 	{
 		return name;
+	}
+	
+	public void gearUp()
+	{
+		gear = (gear+1)%4;
+		setSpeed(speeds[gear]);
 	}
 
 	

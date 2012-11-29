@@ -1,6 +1,7 @@
 package agi_p2_server;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -19,12 +20,19 @@ import org.w3c.dom.Element;
 public class RenderClient {
 	
 	private Socket soc;
+	private OutputStream os;
 	private GameState gs;
 	
 	public RenderClient(Socket soc, GameState gs)
 	{
 		this.soc = soc;
 		this.gs = gs;
+		try {
+			os = soc.getOutputStream();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 

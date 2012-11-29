@@ -10,11 +10,14 @@ public class GameState implements Runnable {
 	private int bulletIdPool;
 	private final double MAX_DISTANCE = 128;
 	private final long UPDATEFREQUENCY = 17;
+	
+	private Server srv;
 
 	private static final double planeHitbox = 0.5f;
 
-	public GameState()
+	public GameState(Server srv)
 	{
+		this.srv = srv;
 		airplanes = new ArrayList<Airplane>();
 		bullets = new ArrayList<Bullet>();
 		planeIdPool = 0;
@@ -30,10 +33,10 @@ public class GameState implements Runnable {
 		long end;
 		while(true)
 		{
+			//System.err.println("Gamestate!");
 			start = System.currentTimeMillis();
 			// TODO Get changes from all clients.
-	
-			// TODO Apply all changes from all clients. This includes updating rotations for planes, speeds for planes and spawning new bullets and/or planes.
+			srv.androidSync();
 			
 			// Move all bullets and planes (Seems to work as expected)
 			moveEverything();
@@ -41,9 +44,13 @@ public class GameState implements Runnable {
 			// Calculate all collisions (Seems to work as expected)
 			calculateCollisions();
 	
-			// TODO Send data to renderclients
+			// TODO Send data to renderclients and androids
+			srv.androidSend();
+			srv.rendererSend();
+			
 			
 			end = System.currentTimeMillis();
+			//System.err.println(((end-start))+" ms");
 			if(end-start < UPDATEFREQUENCY)
 			{
 				try {
@@ -55,8 +62,9 @@ public class GameState implements Runnable {
 			}
 			else
 			{
-				System.err.println("Server can't keep up! "+(UPDATEFREQUENCY-(end-start))+" ms too slow");
+				System.err.println("Server can't keep up! "+((end-start)-UPDATEFREQUENCY)+" ms too slow");
 			}
+			
 		}
 
 	}
