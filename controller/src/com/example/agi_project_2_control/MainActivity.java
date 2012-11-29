@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -43,12 +42,10 @@ public final class MainActivity extends Activity
 	 */
 	private ImageView fireImage;
 	private ImageView gasImage;
-	//public ImageView viewBKImage;
 
 	public ImageView viewLifeImage;
 	public ImageView imageRedFlash; 
 	public ImageView imageViewNavigation;
-	//public ImageView imageViewArrow;
 	public ImageView circle;
 	
 	/**
@@ -57,10 +54,6 @@ public final class MainActivity extends Activity
 	private SensorManager mSensorManager;
 	private Sensor mAccelerometer;
 	
-	/*
-	CustomDrawableView mCustomDrawableView = null;
-    ShapeDrawable mDrawable = new ShapeDrawable();
-	*/
 	/**
 	 * Screen size
 	 */
@@ -71,7 +64,6 @@ public final class MainActivity extends Activity
 	 * Is the android player alive
 	 */
 	public static boolean alive = true;
-
 	
 	private int lastFire = -1;
 	private int lastGas = -1;
@@ -103,10 +95,8 @@ public final class MainActivity extends Activity
 		try {
 			client.connect();
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -118,21 +108,13 @@ public final class MainActivity extends Activity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		new GestureDetector(this);
-		
+		new GestureDetector(this);	
 		showVideo();
-		
-		
-		//viewBKVideo = (VideoView) findViewById(R.id.videoViewBK);
-		//viewBKVideo = MediaPlayer.create(this, R.raw.introvideo);
-		//viewBKVideo.start();
-		
-		
+
 		/**
 		 * Sounds 
 		 */
 		backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
-		//backgroundMusic.setLooping(true);
 		backgroundMusic.setVolume(2.8f, 2.8f);
 		backgroundMusic.start();
 		
@@ -148,30 +130,17 @@ public final class MainActivity extends Activity
 			client.sendAction("screenWidth" + screenWidth);
 			client.sendAction("screenHeight" + screenHeight);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		/*
-		/**
-		 * Initializing OpenGL
-		 * 
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE); 
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
- 		GLSurfaceView v = new GLSurfaceView(this);
-   		v.setRenderer(new OpenGLRenderer());
-   		setContentView(v);
-		*/
 		
 		/**
 		 * Images
 		 */
 		this.fireImage 				= (ImageView)findViewById(R.id.imageFire);
 		this.gasImage 				= (ImageView)findViewById(R.id.imageGas);
-		//this.viewBKImage 			= (ImageView)findViewById(R.id.imageViewBK);
 		this.viewLifeImage 			= (ImageView)findViewById(R.id.imageViewLife);
 		this.imageRedFlash 			= (ImageView)findViewById(R.id.imageRedFlash);
 		this.imageViewNavigation 	= (ImageView)findViewById(R.id.imageViewNavigation);
-		//this.imageViewArrow 		= (ImageView)findViewById(R.id.imageViewArrow);
 
 		/**
 		 * Accelerometer
@@ -188,24 +157,25 @@ public final class MainActivity extends Activity
 						client.reciveAction(airplane);
 					}
 					catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 			}
 		};
-		
+		/**
+		 * Vad fan är det som händer egentligen
+		 */
 		threadImage = new Thread(){
 			@Override
 			public void run(){
 				while(true){
 					try {
 						Thread.sleep(100);
-						(Message.obtain(MainActivity.this.mainHandler, 0)).sendToTarget();
+						//(Message.obtain(MainActivity.this.mainHandler, 0)).sendToTarget();
+						
 						if (!backgroundMusic.isPlaying())
 							backgroundMusic.start();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -223,9 +193,6 @@ public final class MainActivity extends Activity
 	 */
 	protected void onResume() {
 		super.onResume();
-		//MediaPlayer backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
-		//backgroundMusic.setLooping(true);
-		//backgroundMusic.start();
 		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 	}
 	/**
@@ -233,9 +200,6 @@ public final class MainActivity extends Activity
 	 */
 	protected void onPause() {
 		super.onPause();
-		//MediaPlayer backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
-		//backgroundMusic.setLooping(true);
-		//backgroundMusic.start();
 		mSensorManager.unregisterListener(this);
 	}
 	
@@ -287,12 +251,6 @@ public final class MainActivity extends Activity
 		Bitmap result = Bitmap.createBitmap(rot, off, off, myImg.getWidth(), myImg.getHeight());
 		circle.setImageBitmap(result);
 	}
-/*
-	private static MediaPlayer motorsStartSound;
-	private static MediaPlayer motorsSound;
-	private static MediaPlayer motorsEndSound;
-*/
-	
 	private int fireSoundPtr = 0;
 	private int motorsStartSoundPtr = 0;
 	private int motorsEndSoundPtr = 0;
@@ -305,8 +263,6 @@ public final class MainActivity extends Activity
 	
 	@Override
     public boolean onTouchEvent(MotionEvent e){
-
-		//MediaPlayer fireSounds = MediaPlayer.create(this, R.raw.shot);
 		synchronized (this.touchMutex){
 			int fire = -1, gas = -1;
 			int n = e.getPointerCount();
@@ -347,26 +303,11 @@ public final class MainActivity extends Activity
 			}
 			if (gas != this.lastGas){
 				msg += gas != -1 ? "+gas"+e.getY()+"\n" : "-gas\n";
-				/*
-				if (msg.equals("+gas")){
-			    	if (this.motorsStartSoundPool[this.motorsStartSoundPtr] == null)
-						this.motorsStartSoundPool[this.motorsStartSoundPtr] = MediaPlayer.create(this, R.raw.motorsstart);
-					this.motorsStartSoundPool[this.motorsStartSoundPtr++].start();
-					this.motorsStartSoundPtr %= this.motorsStartSoundPool.length;
-				}
-				if (msg.equals("-gas")){
-					this.motorsStartSoundPool[this.motorsStartSoundPtr-1].stop();
-			    	if (this.motorsEndPool[this.motorsEndSoundPtr] == null)
-						this.motorsEndPool[this.motorsEndSoundPtr] = MediaPlayer.create(this, R.raw.motorsend);
-					this.motorsEndPool[this.motorsEndSoundPtr++].start();
-					this.motorsEndSoundPtr %= this.motorsEndPool.length;
-				}*/
 			}
 			if (msg.isEmpty() == false){
 				try {
 					client.sendAction(msg + "\n");
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -383,31 +324,25 @@ public final class MainActivity extends Activity
 	@Override
 	public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2,
 			float arg3) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	@Override
 	public void onLongPress(MotionEvent arg0) {
-		// TODO Auto-generated method stub
 	}
 	@Override
 	public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2,
 			float arg3) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	@Override
 	public void onShowPress(MotionEvent arg0) {
-		// TODO Auto-generated method stub
 	}
 	@Override
 	public boolean onSingleTapUp(MotionEvent arg0) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	@Override
 	public boolean onTouch(View arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	
@@ -416,8 +351,7 @@ public final class MainActivity extends Activity
 	private long endFlash = 0;
 	private static final int[] lifeResources = { R.drawable.life, R.drawable.life1, R.drawable.life2, R.drawable.life3, R.drawable.life4 }; 
 	
-	private void lifeSpan() {
-		
+	private void lifeSpan() {	
 		if (airplane.life != isHitNumber){
 			this.viewLifeImage.setImageResource(lifeResources[airplane.life]);
 			this.imageRedFlash.setBackgroundColor(Color.parseColor("#86E00000"));
@@ -452,7 +386,6 @@ public final class MainActivity extends Activity
 	private void showVideo(){
 		VideoView vd = (VideoView)findViewById(R.id.videoViewBK);
 		Uri uri = Uri.parse(srcPath);
-		//Uri uri = Uri.parse("android.resource://package/"+R.raw.introvideo);
 		vd.setVideoURI(uri);
 		vd.start();;
 	}
@@ -467,9 +400,6 @@ public final class MainActivity extends Activity
             if (msg.what == 1) {
             	endFlash();
             }
-            //if (mag.what == 2) {
-            	//reverseLandscape();
-            //}
         };
     };  
 }

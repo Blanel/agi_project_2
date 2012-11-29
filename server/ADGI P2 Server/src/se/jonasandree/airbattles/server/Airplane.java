@@ -1,5 +1,7 @@
 package se.jonasandree.airbattles.server;
 
+import java.util.ArrayList;
+
 public class Airplane {
 	private int index;
 	private float rotationX 		= 0;
@@ -14,7 +16,9 @@ public class Airplane {
 	private float velocity 			= 1;
 	private boolean gas 			= false;
 	private double velocityDecrese 	= 0.5;
-	public Bullet bullets[] 		= new Bullet[1024];
+	
+	
+	final ArrayList<Bullet> bullets = new ArrayList<>();
 	
 	public Airplane(int index){
 		this.index = index;
@@ -34,15 +38,15 @@ public class Airplane {
 		this.gas = true;
 		this.maxVelocity = speed*20;
 		
-		System.out.println(this.velocity +" v "+ " mv " +this.maxVelocity);
+		//System.out.println(this.velocity +" v "+ " mv " +this.maxVelocity);
 		if (this.velocity <= this.maxVelocity){
-			System.out.println(this.speed +" s "+ " v " +this.velocity);
+			//System.out.println(this.speed +" s "+ " v " +this.velocity);
 			this.velocity = this.speed + this.velocity;
 		}
 	}
 	public void uppdateSpeed(){
 		if (this.velocity <= this.maxVelocity){
-			System.out.println(this.speed +" s "+ " v " +this.velocity);
+			//System.out.println(this.speed +" s "+ " v " +this.velocity);
 			this.velocity = this.speed + this.velocity;
 		}
 	}
@@ -93,14 +97,15 @@ public class Airplane {
 	public boolean getAlive(){
 		return this.alive;
 	}
-	public void addBullets(int bIndex){
-		bullets[bIndex] = new Bullet();
-		bullets[bIndex].setExist(true);
-		bullets[bIndex].setPositionX(this.rotation);
-		bullets[bIndex].setPositionX((float) (this.positionX));
-		bullets[bIndex].setPositionX((float) (this.positionX+Math.cos(this.rotation*Math.PI/180)*2));
+	public void addBullets(){
+		int index = bullets.size();
+		Bullet bullet = new Bullet(index, this.positionX, positionY, this.rotation);
+		bullets.add(bullet);		
 	}
-	public Bullet getBullets(int bulletIndex){
-		return this.bullets[bulletIndex];
+	public ArrayList<Bullet> getBullets(){
+		return this.bullets;
+	}
+	public void removeBullet(int bindex){
+		this.bullets.remove(bindex);
 	}
 }

@@ -8,7 +8,9 @@ import java.util.Scanner;
 
 public class Program implements Runnable {
 	private static OutputStream[] clientOuts = new OutputStream[1024];
-	private static String action = "die"; 
+	private static String action = "die";
+	final ArrayList<Client> renderingClients = new ArrayList<>();
+	
 	
 	/**
 	 * @param args
@@ -27,13 +29,13 @@ public class Program implements Runnable {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				System.out.print("die was sent to client 0");
 			}
 		}
 	}
 	@Override
 	public void run(){
 		final ArrayList<Client> clients = new ArrayList<>();
+
 		try (ServerSocket server = new ServerSocket(15003, 20)) {
 			for(;;){
 				final Socket socket = server.accept();
@@ -61,61 +63,89 @@ public class Program implements Runnable {
 							e.printStackTrace();
 						}
 					}
-				};		
+				};
+				Thread threadClientWrite = new Thread(){
+					@Override
+					public void run(){
+						while(true){							
+							try {
+								Thread.sleep(17);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+							for (Client client : clients){
+								if (!client.getClientType()){
+									renderingClients.add(client);
+								}
+								else{
+									try {
+										String alivetemp = "no";
+										if (client.airplane.getAlive()){
+											alivetemp = "yes";
+										}
+										else {
+											alivetemp = "no";
+										}
+										for (Client client1 :renderingClients){
+											System.out.println("aireplane: " + client.getIndex()+"\n"+"alive: " + alivetemp+"\n");
+											client1.write(("aireplane: " + client.getIndex()+"\n" + "alive: "+alivetemp+"\n").getBytes("UTF-8"));
+											if (client.android){
+												if(client.airplane.getAlive()){
+													System.out.println("x: "+client.airplane.getPositionX()+"\n"+"y: "+client.airplane.getPositionY()+"\n"+"rotation: "+client.airplane.getRotation()+"\n");
+													client1.write(("x: "+client.airplane.getPositionX()+"\n"+"y: "+client.airplane.getPositionY()+"\n"+"rotation: "+client.airplane.getRotation()+"\n").getBytes("UTF-8"));	
+												}
+											}
+										}
+									} catch (UnsupportedEncodingException e) {
+										e.printStackTrace();
+									}
+										ArrayList<Bullet> bullets = client.airplane.getBullets();
+										if (bullets.isEmpty()){
+											;
+										}
+										else{
+											for (int bindex = 0; bindex < bullets.size(); bindex++){
+												//System.out.println(bullets.size()+ ": 2\n");
+												bullets.get(bindex).uppdatePosition();
+												String bexists = "no";
+												if(bullets.get(bindex).getExist()){
+													bexists = "yes";
+												}
+												
+												System.out.println("bullet: "+ bindex + "\n"+ "x: "+ bullets.get(bindex).getPositionX()+"\n"+ "y: "+ bullets.get(bindex).getPositionY()+"\n"+ "rotation: "+ bullets.get(bindex).getRotation()+"\n" + "exists: "+bexists);
+												
+												if (!bullets.get(bindex).getExist()){
+													System.out.println("Bullet Removed:");
+													client.airplane.removeBullet(bindex);
+												}
+												
+												/*
+												try {
+													client.write(("b" + client.airplane.getIndex()+ "bi"+  "e" + client.airplane.getBullets(i).getExist()).getBytes("UTF-8"));
+													if(client.airplane.getBullets(i).getExist()){
+														client.write(("b" + client.airplane.getIndex()+ "bi"+"x" + client.airplane.getBullets(i).getPositionX()+"\n\n").getBytes("UTF-8"));
+														client.write(("b" + client.airplane.getIndex()+ "bi"+ "y" + client.airplane.getBullets(i).getPositionY()+"\n\n").getBytes("UTF-8"));	
+													} 	
+												}catch (UnsupportedEncodingException e) {
+													// TODO Auto-generated catch block
+													e.printStackTrace();
+												}*/
+											}
+										}
+									}
+							}
+						}
+					}
+				};
 				thread.setDaemon(true);
 				thread.start();
+				threadClientWrite.setDaemon(true);
+				threadClientWrite.start();
 			}
 		}catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Thread threadClientWrite = new Thread(){
-			@Override
-			public void run(){
-				while(true){
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-					for (Client client : clients){
-						if (client.getClientType()){
-							
-						}
-						else{
-							try {
-								client.write(("a" + client.airplane.getIndex()+"a"+(client.airplane.getAlive()+"\n\n")).getBytes("UTF-8"));
-								if(client.airplane.getAlive()){
-									client.write(("a" + client.airplane.getIndex()+"x"+client.airplane.getPositionX()+"\n\n").getBytes("UTF-8"));
-									client.write(("a" + client.airplane.getIndex()+"y"+client.airplane.getPositionY()+"\n\n").getBytes("UTF-8"));
-									client.write(("a" + client.airplane.getIndex()+"r"+client.airplane.getRotation()+"\n\n").getBytes("UTF-8"));	
-								}
-							} catch (UnsupportedEncodingException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-						for(int i = 0; i < client.airplane.bullets.length; i++){				
-							try {
-								client.write(("b" + client.airplane.getIndex()+ "bi"+ i + "e" + client.airplane.getBullets(i).getExist()).getBytes("UTF-8"));
-								if(client.airplane.getBullets(i).getExist()){
-									client.write(("b" + client.airplane.getIndex()+ "bi"+ i + "x" + client.airplane.getBullets(i).getPositionX()+"\n\n").getBytes("UTF-8"));
-									client.write(("b" + client.airplane.getIndex()+ "bi"+ i + "y" + client.airplane.getBullets(i).getPositionY()+"\n\n").getBytes("UTF-8"));	
-								} 	
-							}catch (UnsupportedEncodingException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							client.airplane.getBullets(i).uppdatePosition();
-						}
-						//client.airplane.uppdateGas();
-					}
-				}
-			}
-		};
-		threadClientWrite.setDaemon(true);
-		threadClientWrite.start();
 	}
+	
 }

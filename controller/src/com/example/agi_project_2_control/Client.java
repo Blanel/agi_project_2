@@ -14,7 +14,7 @@ public class Client {
 	public void connect() throws UnknownHostException, IOException{
 			this.socket = new Socket("192.168.0.16", 15003);
 			//this.socket = new Socket("127.0.0.1", 55003);
-		
+			
 			this.inputStream =  this.socket.getInputStream();
 			this.outputStream = this.socket.getOutputStream();
 			

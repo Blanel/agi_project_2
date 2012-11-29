@@ -5,8 +5,7 @@ import java.util.Scanner;
 
 
 public class Client {
-	public Client(int index, InputStream in, OutputStream out)
-	{
+	public Client(int index, InputStream in, OutputStream out){
 		this.index = index;
 		this.in = in;
 		this.out = out;
@@ -14,10 +13,8 @@ public class Client {
 	}
 	
 	public Airplane airplane;
-	
 	public int screenWidth;
 	public int screenHeight;
-	
 	public final int index;
 	public final InputStream in;
 	public final OutputStream out;
@@ -38,6 +35,7 @@ public class Client {
 					if (line.substring(0, 7).equals("Android")){
 						this.airplane = new Airplane(index);
 						this.android = true;
+						System.out.println("\n Android "+this.android);
 					}
 					else if (line.substring(0, 15).equals("renderingClient")){
 						this.renderingClient = true;
@@ -54,16 +52,15 @@ public class Client {
 					else if(line.substring(0, 1).equals("y")){
 						this.airplane.setRotationY(Float.valueOf(line.substring(1)));
 						
-						System.out.println("velocity" + this.airplane.getVelocity());
-						System.out.println("speed" + this.airplane.getSpeed());
-						System.out.println("rotation "+ this.airplane.getRotation());
-						System.out.println("x "+ this.airplane.getPositionX());
-						System.out.println("y "+ this.airplane.getPositionY()+ "\n");
+						//System.out.println("velocity" + this.airplane.getVelocity());
+						//System.out.println("speed" + this.airplane.getSpeed());
+						//System.out.println("rotation "+ this.airplane.getRotation());
+						//System.out.println("x "+ this.airplane.getPositionX());
+						//System.out.println("y "+ this.airplane.getPositionY()+ "\n");
 					}
 					else if (line.substring(0, 1).equals("f")){
-						this.airplane.addBullets(this.bIndex);
-						this.bIndex = this.bIndex+1;
-						System.out.print("\n" + line + " index "+ this.index);
+						this.airplane.addBullets();
+						//System.out.print("\n" + line + " index "+ this.index);
 					}
 					else if (line.substring(1, 2).equals("g")){
 						if (line.substring(0, 1).equals("+")){
@@ -77,7 +74,7 @@ public class Client {
 						}
 					}
 					else if (line.substring(0, 6).equals("screen")){
-						System.out.println(line);
+						//System.out.println(line);
 						if(line.substring(6, 7).equals("W")){
 							screenWidth = Integer.valueOf(line.substring(11));
 						}
@@ -90,7 +87,6 @@ public class Client {
 						System.out.flush();
 					}
 				}
-				
 			}
 		}
 	}
@@ -109,5 +105,8 @@ public class Client {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	public int getIndex() {
+		return this.index;
 	}
 }
