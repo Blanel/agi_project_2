@@ -10,8 +10,8 @@ public class Client {
 	protected Object sendMutex = new Object();
 	public Scanner scanner;
 	
-	public void connect(String host, MainActivity main) throws UnknownHostException, IOException{
-		this.socket = new Socket(host, 15003);
+	public void connect(String host, int port, MainActivity main) throws UnknownHostException, IOException{
+		this.socket = new Socket(host, port);
 		this.inputStream =  this.socket.getInputStream();
 		this.outputStream = this.socket.getOutputStream();
 		this.scanner = new Scanner(this.inputStream);

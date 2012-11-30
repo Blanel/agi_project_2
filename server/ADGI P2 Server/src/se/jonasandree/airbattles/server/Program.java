@@ -35,7 +35,7 @@ public class Program implements Runnable {
 	@Override
 	public void run(){
 		final ArrayList<Client> clients = new ArrayList<>();
-		try (ServerSocket server = new ServerSocket(15003, 20)) {
+		try (ServerSocket server = new ServerSocket(12345, 20)) {
 			for(;;){
 				final Socket socket = server.accept();
 				Thread thread = new Thread("Client-" + socket.getRemoteSocketAddress()){

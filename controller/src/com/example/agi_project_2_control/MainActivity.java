@@ -97,6 +97,7 @@ public final class MainActivity extends Activity
 	
 	static boolean inititialised = false;
 	public String host = "192.168.0.16";
+	public int port;
 	static boolean getHost = false;
 		
 	/**
@@ -113,7 +114,7 @@ public final class MainActivity extends Activity
 	    			context);
 	    	
 	    	// set title
-	    	alertDialogBuilder.setTitle("Enter IP:");
+	    	alertDialogBuilder.setTitle("Enter IP:port");
 	    	final EditText input = new EditText(this);
 	    	alertDialogBuilder.setView(input);
 	    	
@@ -123,12 +124,14 @@ public final class MainActivity extends Activity
 	    		.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
 	    			public void onClick(DialogInterface dialog,int id) {
 	    				Editable hosttemp = input.getText();
-	    				host = hosttemp.toString();
+	    				
+	    				host = hosttemp.toString().split(":")[0];
+	    				port = Integer.parseInt(hosttemp.toString().split(":")[1]);
 	    				getHost = true;
 	    				if(inititialised == false){
 	    					//Log.d("MyApp","2\n");
 	    					try {
-	    						client.connect(host, MainActivity.this);
+	    						client.connect(host, port, MainActivity.this);
 	    					} catch (UnknownHostException e) {
 	    						e.printStackTrace();
 	    					} catch (IOException e) {
