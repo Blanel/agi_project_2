@@ -26,7 +26,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.VideoView;
 
 import java.io.*;
@@ -107,7 +106,7 @@ public final class MainActivity extends Activity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		/*
+		
 		if (getHost == false){
 			final Context context = this;
 	    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
@@ -115,7 +114,6 @@ public final class MainActivity extends Activity
 	    	
 	    	// set title
 	    	alertDialogBuilder.setTitle("Enter IP:");
-	    	
 	    	final EditText input = new EditText(this);
 	    	alertDialogBuilder.setView(input);
 	    	
@@ -126,114 +124,121 @@ public final class MainActivity extends Activity
 	    			public void onClick(DialogInterface dialog,int id) {
 	    				Editable hosttemp = input.getText();
 	    				host = hosttemp.toString();
-	    				MainActivity.getHost = true;
+	    				getHost = true;
+	    				if(inititialised == false){
+	    					//Log.d("MyApp","2\n");
+	    					try {
+	    						client.connect(host, MainActivity.this);
+	    					} catch (UnknownHostException e) {
+	    						e.printStackTrace();
+	    					} catch (IOException e) {
+	    						e.printStackTrace();
+	    					}
+	    					inititialised = true;
+	    				}
 	    			}
 	    		  });
-
 	    	// create alert dialog
 	    	AlertDialog alertDialog = alertDialogBuilder.create();
-
 	    	// show it
 	    	alertDialog.show();
-	    	Log.d("MyApp","1");
-	    	MainActivity.getHost = true;
-	    	
 		}
-		else{*/
-			//Log.d("MyApp","1.5\n");
-			if(inititialised == false){
-				//Log.d("MyApp","2\n");
-				try {
-					client.connect(host);
-				} catch (UnknownHostException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				inititialised = true;
-			}
-			//Log.d("MyApp","3\n");
-			new GestureDetector(this);	
-			showVideo();
-	
-			/**
-			 * Sounds 
-			 */
-			backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
-			backgroundMusic.setVolume(2.8f, 2.8f);
-			backgroundMusic.start();
-			
-			
-			/**
-			 * Sending Image size to server and client type in this case Android.
-			 */
-			Display display = getWindowManager().getDefaultDisplay(); 
-			this.screenWidth = display.getWidth();
-			this.screenHeight = display.getHeight();
+		
+	}
+	public void onCreatAgain(){
+		//Log.d("MyApp","1.5\n");
+    	/*
+		if(inititialised == false){
+			//Log.d("MyApp","2\n");
 			try {
-				client.sendAction("Android");
-				client.sendAction("screenWidth" + screenWidth);
-				client.sendAction("screenHeight" + screenHeight);
+				client.connect(host);
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
-			/**
-			 * Images
-			 */
-			this.fireImage 				= (ImageView)findViewById(R.id.imageFire);
-			this.gasImage 				= (ImageView)findViewById(R.id.imageGas);
-			this.viewLifeImage 			= (ImageView)findViewById(R.id.imageViewLife);
-			this.imageRedFlash 			= (ImageView)findViewById(R.id.imageRedFlash);
-			this.imageViewNavigation 	= (ImageView)findViewById(R.id.imageViewNavigation);
-	
-			/**
-			 * Accelerometer
-			 */
-			mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-			mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-			mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-			
-			threadInput = new Thread(){
-				@Override
-				public void run(){
-					while(true){
-						try {
-							client.reciveAction(airplane);
-						}
-						catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			};
-			/**
-			 * Vad fan är det som händer egentligen
-			 */
-			threadImage = new Thread(){
-				@Override
-				public void run(){
-					while(true){
-						try {
-							Thread.sleep(100);
-							//(Message.obtain(MainActivity.this.mainHandler, 0)).sendToTarget();
-							
-							if (!backgroundMusic.isPlaying())
-								backgroundMusic.start();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			};
-	        
-			threadImage.setDaemon(true);
-			threadImage.start();
-			threadInput.setDaemon(true);
-			threadInput.start();
+			inititialised = true;
+		}*/
+		//Log.d("MyApp","3\n");
+		new GestureDetector(this);	
+		showVideo();
+
+		/**
+		 * Sounds 
+		 */
+		backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
+		backgroundMusic.setVolume(2.8f, 2.8f);
+		backgroundMusic.start();
+		
+		
+		/**
+		 * Sending Image size to server and client type in this case Android.
+		 */
+		Display display = getWindowManager().getDefaultDisplay(); 
+		this.screenWidth = display.getWidth();
+		this.screenHeight = display.getHeight();
+		try {
+			client.sendAction("Android");
+			client.sendAction("screenWidth" + screenWidth);
+			client.sendAction("screenHeight" + screenHeight);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		
-	//}
+		/**
+		 * Images
+		 */
+		this.fireImage 				= (ImageView)findViewById(R.id.imageFire);
+		this.gasImage 				= (ImageView)findViewById(R.id.imageGas);
+		this.viewLifeImage 			= (ImageView)findViewById(R.id.imageViewLife);
+		this.imageRedFlash 			= (ImageView)findViewById(R.id.imageRedFlash);
+		this.imageViewNavigation 	= (ImageView)findViewById(R.id.imageViewNavigation);
+
+		/**
+		 * Accelerometer
+		 */
+		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+		
+		threadInput = new Thread(){
+			@Override
+			public void run(){
+				while(true){
+					try {
+						client.reciveAction(airplane);
+					}
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		/**
+		 * Vad fan är det som händer egentligen
+		 */
+		threadImage = new Thread(){
+			@Override
+			public void run(){
+				while(true){
+					try {
+						Thread.sleep(100);
+						//(Message.obtain(MainActivity.this.mainHandler, 0)).sendToTarget();
+						
+						if (!backgroundMusic.isPlaying())
+							backgroundMusic.start();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+        
+		threadImage.setDaemon(true);
+		threadImage.start();
+		threadInput.setDaemon(true);
+		threadInput.start();
+	}
 	/**
 	 *	What should happen when the program needs to be resumed.
 	 */

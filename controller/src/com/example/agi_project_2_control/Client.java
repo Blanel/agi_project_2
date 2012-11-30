@@ -17,7 +17,7 @@ public class Client {
 	public Scanner scanner;
 	
 	
-	public void connect(String host) throws UnknownHostException, IOException{
+	public void connect(String host, MainActivity main) throws UnknownHostException, IOException{
 		this.socket = new Socket(host, 15003);
 		//this.socket = new Socket("127.0.0.1", 55003);
 		
@@ -25,10 +25,18 @@ public class Client {
 		this.outputStream = this.socket.getOutputStream();
 		
 		this.scanner = new Scanner(this.inputStream);
+		main.onCreatAgain();
 	}
 	public void disconnect() {
 			if (this.socket != null){
 				try {
+					/**
+					 * 
+					 * 
+					 *  VIKTIGT TA DÖD PÅ PLANET HÄR
+					 * 
+					 * 
+					 */
 					this.socket.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
