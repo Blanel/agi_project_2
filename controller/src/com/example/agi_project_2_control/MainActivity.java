@@ -104,6 +104,8 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	private boolean initialised = false;
 	private String host = "192.168.0.16";
 	private int port;
+	private boolean retry = false;
+	//private AlertDialog.Builder alertDialogBuilder;
 	//static boolean getHost = false;
 
 	/**
@@ -115,6 +117,8 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		setContentView(R.layout.activity_main);
 
 		ss = new StateSender(this);
+
+		retry = false;
 		final Context context = this;
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 				context);
@@ -131,19 +135,25 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 			public void onClick(DialogInterface dialog,int id) {
 				Editable hosttemp = input.getText();
 
-				host = hosttemp.toString().split(":")[0];
-				port = Integer.parseInt(hosttemp.toString().split(":")[1]);
+
+
 				//getHost = true;
 
 				//Log.d("MyApp","2\n");
 				try {
+					host = hosttemp.toString().split(":")[0];
+					port = Integer.parseInt(hosttemp.toString().split(":")[1]);
 					ss.setSoc(new Socket(host,port));
 					//client.connect(host, port, MainActivity.this);
 					initialised = true;
+					continueRunning();
+
 				} catch (UnknownHostException e) {
 					//e.printStackTrace();
 				} catch (IOException e) {
 					//e.printStackTrace();
+				} catch (ArrayIndexOutOfBoundsException e){
+				} catch (NumberFormatException e) {
 				}
 
 
@@ -152,8 +162,11 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		// create alert dialog
 		AlertDialog alertDialog = alertDialogBuilder.create();
 		// show it
-		while(!initialised)
-			alertDialog.show();
+		alertDialog.show();
+	}
+
+	public void continueRunning()
+	{
 
 
 		new GestureDetector(this);	
@@ -231,6 +244,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		//threadInput.setDaemon(true);
 		//threadInput.start();
 	}
+
 	/**
 	 *	What should happen when the program needs to be resumed.
 	 */

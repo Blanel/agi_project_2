@@ -3,6 +3,7 @@ package com.example.agi_project_2_control;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -18,6 +19,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class StateSender {
@@ -95,7 +97,7 @@ public class StateSender {
 						try {
 							DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 							DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-							Document doc = docBuilder.parse(line);
+							Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
 							ma.airplane.setLife(Integer.parseInt(doc.getElementsByTagName("life").item(0).getTextContent()));
 							ma.lifeSpan();
 						} catch (IOException e) {
@@ -166,6 +168,7 @@ public class StateSender {
 
 						StreamResult result = new StreamResult(os);
 						transformer.transform(source,result);
+						os.write("\n".getBytes());
 
 					} catch (ParserConfigurationException e1) {
 						System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
@@ -182,6 +185,9 @@ public class StateSender {
 						} catch (IOException e) {
 							System.err.println("an IO derp");
 						}
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 
 

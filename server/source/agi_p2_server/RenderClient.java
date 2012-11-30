@@ -110,6 +110,7 @@ public class RenderClient {
 			
 			StreamResult result = new StreamResult(os);
 			transformer.transform(source,result);
+			os.write("\n".getBytes());
 		}
 		catch (ParserConfigurationException pce) {
 			System.err.println("Parser exception! Did a renderer disconnect?");
@@ -130,6 +131,9 @@ public class RenderClient {
 				System.err.println("... and an IOException to boot!");
 				return;
 			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} 
 	}
 	

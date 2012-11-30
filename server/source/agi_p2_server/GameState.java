@@ -9,7 +9,7 @@ public class GameState implements Runnable {
 	private int planeIdPool;
 	private int bulletIdPool;
 	private final double MAX_DISTANCE = 128;
-	private final long UPDATEFREQUENCY = 17;
+	private final long UPDATEFREQUENCY = 4000000;
 	
 	private Server srv;
 
@@ -30,12 +30,14 @@ public class GameState implements Runnable {
 	public void run()
 	{
 		System.out.println("Gamestate loop started");
-		long start;
-		long end;
+		long start = 0;
+		long end = 100;
+		long waitstart;
+		long waitend;
 		while(true)
 		{
 			//System.err.println("Gamestate!");
-			start = System.currentTimeMillis();
+			
 			// Get changes from all clients.
 			srv.androidSync();
 			
@@ -46,24 +48,32 @@ public class GameState implements Runnable {
 			calculateCollisions();
 	
 			// Send data to renderclients and androids
-			srv.androidSend();
-			srv.rendererSend();
-			purgeDead();
-			
-			end = System.currentTimeMillis();
-			//System.err.println(((end-start))+" ms");
+			end = System.nanoTime();
+			//System.err.print("Calculation time: "+(end-start)+"     ");
+			//waitstart = System.nanoTime();
 			if(end-start < UPDATEFREQUENCY)
 			{
-				try {
-					Thread.sleep(UPDATEFREQUENCY-(end-start));
-				} catch (InterruptedException e) {
-					System.err.println("GameState sleep was interupted!");
+				while(end-start < UPDATEFREQUENCY)
+				{
+					end = System.nanoTime();
 				}
 			}
 			else
 			{
 				System.err.println("Server can't keep up! "+((end-start)-UPDATEFREQUENCY)+" ms too slow");
 			}
+			//waitend = System.nanoTime();
+			//System.err.print("Waittime: "+(waitend-waitstart)+"      ");
+			start = System.nanoTime();
+			srv.androidSend();
+			srv.rendererSend();
+			purgeDead();
+			//end = System.nanoTime();
+			//System.err.println("Sendtime: "+(end-start));
+			//start = System.nanoTime();
+			
+			
+			//System.err.println(((end-start))+" ms");
 			
 		}
 
@@ -164,11 +174,15 @@ public class GameState implements Runnable {
 		{
 			if(airplanes.get(i).getStatus()<0)
 				airplanes.remove(i--);
+			else if(airplanes.get(i).getStatus()>0)
+				airplanes.get(i).setStatus(0);
 		}
 		for(int i=0 ; i<bullets.size(); i++)
 		{
 			if(bullets.get(i).getStatus()<0)
 				bullets.remove(i--);
+			else if(bullets.get(i).getStatus()>0)
+				bullets.get(i).setStatus(0);
 		}
 	}
 

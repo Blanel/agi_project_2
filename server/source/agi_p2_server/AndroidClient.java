@@ -3,6 +3,7 @@ package agi_p2_server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.Socket;
 import java.util.Random;
 import java.util.Scanner;
@@ -20,6 +21,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class AndroidClient implements Runnable{
@@ -28,7 +30,7 @@ public class AndroidClient implements Runnable{
 	private Socket soc;
 	private boolean isShooting;
 	private double rotation;
-	private boolean isGearUp;
+	private double speedMod;
 	private InputStream is;
 	private OutputStream os;
 	private Scanner sc;
@@ -56,11 +58,7 @@ public class AndroidClient implements Runnable{
 	public void update()
 	{
 		plane.addAngle(rotation);
-		if(isGearUp)
-		{
-			plane.gearUp();
-			isGearUp=false;
-		}
+		plane.speedMod(speedMod);
 		if(isShooting)
 		{
 			gs.bullets.add(new Bullet(gs.nextBId(), plane));
@@ -76,19 +74,17 @@ public class AndroidClient implements Runnable{
 			if(sc.hasNextLine())
 			{
 				String line = sc.nextLine();
-				
+				//System.err.println(line);
 				try {
 					DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 					DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-					Document doc = docBuilder.parse(line);
+					Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
+					//Document doc = docBuilder.parse(line);
 					rotation = Double.parseDouble(doc.getElementsByTagName("rotation").item(0).getTextContent());
 					if(!isShooting)
-						Boolean.parseBoolean(doc.getElementsByTagName("shooting").item(0).getTextContent());
-					if(!isGearUp)
-						Boolean.parseBoolean(doc.getElementsByTagName("gear").item(0).getTextContent());
+						isShooting = Boolean.parseBoolean(doc.getElementsByTagName("shooting").item(0).getTextContent());
 					
-					
-				} catch (ParserConfigurationException | SAXException | IOException e) {
+				} catch (ParserConfigurationException  | IOException e) {
 					System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
 					try {
 						soc.close();
@@ -96,6 +92,9 @@ public class AndroidClient implements Runnable{
 						System.err.println("an IO derp");
 					}
 					return;
+				} catch (SAXException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 
 				
@@ -130,6 +129,7 @@ public class AndroidClient implements Runnable{
 				
 				StreamResult result = new StreamResult(os);
 				transformer.transform(source,result);
+				os.write("\n".getBytes());
 			
 			} catch (ParserConfigurationException | TransformerException e1) {
 				System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
@@ -139,6 +139,9 @@ public class AndroidClient implements Runnable{
 					System.err.println("an IO derp");
 				}
 				return;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			
 			
@@ -156,7 +159,7 @@ public class AndroidClient implements Runnable{
 	
 	public boolean isOpen()
 	{
-		return soc.isClosed();
+		return !soc.isClosed();
 	}
 	public Socket getSocket()
 	{

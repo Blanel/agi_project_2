@@ -7,7 +7,11 @@ public class Airplane extends Entity{
 	private int kills;
 	private String name;
 	private int gear;
-	private final static double[] speeds = {1,2,3,4};
+	//private final static double[] speeds = {1,2,3,4};
+	
+	private final static double BASESPEED = 1;
+	
+	private double speed;
 	
 	/*
 	 * Statuses for planes:
@@ -19,7 +23,7 @@ public class Airplane extends Entity{
 	public Airplane(int id, double x, double y, double angle, String name)
 	{
 		
-		super(id, x,y,angle, speeds[0]);
+		super(id, x,y,angle, BASESPEED);
 		gear = 0;
 		this.name = name;
 		life = 5;
@@ -27,7 +31,7 @@ public class Airplane extends Entity{
 	public Airplane(int id, double x, double y, double angle)
 	{
 		
-		super(id, x,y,angle, speeds[0]);
+		super(id, x,y,angle, BASESPEED);
 		
 		name = "John Doe";
 		life = 5;
@@ -80,10 +84,11 @@ public class Airplane extends Entity{
 		return name;
 	}
 	
-	public void gearUp()
+
+	
+	public void speedMod(double m)
 	{
-		gear = (gear+1)%4;
-		setSpeed(speeds[gear]);
+		setSpeed(BASESPEED+m);
 	}
 
 	

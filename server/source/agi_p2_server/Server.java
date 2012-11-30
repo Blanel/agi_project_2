@@ -63,6 +63,7 @@ public class Server {
 						AndroidClient temp = new AndroidClient(soc, gs);
 						androids.add(temp);
 						System.out.println("Android Client Connected: "+soc.getInetAddress().getHostAddress());
+						(new Thread(temp)).start();
 					} catch (IOException e) {
 						System.err.println("Connection of android failed!");
 					}
