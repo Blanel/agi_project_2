@@ -20,4 +20,8 @@ public class Airplane {
 			}
 		}
 	}
+	public boolean isAlive(){
+		return this.alive;
+		
+	}
 }

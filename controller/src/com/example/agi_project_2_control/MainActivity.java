@@ -189,7 +189,7 @@ public final class MainActivity extends Activity
 		threadInput = new Thread(){
 			@Override
 			public void run(){
-				while(true){
+				while(MainActivity.airplane.isAlive()){
 					try {
 						client.reciveAction(airplane);
 					}
@@ -205,11 +205,10 @@ public final class MainActivity extends Activity
 		threadImage = new Thread(){
 			@Override
 			public void run(){
-				while(true){
+				while(MainActivity.airplane.isAlive()){
 					try {
 						Thread.sleep(100);
 						(Message.obtain(MainActivity.this.mainHandler, 0)).sendToTarget();
-						
 						if (!backgroundMusic.isPlaying())
 							backgroundMusic.start();
 					} catch (InterruptedException e) {
@@ -240,7 +239,6 @@ public final class MainActivity extends Activity
 		if(inititialised)
 			mSensorManager.unregisterListener(this);
 	}
-	
 	/**
 	 * Option menu
 	 */
@@ -250,12 +248,10 @@ public final class MainActivity extends Activity
 			getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
-	
 	public float rotation = 0; 
 
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
 	}
 	/**
 	 * Checking the accelerometer sensor for change and sends the change to the server and rotates the 
@@ -263,31 +259,33 @@ public final class MainActivity extends Activity
 	 */
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		float x = event.values[0];
-		float y = event.values[1];
-		//float z = event.values[2];
-		
-		try {
-			client.sendAction("x"+Float.toString(x));
-			client.sendAction("y"+Float.toString(y));
+		if (MainActivity.airplane.isAlive()){
+			float x = event.values[0];
+			float y = event.values[1];
+			//float z = event.values[2];
 			
-			//client.sendAction("z"+Float.toString(z)); No need to send at the moment we do not need to use it.
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			try {
+				client.sendAction("x"+Float.toString(x));
+				client.sendAction("y"+Float.toString(y));
+				
+				//client.sendAction("z"+Float.toString(z)); No need to send at the moment we do not need to use it.
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			float degree = (float) (-Math.atan2(y/10, x/10)*180/Math.PI);
+			
+			circle = (ImageView) findViewById(R.id.imageViewArrow);
+			Bitmap myImg = BitmapFactory.decodeResource(getResources(), R.drawable.a0);
+	
+			Matrix matrix = new Matrix(); 
+			matrix.postRotate(degree);
+			
+			Bitmap rot = Bitmap.createBitmap(myImg, 0, 0, myImg.getWidth(), myImg.getHeight(), matrix, true);
+			int off = (rot.getWidth() - myImg.getWidth()) / 2;
+			Bitmap result = Bitmap.createBitmap(rot, off, off, myImg.getWidth(), myImg.getHeight());
+			circle.setImageBitmap(result);
 		}
-		float degree = (float) (-Math.atan2(y/10, x/10)*180/Math.PI);
-		
-		circle = (ImageView) findViewById(R.id.imageViewArrow);
-		Bitmap myImg = BitmapFactory.decodeResource(getResources(), R.drawable.a0);
-
-		Matrix matrix = new Matrix(); 
-		matrix.postRotate(degree);
-		
-		Bitmap rot = Bitmap.createBitmap(myImg, 0, 0, myImg.getWidth(), myImg.getHeight(), matrix, true);
-		int off = (rot.getWidth() - myImg.getWidth()) / 2;
-		Bitmap result = Bitmap.createBitmap(rot, off, off, myImg.getWidth(), myImg.getHeight());
-		circle.setImageBitmap(result);
 	}
 	private int fireSoundPtr = 0;
 	private int motorsStartSoundPtr = 0;
@@ -321,6 +319,7 @@ public final class MainActivity extends Activity
 			    	fire = i;
 			    	fireImage.setBackgroundColor(Color.parseColor("#86E0AC00"));
 				}
+			    
 			}
 			if ((e.getAction() == 1) || (e.getAction() == gas * 256 + 6)){
 				gas = -1;
@@ -354,6 +353,7 @@ public final class MainActivity extends Activity
 			this.lastFire = fire;
 			return true;
 		}
+		
     }
 	@Override
     public boolean onDown(MotionEvent e){
@@ -383,7 +383,6 @@ public final class MainActivity extends Activity
 	public boolean onTouch(View arg0, MotionEvent arg1) {
 		return false;
 	}
-	
 	private boolean isHit = false;
 	private int isHitNumber = 5;
 	private long endFlash = 0;
@@ -419,18 +418,13 @@ public final class MainActivity extends Activity
 	}
 	public void  setRenderer(GLSurfaceView.Renderer renderer){	
 	}
-
 	private String srcPath = "android.resource://com.example.agi_project_2_control/raw/introvideo";
 	private void showVideo(){
-		//Log.d("MyApp","ShowVideo\n");
 		VideoView vd = (VideoView)findViewById(R.id.videoViewBK);
 		Uri uri = Uri.parse(srcPath);
 		vd.setVideoURI(uri);
 		vd.start();;
 	}
-	
-	
-	
 	public Handler mainHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             if (msg.what == 0) {
