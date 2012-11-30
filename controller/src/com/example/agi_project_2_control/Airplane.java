@@ -1,27 +1,22 @@
 package com.example.agi_project_2_control;
 
 public class Airplane {
-	public int life;
-	public boolean alive;
-	
+	private int life;
 	public Airplane(){
 		this.life = 5;
-		this.alive = true;
 	}
 	
-	public void hit(){
-		if (alive){
-			if (this.life > 0){
-				this.life--;
-			}
-			else{ 
-				this.alive = false;
-				MainActivity.alive = this.alive;
-			}
-		}
+	public void setLife(int l)
+	{
+		life = l;
 	}
+	
+	public int getLife()
+	{
+		return life;
+	}
+	
 	public boolean isAlive(){
-		return this.alive;
-		
+		return (life>0);
 	}
 }

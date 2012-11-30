@@ -27,6 +27,15 @@ public class StateSender implements Runnable{
 	}
 	
 
+	public void run()
+	{
+		while(true) //TODO Create sane thread management here!
+		{
+			
+		}
+	}
+	
+
 	public float getSpeedFrac() {
 		return speedFrac;
 	}
@@ -67,13 +76,7 @@ public class StateSender implements Runnable{
 		this.rotY = rotY;
 	}
 	
-	public void run()
-	{
-		while(true) //TODO Create sane thread management here!
-		{
-			
-		}
-	}
+	
 	
 	
 

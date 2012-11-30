@@ -52,7 +52,7 @@ public class Client {
 		}
 	}*/
 	
-	public void reciveAction(Airplane airplane) throws IOException{
+	/*public void reciveAction(Airplane airplane) throws IOException{
 		for (String line; this.scanner.hasNextLine();){
 			line = this.scanner.nextLine();
 			if (line.length() == 0){
@@ -62,5 +62,5 @@ public class Client {
 				airplane.hit();
 			}	
 		}
-	}
+	}*/
 }

@@ -16,10 +16,10 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+//import android.os.Handler;
+//import android.os.Message;
 import android.text.Editable;
-import android.util.Log;
+//import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MotionEvent;
@@ -35,15 +35,15 @@ import android.view.GestureDetector.OnGestureListener;
 import android.view.GestureDetector;
 
 public final class MainActivity extends Activity
-	implements View.OnTouchListener, SensorEventListener, OnGestureListener {
+implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	/**
 	 * Adding classes 
 	 */
-	private static Client client = new Client();	
-	public static Airplane airplane = new Airplane();
-	
+	private Client client = new Client();	
+	private Airplane airplane = new Airplane();
+
 	private static StateSender ss = new StateSender();
-	
+
 	/**
 	 * Image Viewers
 	 */
@@ -55,29 +55,32 @@ public final class MainActivity extends Activity
 	public ImageView imageViewNavigation;
 	public ImageView circle;
 	
-	
-	
+	private static final int[] lifeResources = { R.drawable.life, R.drawable.life1, R.drawable.life2, R.drawable.life3, R.drawable.life4 }; 
+
+
+
+
 	/**
 	 * Used for sensor usage
 	 */
 	private SensorManager mSensorManager;
 	private Sensor mAccelerometer;
-	
+
 	/**
 	 * Screen size
 	 */
 	private int screenWidth;
 	private int screenHeight;
-	
+
 	/**
 	 * Is the android player alive
 	 */
-	public static boolean alive = true;
-	
+	//public static boolean alive = true;
+
 	private int lastFire = -1;
 	private int lastGas = -1;
 	private final Object touchMutex = new Object();
-	
+
 	/**
 	 * Video
 	 */
@@ -85,24 +88,24 @@ public final class MainActivity extends Activity
 	/**
 	 * Sound
 	 */
-	private static MediaPlayer fireSounds;
+	//private static MediaPlayer fireSounds;
 	private static MediaPlayer backgroundMusic;
-	private static MediaPlayer motorsStartSound;
-	private static MediaPlayer motorsSound;
-	private static MediaPlayer motorsEndSound;
+	//private static MediaPlayer motorsStartSound;
+	//private static MediaPlayer motorsSound;
+	//private static MediaPlayer motorsEndSound;
 
 	/**
 	 * Starting Threads
 	 */
-	private Thread threadImage;
-	private Thread threadInput;
-	private Thread threadInputAlert;
-	
+	//private Thread threadImage;
+	//private Thread threadInput;
+	//private Thread threadInputAlert;
+
 	static boolean inititialised = false;
 	public String host = "192.168.0.16";
 	public int port;
 	static boolean getHost = false;
-		
+
 	/**
 	 * Called when the activity first creates.
 	 */
@@ -110,46 +113,46 @@ public final class MainActivity extends Activity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+
 		if (getHost == false){
 			final Context context = this;
-	    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-	    			context);
-	    	
-	    	// set title
-	    	alertDialogBuilder.setTitle("Enter IP:port");
-	    	final EditText input = new EditText(this);
-	    	alertDialogBuilder.setView(input);
-	    	
-	    	// set dialog message
-	    	alertDialogBuilder
-	    		.setCancelable(false)
-	    		.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
-	    			public void onClick(DialogInterface dialog,int id) {
-	    				Editable hosttemp = input.getText();
-	    				
-	    				host = hosttemp.toString().split(":")[0];
-	    				port = Integer.parseInt(hosttemp.toString().split(":")[1]);
-	    				getHost = true;
-	    				if(inititialised == false){
-	    					//Log.d("MyApp","2\n");
-	    					try {
-	    						client.connect(host, port, MainActivity.this);
-	    					} catch (UnknownHostException e) {
-	    						e.printStackTrace();
-	    					} catch (IOException e) {
-	    						e.printStackTrace();
-	    					}
-	    					inititialised = true;
-	    				}
-	    			}
-	    		  });
-	    	// create alert dialog
-	    	AlertDialog alertDialog = alertDialogBuilder.create();
-	    	// show it
-	    	alertDialog.show();
+			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+					context);
+
+			// set title
+			alertDialogBuilder.setTitle("Enter IP:port");
+			final EditText input = new EditText(this);
+			alertDialogBuilder.setView(input);
+
+			// set dialog message
+			alertDialogBuilder
+			.setCancelable(false)
+			.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog,int id) {
+					Editable hosttemp = input.getText();
+
+					host = hosttemp.toString().split(":")[0];
+					port = Integer.parseInt(hosttemp.toString().split(":")[1]);
+					getHost = true;
+					if(inititialised == false){
+						//Log.d("MyApp","2\n");
+						try {
+							client.connect(host, port, MainActivity.this);
+						} catch (UnknownHostException e) {
+							e.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						inititialised = true;
+					}
+				}
+			});
+			// create alert dialog
+			AlertDialog alertDialog = alertDialogBuilder.create();
+			// show it
+			alertDialog.show();
 		}
-		
+
 	}
 	public void onCreatAgain(){
 		new GestureDetector(this);	
@@ -169,7 +172,7 @@ public final class MainActivity extends Activity
 		this.screenWidth = display.getWidth();
 		this.screenHeight = display.getHeight();
 		ss.setScreenHeight(screenHeight);
-			/*
+		/*
 		try {
 			client.sendAction("Android");
 			client.sendAction("screenWidth" + screenWidth);
@@ -177,7 +180,7 @@ public final class MainActivity extends Activity
 		} catch (IOException e) {
 			e.printStackTrace();
 		}*/
-		
+
 		/**
 		 * Images
 		 */
@@ -193,24 +196,19 @@ public final class MainActivity extends Activity
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-		
-		threadInput = new Thread(){
+
+		(new Thread(){
 			@Override
 			public void run(){
-				while(MainActivity.airplane.isAlive()){
-					try {
-						client.reciveAction(airplane);
-					}
-					catch (IOException e) {
-						e.printStackTrace();
-					}
+				while(airplane.isAlive()){
+					
 				}
 			}
-		};
+		}).start();
 		/**
 		 * Vad fan är det som händer egentligen
 		 */
-		threadImage = new Thread(){
+		/*threadImage = new Thread(){
 			@Override
 			public void run(){
 				while(MainActivity.airplane.isAlive()){
@@ -225,11 +223,11 @@ public final class MainActivity extends Activity
 				}
 			}
 		};
-        
+
 		threadImage.setDaemon(true);
-		threadImage.start();
-		threadInput.setDaemon(true);
-		threadInput.start();
+		threadImage.start();*/
+		//threadInput.setDaemon(true);
+		//threadInput.start();
 	}
 	/**
 	 *	What should happen when the program needs to be resumed.
@@ -253,7 +251,7 @@ public final class MainActivity extends Activity
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-			getMenuInflater().inflate(R.menu.activity_main, menu);
+		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
 	public float rotation = 0; 
@@ -270,66 +268,66 @@ public final class MainActivity extends Activity
 		float x = event.values[0];
 		float y = event.values[1];
 		//float z = event.values[2];
-		
+
 		/*try {
 			client.sendAction("x"+Float.toString(x));
 			client.sendAction("y"+Float.toString(y));
-			
+
 			//client.sendAction("z"+Float.toString(z)); No need to send at the moment we do not need to use it.
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-		
+
 		ss.setRotX(x);
 		ss.setRotY(y);
-		
+
 		float degree = (float) (-Math.atan2(y/10, x/10)*180/Math.PI);
-		
+
 		circle = (ImageView) findViewById(R.id.imageViewArrow);
 		Bitmap myImg = BitmapFactory.decodeResource(getResources(), R.drawable.a0);
 
 		Matrix matrix = new Matrix(); 
 		matrix.postRotate(degree);
-		
+
 		Bitmap rot = Bitmap.createBitmap(myImg, 0, 0, myImg.getWidth(), myImg.getHeight(), matrix, true);
 		int off = (rot.getWidth() - myImg.getWidth()) / 2;
 		Bitmap result = Bitmap.createBitmap(rot, off, off, myImg.getWidth(), myImg.getHeight());
 		circle.setImageBitmap(result);
 	}
 	private int fireSoundPtr = 0;
-	private int motorsStartSoundPtr = 0;
-	private int motorsEndSoundPtr = 0;
+	//private int motorsStartSoundPtr = 0;
+	//private int motorsEndSoundPtr = 0;
 	private int motorsSoundPtr = 0;
-	
+
 	private MediaPlayer[] fireSoundPool = new MediaPlayer[20];
-	private MediaPlayer[] motorsStartSoundPool = new MediaPlayer[3];
-	private MediaPlayer[] motorsEndPool = new MediaPlayer[3];
+	//private MediaPlayer[] motorsStartSoundPool = new MediaPlayer[3];
+	//private MediaPlayer[] motorsEndPool = new MediaPlayer[3];
 	private MediaPlayer[] motorsSoundPool = new MediaPlayer[3];
-	
+
 	@Override
-    public boolean onTouchEvent(MotionEvent e){
+	public boolean onTouchEvent(MotionEvent e){
 		synchronized (this.touchMutex){
 			int fire = -1, gas = -1;
 			int n = e.getPointerCount();
 			for (int i = 0; i < n; i++) {
-			    float x = e.getX(i);
-			    if (x < (int)(this.screenWidth*0.5)){
-			    	gasImage.setBackgroundColor(Color.parseColor("#86E0AC00"));
-			    	gas = i;
-				    	if (this.motorsSoundPool[this.motorsSoundPtr] == null){
-				    		this.motorsSoundPool[this.motorsSoundPtr] = MediaPlayer.create(this, R.raw.motors);
-				    	}
-			    		if(!motorsSoundPool[this.motorsSoundPtr].isPlaying()){
-			    			this.motorsSoundPool[this.motorsSoundPtr++].start();
-			    		}
-						this.motorsSoundPtr %= this.motorsSoundPool.length;
-			    }
-			    else {
-			    	fire = i;
-			    	fireImage.setBackgroundColor(Color.parseColor("#86E0AC00"));
+				float x = e.getX(i);
+				if (x < (int)(this.screenWidth*0.5)){
+					gasImage.setBackgroundColor(Color.parseColor("#86E0AC00"));
+					gas = i;
+					if (this.motorsSoundPool[this.motorsSoundPtr] == null){
+						this.motorsSoundPool[this.motorsSoundPtr] = MediaPlayer.create(this, R.raw.motors);
+					}
+					if(!motorsSoundPool[this.motorsSoundPtr].isPlaying()){
+						this.motorsSoundPool[this.motorsSoundPtr++].start();
+					}
+					this.motorsSoundPtr %= this.motorsSoundPool.length;
 				}
-			    
+				else {
+					fire = i;
+					fireImage.setBackgroundColor(Color.parseColor("#86E0AC00"));
+				}
+
 			}
 			if ((e.getAction() == 1) || (e.getAction() == gas * 256 + 6)){
 				gas = -1;
@@ -339,13 +337,13 @@ public final class MainActivity extends Activity
 				fire = -1;
 				fireImage.setBackgroundColor(Color.parseColor("#8600ACE0"));
 			}
-			String msg = "";
+			//String msg = "";
 			if ((fire != this.lastFire) && (fire != -1)){
 				if (this.fireSoundPool[this.fireSoundPtr] == null)
 					this.fireSoundPool[this.fireSoundPtr] = MediaPlayer.create(this, R.raw.shot);
 				this.fireSoundPool[this.fireSoundPtr++].start();
 				this.fireSoundPtr %= this.fireSoundPool.length;
-				
+
 				//msg += "fire\n";
 				ss.setShooting(true);
 			}
@@ -360,17 +358,17 @@ public final class MainActivity extends Activity
 					e1.printStackTrace();
 				}
 			}*/
-			
+
 			this.lastGas = gas;
 			this.lastFire = fire;
 			return true;
 		}
-		
-    }
+
+	}
 	@Override
-    public boolean onDown(MotionEvent e){
+	public boolean onDown(MotionEvent e){
 		return true;
-    }
+	}
 	@Override
 	public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2,
 			float arg3) {
@@ -395,39 +393,29 @@ public final class MainActivity extends Activity
 	public boolean onTouch(View arg0, MotionEvent arg1) {
 		return false;
 	}
-	private boolean isHit = false;
-	private int isHitNumber = 5;
-	private long endFlash = 0;
-	private static final int[] lifeResources = { R.drawable.life, R.drawable.life1, R.drawable.life2, R.drawable.life3, R.drawable.life4 }; 
+	//private boolean isHit = false;
+	//private int isHitNumber = 5;
 	
 	private void lifeSpan() {	
-		if (airplane.life != isHitNumber){
-			this.viewLifeImage.setImageResource(lifeResources[airplane.life]);
-			this.imageRedFlash.setBackgroundColor(Color.parseColor("#86E00000"));
-			isHit = true;
-			isHitNumber = airplane.life;
-			if (isHitNumber != 0){
-				endFlash = System.currentTimeMillis() + 300;
-				(new Thread(){
-					@Override
-					public void run(){
-						try {
-							while (System.currentTimeMillis() < endFlash)
-								Thread.sleep(endFlash - System.currentTimeMillis());
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						(Message.obtain(MainActivity.this.mainHandler, 1)).sendToTarget();
-					}
-				}).start();
+		this.viewLifeImage.setImageResource(lifeResources[airplane.getLife()]);
+		
+		//isHit = true;
+		//isHitNumber = airplane.life;
+		(new Thread(){
+			@Override
+			public void run(){
+				try {
+					imageRedFlash.setBackgroundColor(Color.parseColor("#86E00000"));
+					Thread.sleep(300);
+					imageRedFlash.setBackgroundColor(Color.parseColor("#00E00000"));
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				//(Message.obtain(MainActivity.this.mainHandler, 1)).sendToTarget();
 			}
-		}
-    }
-	private void endFlash()
-	{
-		imageRedFlash.setBackgroundColor(Color.parseColor("#00E00000"));
-		isHit = false;
+		}).start();
 	}
+
 	public void  setRenderer(GLSurfaceView.Renderer renderer){	
 	}
 	private String srcPath = "android.resource://com.example.agi_project_2_control/raw/introvideo";
@@ -437,16 +425,17 @@ public final class MainActivity extends Activity
 		vd.setVideoURI(uri);
 		vd.start();;
 	}
-	public Handler mainHandler = new Handler() {
+	/*public Handler mainHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             if (msg.what == 0) {
+            	System.err.println("STUFF!!!!");
             	lifeSpan();
             }
             if (msg.what == 1) {
             	endFlash();
             }
         };
-    }; 
+    }; */
 }
 
 
