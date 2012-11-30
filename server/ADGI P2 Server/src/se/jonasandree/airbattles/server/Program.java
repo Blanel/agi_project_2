@@ -35,14 +35,10 @@ public class Program implements Runnable {
 	@Override
 	public void run(){
 		final ArrayList<Client> clients = new ArrayList<>();
-		try (ServerSocket server = new ServerSocket(15003, 20)) {
+		try (ServerSocket server = new ServerSocket(12345, 20)) {
 			for(;;){
 				final Socket socket = server.accept();
 				Thread thread = new Thread("Client-" + socket.getRemoteSocketAddress()){
-					/**
-					 * logik f�r tr�den(non-Javadoc)
-					 * @see java.lang.Thread#run()
-					 */
 					@Override
 					public void run(){
 						try (final InputStream in 	= socket.getInputStream()
@@ -75,10 +71,8 @@ public class Program implements Runnable {
 							for (Client client : clients){
 								if (client.getClientType() == false && client.isAClient == true){
 									renderingClients.add(client);
-									//System.out.println("AndroidClient: "+client.getClientType()+"");
 								}
 								else if (client.isAClient == true){
-									//System.out.println("AndroidClient: "+client.getClientType()+"");
 									try {
 										String alivetemp = "no";
 										if (client.airplane.getAlive()){
@@ -87,7 +81,6 @@ public class Program implements Runnable {
 										else {
 											alivetemp = "no";
 										}
-										//System.out.println("Amount of rendering clients: "+ renderingClients.size());
 										for (Client client1 :renderingClients){
 											System.out.println("aireplane: " + client.getIndex()+"\n"+"alive: " + alivetemp+"\n");
 											client1.write(("aireplane: " + client.getIndex()+"\n" + "alive: "+alivetemp+"\n").getBytes("UTF-8"));
@@ -108,7 +101,6 @@ public class Program implements Runnable {
 										}
 										else{
 											for (int bindex = 0; bindex < bullets.size(); bindex++){
-												//System.out.println(bullets.size()+ ": 2\n");
 												bullets.get(bindex).uppdatePosition();
 												String bexists = "no";
 												if(bullets.get(bindex).getExist()){

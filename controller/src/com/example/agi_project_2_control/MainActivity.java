@@ -26,7 +26,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.VideoView;
 
 import java.io.*;
@@ -101,6 +100,7 @@ public final class MainActivity extends Activity
 	
 	static boolean inititialised = false;
 	public String host = "192.168.0.16";
+	public int port;
 	static boolean getHost = false;
 		
 	/**
@@ -110,15 +110,14 @@ public final class MainActivity extends Activity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		/*
+		
 		if (getHost == false){
 			final Context context = this;
 	    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 	    			context);
 	    	
 	    	// set title
-	    	alertDialogBuilder.setTitle("Enter IP:");
-	    	
+	    	alertDialogBuilder.setTitle("Enter IP:port");
 	    	final EditText input = new EditText(this);
 	    	alertDialogBuilder.setView(input);
 	    	
@@ -128,121 +127,110 @@ public final class MainActivity extends Activity
 	    		.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
 	    			public void onClick(DialogInterface dialog,int id) {
 	    				Editable hosttemp = input.getText();
-	    				host = hosttemp.toString();
-	    				MainActivity.getHost = true;
+	    				
+	    				host = hosttemp.toString().split(":")[0];
+	    				port = Integer.parseInt(hosttemp.toString().split(":")[1]);
+	    				getHost = true;
+	    				if(inititialised == false){
+	    					//Log.d("MyApp","2\n");
+	    					try {
+	    						client.connect(host, port, MainActivity.this);
+	    					} catch (UnknownHostException e) {
+	    						e.printStackTrace();
+	    					} catch (IOException e) {
+	    						e.printStackTrace();
+	    					}
+	    					inititialised = true;
+	    				}
 	    			}
 	    		  });
-
 	    	// create alert dialog
 	    	AlertDialog alertDialog = alertDialogBuilder.create();
-
 	    	// show it
 	    	alertDialog.show();
-	    	Log.d("MyApp","1");
-	    	MainActivity.getHost = true;
-	    	
-		}
-		else{*/
-			//Log.d("MyApp","1.5\n");
-			if(inititialised == false){
-				//Log.d("MyApp","2\n");
-				try {
-					client.connect(host);
-				} catch (UnknownHostException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				inititialised = true;
-			}
-			//Log.d("MyApp","3\n");
-			new GestureDetector(this);	
-			showVideo();
-	
-			/**
-			 * Sounds 
-			 */
-			backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
-			backgroundMusic.setVolume(2.8f, 2.8f);
-			backgroundMusic.start();
-			
-			
-			/**
-			 * Sending Image size to server and client type in this case Android.
-			 */
-			Display display = getWindowManager().getDefaultDisplay(); 
-			this.screenWidth = display.getWidth();
-			this.screenHeight = display.getHeight();
-			
-			ss.setScreenHeight(screenHeight);
-			
-			
-			
-			/*
-			try {
-				client.sendAction("Android");
-				client.sendAction("screenWidth" + screenWidth);
-				client.sendAction("screenHeight" + screenHeight);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}*/
-			
-			/**
-			 * Images
-			 */
-			this.fireImage 				= (ImageView)findViewById(R.id.imageFire);
-			this.gasImage 				= (ImageView)findViewById(R.id.imageGas);
-			this.viewLifeImage 			= (ImageView)findViewById(R.id.imageViewLife);
-			this.imageRedFlash 			= (ImageView)findViewById(R.id.imageRedFlash);
-			this.imageViewNavigation 	= (ImageView)findViewById(R.id.imageViewNavigation);
-	
-			/**
-			 * Accelerometer
-			 */
-			mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-			mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-			mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-			
-			threadInput = new Thread(){
-				@Override
-				public void run(){
-					while(true){
-						try {
-							client.reciveAction(airplane);
-						}
-						catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			};
-			/**
-			 * Vad fan är det som händer egentligen
-			 */
-			threadImage = new Thread(){
-				@Override
-				public void run(){
-					while(true){
-						try {
-							Thread.sleep(100);
-							//(Message.obtain(MainActivity.this.mainHandler, 0)).sendToTarget();
-							
-							if (!backgroundMusic.isPlaying())
-								backgroundMusic.start();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			};
-	        
-			threadImage.setDaemon(true);
-			threadImage.start();
-			threadInput.setDaemon(true);
-			threadInput.start();
 		}
 		
-	//}
+	}
+	public void onCreatAgain(){
+		new GestureDetector(this);	
+		showVideo();
+
+		/**
+		 * Sounds 
+		 */
+		backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
+		backgroundMusic.setVolume(2.8f, 2.8f);
+		backgroundMusic.start();
+
+		/**
+		 * Sending Image size to server and client type in this case Android.
+		 */
+		Display display = getWindowManager().getDefaultDisplay(); 
+		this.screenWidth = display.getWidth();
+		this.screenHeight = display.getHeight();
+		ss.setScreenHeight(screenHeight);
+			/*
+		try {
+			client.sendAction("Android");
+			client.sendAction("screenWidth" + screenWidth);
+			client.sendAction("screenHeight" + screenHeight);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}*/
+		
+		/**
+		 * Images
+		 */
+		this.fireImage 				= (ImageView)findViewById(R.id.imageFire);
+		this.gasImage 				= (ImageView)findViewById(R.id.imageGas);
+		this.viewLifeImage 			= (ImageView)findViewById(R.id.imageViewLife);
+		this.imageRedFlash 			= (ImageView)findViewById(R.id.imageRedFlash);
+		this.imageViewNavigation 	= (ImageView)findViewById(R.id.imageViewNavigation);
+
+		/**
+		 * Accelerometer
+		 */
+		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+		
+		threadInput = new Thread(){
+			@Override
+			public void run(){
+				while(MainActivity.airplane.isAlive()){
+					try {
+						client.reciveAction(airplane);
+					}
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		/**
+		 * Vad fan är det som händer egentligen
+		 */
+		threadImage = new Thread(){
+			@Override
+			public void run(){
+				while(MainActivity.airplane.isAlive()){
+					try {
+						Thread.sleep(100);
+						(Message.obtain(MainActivity.this.mainHandler, 0)).sendToTarget();
+						if (!backgroundMusic.isPlaying())
+							backgroundMusic.start();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+        
+		threadImage.setDaemon(true);
+		threadImage.start();
+		threadInput.setDaemon(true);
+		threadInput.start();
+	}
 	/**
 	 *	What should happen when the program needs to be resumed.
 	 */
@@ -259,7 +247,6 @@ public final class MainActivity extends Activity
 		if(inititialised)
 			mSensorManager.unregisterListener(this);
 	}
-	
 	/**
 	 * Option menu
 	 */
@@ -269,12 +256,10 @@ public final class MainActivity extends Activity
 			getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
-	
 	public float rotation = 0; 
 
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
 	}
 	/**
 	 * Checking the accelerometer sensor for change and sends the change to the server and rotates the 
@@ -344,6 +329,7 @@ public final class MainActivity extends Activity
 			    	fire = i;
 			    	fireImage.setBackgroundColor(Color.parseColor("#86E0AC00"));
 				}
+			    
 			}
 			if ((e.getAction() == 1) || (e.getAction() == gas * 256 + 6)){
 				gas = -1;
@@ -379,6 +365,7 @@ public final class MainActivity extends Activity
 			this.lastFire = fire;
 			return true;
 		}
+		
     }
 	@Override
     public boolean onDown(MotionEvent e){
@@ -408,7 +395,6 @@ public final class MainActivity extends Activity
 	public boolean onTouch(View arg0, MotionEvent arg1) {
 		return false;
 	}
-	
 	private boolean isHit = false;
 	private int isHitNumber = 5;
 	private long endFlash = 0;
@@ -444,18 +430,13 @@ public final class MainActivity extends Activity
 	}
 	public void  setRenderer(GLSurfaceView.Renderer renderer){	
 	}
-
 	private String srcPath = "android.resource://com.example.agi_project_2_control/raw/introvideo";
 	private void showVideo(){
-		//Log.d("MyApp","ShowVideo\n");
 		VideoView vd = (VideoView)findViewById(R.id.videoViewBK);
 		Uri uri = Uri.parse(srcPath);
 		vd.setVideoURI(uri);
 		vd.start();;
 	}
-	
-	
-	
 	public Handler mainHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             if (msg.what == 0) {
@@ -464,43 +445,8 @@ public final class MainActivity extends Activity
             if (msg.what == 1) {
             	endFlash();
             }
-            if (msg.what == 2) {
-            	inputhostID();
-            }
         };
     }; 
-    
-    public void inputhostID(){
-    	final Context context = this;
-    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-    			context);
-    	
-    	// set title
-    	alertDialogBuilder.setTitle("Enter IP:");
-    	
-    	final EditText input = new EditText(this);
-    	alertDialogBuilder.setView(input);
-    	
-    	// set dialog message
-    	alertDialogBuilder
-    		.setCancelable(false)
-    		.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
-    			public void onClick(DialogInterface dialog,int id) {
-    				Editable hosttemp = input.getText();
-    				host = hosttemp.toString();
-    				MainActivity.getHost = true;
-    			}
-    		  });
-
-    	// create alert dialog
-    	AlertDialog alertDialog = alertDialogBuilder.create();
-
-    	// show it
-    	alertDialog.show();
-    	Log.d("MyApp","1");
-    	MainActivity.getHost = true;
-    }
-    
 }
 
 
