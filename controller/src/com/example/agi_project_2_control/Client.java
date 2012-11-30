@@ -3,12 +3,6 @@ import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.text.Editable;
-import android.view.View;
-
 public class Client {
 	protected Socket socket = null;
 	protected InputStream inputStream = null;
@@ -30,13 +24,6 @@ public class Client {
 	public void disconnect() {
 			if (this.socket != null){
 				try {
-					/**
-					 * 
-					 * 
-					 *  VIKTIGT TA DÖD PÅ PLANET HÄR
-					 * 
-					 * 
-					 */
 					this.socket.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -76,7 +63,7 @@ public class Client {
 			{
 				;
 			}
-			else{
+			else if(line.equals("die")){
 				airplane.hit();
 			}	
 		}

@@ -146,20 +146,6 @@ public final class MainActivity extends Activity
 		
 	}
 	public void onCreatAgain(){
-		//Log.d("MyApp","1.5\n");
-    	/*
-		if(inititialised == false){
-			//Log.d("MyApp","2\n");
-			try {
-				client.connect(host);
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			inititialised = true;
-		}*/
-		//Log.d("MyApp","3\n");
 		new GestureDetector(this);	
 		showVideo();
 
@@ -169,8 +155,7 @@ public final class MainActivity extends Activity
 		backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
 		backgroundMusic.setVolume(2.8f, 2.8f);
 		backgroundMusic.start();
-		
-		
+
 		/**
 		 * Sending Image size to server and client type in this case Android.
 		 */
@@ -223,7 +208,7 @@ public final class MainActivity extends Activity
 				while(true){
 					try {
 						Thread.sleep(100);
-						//(Message.obtain(MainActivity.this.mainHandler, 0)).sendToTarget();
+						(Message.obtain(MainActivity.this.mainHandler, 0)).sendToTarget();
 						
 						if (!backgroundMusic.isPlaying())
 							backgroundMusic.start();
@@ -454,43 +439,8 @@ public final class MainActivity extends Activity
             if (msg.what == 1) {
             	endFlash();
             }
-            if (msg.what == 2) {
-            	inputhostID();
-            }
         };
     }; 
-    
-    public void inputhostID(){
-    	final Context context = this;
-    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-    			context);
-    	
-    	// set title
-    	alertDialogBuilder.setTitle("Enter IP:");
-    	
-    	final EditText input = new EditText(this);
-    	alertDialogBuilder.setView(input);
-    	
-    	// set dialog message
-    	alertDialogBuilder
-    		.setCancelable(false)
-    		.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
-    			public void onClick(DialogInterface dialog,int id) {
-    				Editable hosttemp = input.getText();
-    				host = hosttemp.toString();
-    				MainActivity.getHost = true;
-    			}
-    		  });
-
-    	// create alert dialog
-    	AlertDialog alertDialog = alertDialogBuilder.create();
-
-    	// show it
-    	alertDialog.show();
-    	Log.d("MyApp","1");
-    	MainActivity.getHost = true;
-    }
-    
 }
 
 
