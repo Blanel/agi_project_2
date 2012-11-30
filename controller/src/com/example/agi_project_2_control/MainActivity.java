@@ -39,10 +39,10 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	/**
 	 * Adding classes 
 	 */
-	private Client client = new Client();	
-	private Airplane airplane = new Airplane();
+	//private Client client = new Client();	
+	public Airplane airplane = new Airplane();
 
-	private static StateSender ss = new StateSender();
+	private static StateSender ss;
 
 	/**
 	 * Image Viewers
@@ -54,7 +54,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	public ImageView imageRedFlash; 
 	public ImageView imageViewNavigation;
 	public ImageView circle;
-	
+
 	private static final int[] lifeResources = { R.drawable.life, R.drawable.life1, R.drawable.life2, R.drawable.life3, R.drawable.life4 }; 
 
 
@@ -101,10 +101,10 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	//private Thread threadInput;
 	//private Thread threadInputAlert;
 
-	static boolean inititialised = false;
-	public String host = "192.168.0.16";
-	public int port;
-	static boolean getHost = false;
+	private boolean initialised = false;
+	private String host = "192.168.0.16";
+	private int port;
+	//static boolean getHost = false;
 
 	/**
 	 * Called when the activity first creates.
@@ -114,47 +114,48 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		if (getHost == false){
-			final Context context = this;
-			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-					context);
+		ss = new StateSender(this);
+		final Context context = this;
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				context);
 
-			// set title
-			alertDialogBuilder.setTitle("Enter IP:port");
-			final EditText input = new EditText(this);
-			alertDialogBuilder.setView(input);
+		// set title
+		alertDialogBuilder.setTitle("Enter IP:port");
+		final EditText input = new EditText(this);
+		alertDialogBuilder.setView(input);
 
-			// set dialog message
-			alertDialogBuilder
-			.setCancelable(false)
-			.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog,int id) {
-					Editable hosttemp = input.getText();
+		// set dialog message
+		alertDialogBuilder
+		.setCancelable(false)
+		.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog,int id) {
+				Editable hosttemp = input.getText();
 
-					host = hosttemp.toString().split(":")[0];
-					port = Integer.parseInt(hosttemp.toString().split(":")[1]);
-					getHost = true;
-					if(inititialised == false){
-						//Log.d("MyApp","2\n");
-						try {
-							client.connect(host, port, MainActivity.this);
-						} catch (UnknownHostException e) {
-							e.printStackTrace();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-						inititialised = true;
-					}
+				host = hosttemp.toString().split(":")[0];
+				port = Integer.parseInt(hosttemp.toString().split(":")[1]);
+				//getHost = true;
+
+				//Log.d("MyApp","2\n");
+				try {
+					ss.setSoc(new Socket(host,port));
+					//client.connect(host, port, MainActivity.this);
+					initialised = true;
+				} catch (UnknownHostException e) {
+					//e.printStackTrace();
+				} catch (IOException e) {
+					//e.printStackTrace();
 				}
-			});
-			// create alert dialog
-			AlertDialog alertDialog = alertDialogBuilder.create();
-			// show it
-			alertDialog.show();
-		}
 
-	}
-	public void onCreatAgain(){
+
+			}
+		});
+		// create alert dialog
+		AlertDialog alertDialog = alertDialogBuilder.create();
+		// show it
+		while(!initialised)
+			alertDialog.show();
+
+
 		new GestureDetector(this);	
 		showVideo();
 
@@ -172,6 +173,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		this.screenWidth = display.getWidth();
 		this.screenHeight = display.getHeight();
 		ss.setScreenHeight(screenHeight);
+		ss.startListenerThreads();
 		/*
 		try {
 			client.sendAction("Android");
@@ -201,7 +203,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 			@Override
 			public void run(){
 				while(airplane.isAlive()){
-					
+
 				}
 			}
 		}).start();
@@ -234,7 +236,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	 */
 	protected void onResume() {
 		super.onResume();
-		if(inititialised)
+		if(initialised)
 			mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 	}
 	/**
@@ -242,7 +244,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	 */
 	protected void onPause() {
 		super.onPause();
-		if(inititialised)
+		if(initialised)
 			mSensorManager.unregisterListener(this);
 	}
 	/**
@@ -349,7 +351,11 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 			}
 			if (gas != this.lastGas){
 				//msg += gas != -1 ? "+gas"+e.getY()+"\n" : "-gas\n";
-				ss.setSpeedFrac(e.getY());
+
+				if(gas !=-1)
+					ss.setSpeedFrac(1-e.getY()/(double)screenHeight);
+				else
+					ss.setSpeedFrac(0);
 			}
 			/*if (msg.isEmpty() == false){
 				try {
@@ -395,10 +401,10 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	}
 	//private boolean isHit = false;
 	//private int isHitNumber = 5;
-	
-	private void lifeSpan() {	
+
+	public void lifeSpan() {	
 		this.viewLifeImage.setImageResource(lifeResources[airplane.getLife()]);
-		
+
 		//isHit = true;
 		//isHitNumber = airplane.life;
 		(new Thread(){
