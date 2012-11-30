@@ -157,6 +157,7 @@ public class StateSender {
 						Element shootingTag = doc.createElement("shooting");
 						rootElement.appendChild(shootingTag);
 						shootingTag.appendChild(doc.createTextNode(""+shooting));
+						shooting = false;
 						
 						Element speedmodTag = doc.createElement("speedmod");
 						rootElement.appendChild(speedmodTag);

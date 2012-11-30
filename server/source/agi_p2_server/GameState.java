@@ -37,7 +37,7 @@ public class GameState implements Runnable {
 		while(true)
 		{
 			//System.err.println("Gamestate!");
-			
+			//System.err.println("Bullets: "+bullets.size());
 			// Get changes from all clients.
 			srv.androidSync();
 			
@@ -60,7 +60,7 @@ public class GameState implements Runnable {
 			}
 			else
 			{
-				System.err.println("Server can't keep up! "+((end-start)-UPDATEFREQUENCY)+" ms too slow");
+				System.err.println("Server can't keep up! "+(((end-start)-UPDATEFREQUENCY))+" ns too slow");
 			}
 			//waitend = System.nanoTime();
 			//System.err.print("Waittime: "+(waitend-waitstart)+"      ");

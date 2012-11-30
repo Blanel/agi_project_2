@@ -29,6 +29,7 @@ public class AndroidClient implements Runnable{
 	private Airplane plane;
 	private Socket soc;
 	private boolean isShooting;
+	private boolean hasShot;
 	private double rotation;
 	private double speedMod;
 	private InputStream is;
@@ -45,8 +46,10 @@ public class AndroidClient implements Runnable{
 		is = soc.getInputStream();
 		os = soc.getOutputStream();
 		sc = new Scanner(is);
+		this.gs = gs;
 		
 		isShooting = false;
+		hasShot = false;
 		rotation = 0;
 		double angle = new Random().nextDouble()*Math.PI*2;
 		Coord centre = gs.getCentre();
@@ -57,12 +60,13 @@ public class AndroidClient implements Runnable{
 	
 	public void update()
 	{
-		plane.addAngle(rotation);
+		plane.addAngle(rotation*0.001);
 		plane.speedMod(speedMod);
-		if(isShooting)
+		if(isShooting && !hasShot)
 		{
 			gs.bullets.add(new Bullet(gs.nextBId(), plane));
 			isShooting=false;
+			hasShot = true;
 		}
 
 	}
@@ -81,8 +85,18 @@ public class AndroidClient implements Runnable{
 					Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
 					//Document doc = docBuilder.parse(line);
 					rotation = Double.parseDouble(doc.getElementsByTagName("rotation").item(0).getTextContent());
-					if(!isShooting)
-						isShooting = Boolean.parseBoolean(doc.getElementsByTagName("shooting").item(0).getTextContent());
+					if(Boolean.parseBoolean(doc.getElementsByTagName("shooting").item(0).getTextContent()))
+					{
+						if(!hasShot)
+							isShooting = true;
+					}
+					else
+					{
+						if(hasShot)
+							hasShot = false;
+					}
+					
+					
 					
 				} catch (ParserConfigurationException  | IOException e) {
 					System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");

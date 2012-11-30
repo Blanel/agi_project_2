@@ -63,11 +63,17 @@ public class Entity {
 	public void setAngle(double angle) 
 	{
 		this.angle = angle;
+		this.angle %= Math.PI*2;
+		if(this.angle<0)
+			this.angle += Math.PI*2;
 	}
 	
 	public void addAngle(double angle)
 	{
 		this.angle += angle;
+		this.angle %= Math.PI*2;
+		if(this.angle<0)
+			this.angle += Math.PI*2;
 	}
 	public double getSpeed() 
 	{

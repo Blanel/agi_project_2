@@ -3,8 +3,8 @@ package agi_p2_server;
 public class Bullet extends Entity {
 	
 	private Airplane owner;
-	private final static double INITIAL_SPEED = 10; 
-	private final static double ttl = 10;
+	private final static double INITIAL_SPEED = 0.5; 
+	private final static double ttl = 180;
 	private double life=0;
 	
 	/*
