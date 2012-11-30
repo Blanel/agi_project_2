@@ -9,7 +9,8 @@ public class Airplane extends Entity{
 	private int gear;
 	//private final static double[] speeds = {1,2,3,4};
 	
-	private final static double BASESPEED = 1;
+	private final static double BASESPEED = 0.01;
+	private final static double SPM = 0.01;
 	
 	private double speed;
 	
@@ -88,7 +89,7 @@ public class Airplane extends Entity{
 	
 	public void speedMod(double m)
 	{
-		setSpeed(BASESPEED+m);
+		setSpeed(BASESPEED+m*SPM);
 	}
 
 	
