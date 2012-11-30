@@ -53,13 +53,13 @@ public class Client {
 				}
 			}
 	}
-	public void sendAction(String action) throws IOException{
+	/*public void sendAction(String action) throws IOException{
 		synchronized(this.sendMutex)
 		{
 			this.outputStream.write((action + "\n\n").getBytes("UTF-8"));
 			this.outputStream.flush();
 		}
-	}
+	}*/
 	
 	public void reciveAction(Airplane airplane) throws IOException{
 		for (String line; this.scanner.hasNextLine();){

@@ -45,6 +45,7 @@ public class Client {
 					}
 				}
 				else if(this.android){
+					System.err.println(line);
 					if(line.substring(0, 1).equals("x")){
 						this.airplane.setRotationX(Float.valueOf(line.substring(1)));
 

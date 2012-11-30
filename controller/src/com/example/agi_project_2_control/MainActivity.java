@@ -42,6 +42,9 @@ public final class MainActivity extends Activity
 	 */
 	private static Client client = new Client();	
 	public static Airplane airplane = new Airplane();
+	
+	private static StateSender ss = new StateSender();
+	
 	/**
 	 * Image Viewers
 	 */
@@ -170,13 +173,19 @@ public final class MainActivity extends Activity
 			Display display = getWindowManager().getDefaultDisplay(); 
 			this.screenWidth = display.getWidth();
 			this.screenHeight = display.getHeight();
+			
+			ss.setScreenHeight(screenHeight);
+			
+			
+			
+			/*
 			try {
 				client.sendAction("Android");
 				client.sendAction("screenWidth" + screenWidth);
 				client.sendAction("screenHeight" + screenHeight);
 			} catch (IOException e) {
 				e.printStackTrace();
-			}
+			}*/
 			
 			/**
 			 * Images
@@ -277,7 +286,7 @@ public final class MainActivity extends Activity
 		float y = event.values[1];
 		//float z = event.values[2];
 		
-		try {
+		/*try {
 			client.sendAction("x"+Float.toString(x));
 			client.sendAction("y"+Float.toString(y));
 			
@@ -285,7 +294,11 @@ public final class MainActivity extends Activity
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
+		
+		ss.setRotX(x);
+		ss.setRotY(y);
+		
 		float degree = (float) (-Math.atan2(y/10, x/10)*180/Math.PI);
 		
 		circle = (ImageView) findViewById(R.id.imageViewArrow);
@@ -347,18 +360,20 @@ public final class MainActivity extends Activity
 				this.fireSoundPool[this.fireSoundPtr++].start();
 				this.fireSoundPtr %= this.fireSoundPool.length;
 				
-				msg += "fire\n";
+				//msg += "fire\n";
+				ss.setShooting(true);
 			}
 			if (gas != this.lastGas){
-				msg += gas != -1 ? "+gas"+e.getY()+"\n" : "-gas\n";
+				//msg += gas != -1 ? "+gas"+e.getY()+"\n" : "-gas\n";
+				ss.setSpeedFrac(e.getY());
 			}
-			if (msg.isEmpty() == false){
+			/*if (msg.isEmpty() == false){
 				try {
 					client.sendAction(msg + "\n");
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-			}
+			}*/
 			
 			this.lastGas = gas;
 			this.lastFire = fire;
