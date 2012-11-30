@@ -171,6 +171,11 @@ public:
 
 			m_Pixels = std::vector<T>(dataptr, dataptr + pixelcount);
 
+			for (auto& pixel : m_Pixels)
+			{
+				std::swap(pixel.r, pixel.b);
+			}
+
 			SDL_FreeSurface(image);
 		}
 		else

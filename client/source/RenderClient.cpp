@@ -18,8 +18,7 @@
 #include <string>
 #include "SDL.h"
 
-//#include <boost/array.hpp>
-//#include <boost/asio.hpp>
+#include "ServerConn.h"
 
 #include "Image2D.h"
 #include "SimplexNoise.h"
@@ -36,11 +35,16 @@ using namespace revel::renderer;
 //using namespace boost::asio;
 
 #include "TerrainTile.h"
+#include "TerrainManager.h"
 #include "Plane.h"
 
 #include <pugixml.hpp>
+#include <thread>
+
 
 #include "Image3D.h"
+
+#include <sstream>
 
 namespace revel
 {
@@ -78,9 +82,21 @@ RenderClient::run()
 	m_Running = true;
 
 	//TODO: Check boost sockets
-	//boost::asio::io_service io_service;
-	//boost::asio::ip::tcp::resolver resolver(io_service);
-	//resolver::query query()
+    
+    pugi::xml_document doc;    
+
+    std::string xmlframe;
+
+	//ServerConn serverconnection("192.168.0.197");    
+
+	//serverconnection.start();
+
+	std::string ip = Config::get<std::string>("ip");
+	u32 port = Config::get<u32>("port");
+
+	boost::asio::io_service io_service;
+	boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address::from_string(ip), port);
+	boost::asio::ip::tcp::socket socket(io_service);
 
 	auto& ctx = active_window()->context();
 
@@ -102,15 +118,14 @@ RenderClient::run()
 
     //auto text = Device::graphics()->create_texture_2d();
 
-    pugi::xml_document doc;
-    
+
 
     auto sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/passthrough_vs.glsl", 
     															  "../client/source/shaders/passthrough_fs.glsl"); 
 
 
 
-	auto planemesh = geo::Mesh::create_quad();
+	auto planemesh = geo::Mesh::create_arrow();
 	auto planemeshva = ctx->create_vertex_array(planemesh);
 
     auto planesp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/plane.vs", 
@@ -128,9 +143,6 @@ RenderClient::run()
 	//sun.set_direction(vec3(0, -1, 0));
 
 	Image3D<pixel::Gray_f32> image3d(16, 16, 16);
-
-	sp->use();
-	auto& mvp = sp->uniform<mat4>("r_MVP");
 
 	//auto p = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::translate(1, 0, -100) * Transform::rotate_x(math::PI * 2);
 	//mvp.set_value();
@@ -151,11 +163,16 @@ RenderClient::run()
 
     //auto heightmap 	= Terrain::generate_heightmap(128, 128, 24.0f, 2.5f);
     //auto tmesh 		= Terrain::heightmap_to_mesh(heightmap);
-	TerrainTile tt(0,0,128,10, 5);
-	auto tmesh 		= tt.mesh;
-	auto tmeshva 	= ctx->create_vertex_array(tmesh);
 
-	R_LOG_INFO("MESH: " << tmeshva->index_count());
+
+	GameState gs;
+	TerrainManager tm(ctx, 100, 3, 128, 10, 2.5);
+	tm.generate(gs);
+	
+	auto tmeshva1  = tm.get_chunk(0,0);
+
+	
+
 
     //TGA::write("D:/hello.tga", terrain);
 
@@ -175,6 +192,31 @@ RenderClient::run()
 	//StopWatch frametimer;
 
 	camera->set_eye(0, 0, 100);
+
+	socket.connect(ep);
+
+	u32 counter = 0;
+
+/*
+	while(true)
+	{
+    	boost::asio::streambuf buffer;
+    
+      	size_t len = boost::asio::read_until(socket, buffer, "\n");
+	      	
+      	std::istream is(&buffer);
+		std::getline(is, xmlframe);
+
+      	//std::cout << xmlframe << std::endl;
+      	counter++;
+
+        if (timer.elapsed_time() > 1)
+        {
+        	R_LOG_INFO("COUNTER: " << counter);
+        }
+
+	}
+*/
 
 	while (this->is_running())
 	{
@@ -219,7 +261,29 @@ RenderClient::run()
     	//update data
     	//poll socket
 
+    	boost::asio::streambuf buffer;
+    
+      	size_t len = boost::asio::read_until(socket, buffer, "\n");
 
+      	
+      	std::istream is(&buffer);
+		//std::getline(is, xmlframe);
+
+		pugi::xml_parse_result result = doc.load(is);
+		R_LOG_INFO("TS: "  << doc.child("tick").attribute("attr").value());
+
+
+
+      	//std::cout << xmlframe << std::endl;
+      	counter++;
+
+        if (timer.elapsed_time() > 1)
+        {
+        	R_LOG_INFO("COUNTER: " << counter);
+        }
+
+		tm.generate(gs);
+		
     	//draw data
 		ctx->clear(clearstate);
 		//ctx->render(scene);
@@ -235,17 +299,21 @@ RenderClient::run()
 		
 		::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-		tmeshva->bind();
-		sp->use();
+		//tmeshva1->bind();
+		//sp->use();
+		//mvp = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::rotate_x(-math::PI/12) * Transform::translate(0, 0, -75);
+		//::glDrawElements(GL_TRIANGLES, tmeshva1->index_count(), GL_UNSIGNED_INT, 0);
 		
+
+		tm.draw(camera);
 		
 
 
 
 		//mvp = camera->projection_matrix() * (Transform::rotate_z(0.1 * timer.elapsed_time()) * Transform::translate(0, 0, 100)).inversed() * Transform::translate(0, 0, -1*timer.elapsed_time());
-		mvp = camera->projection_matrix() * camera->view_matrix() * Transform::translate(0, 0, 0);
+		//mvp = camera->projection_matrix() * camera->view_matrix() * Transform::translate(0, 0, 0);
 
-		::glDrawElements(GL_TRIANGLES, tmeshva->index_count(), GL_UNSIGNED_INT, 0);
+		
 
 		::glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 

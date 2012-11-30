@@ -25,6 +25,6 @@ solution "AGI12 Project2"
 			flags {"Optimize"}
 
 		configuration "gmake"
-			links{ "glew32", "opengl32", "mingw32", "SDL2main", "SDL2", "SDL2_image" , "m", "pugixml" }
-			libdirs{"client/externals/mingw64/lib"}
+			links{ "glew32", "opengl32", "mingw32", "SDL2main", "SDL2", "SDL2_image" , "m", "pugixml", "boost_system-mgw47-s-1_52", "ws2_32" }
+			libdirs{"client/externals/mingw64/lib", "E:/Boost-1.49.0-w64-x86_64-20120312/Boost/lib"}
 			buildoptions { "-std=c++11", "-mwindows", "-mno-ms-bitfields" }

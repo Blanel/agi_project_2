@@ -78,10 +78,10 @@ public:
         quadp->data().push_back(point3( 0.5,  0.5, 0));
         quadp->data().push_back(point3(-0.5,  0.5, 0));
 
-        quadt->data().push_back(vec2(0, 0));
-        quadt->data().push_back(vec2(1, 0));
-        quadt->data().push_back(vec2(1, 1));
-        quadt->data().push_back(vec2(0, 1));
+        quadt->data().push_back(vec2(0.0f, 0.0f));
+        quadt->data().push_back(vec2(1.0f, 0.0f));
+        quadt->data().push_back(vec2(1.0f, 1.0f));
+        quadt->data().push_back(vec2(0.0f, 1.0f));
 
         quadn->data().push_back(vec3(0, 0, 1));
         quadn->data().push_back(vec3(0, 0, 1));
@@ -98,6 +98,32 @@ public:
         quadi->data().push_back(3);
 
         return quad;
+    }
+
+    static std::shared_ptr<Mesh> create_arrow()
+    {
+        auto arrow = std::make_shared<Mesh>();
+        auto arrowp = arrow->create_vertex_attrib<point3>("position");
+        
+        arrowp->data().push_back(point3(-0.5, 0, 0.5));
+        arrowp->data().push_back(point3( 0.5, 0, 0.5));
+        arrowp->data().push_back(point3( 0,  0, -0.5));
+
+        arrowp->data().push_back(point3( 0, 0.5, 0.5));
+        arrowp->data().push_back(point3( 0, -0.5, 0.5));
+        arrowp->data().push_back(point3( 0, 0, -0.5));
+
+
+        auto arrowi = arrow->indices<u32>();
+        arrowi->data().push_back(0);
+        arrowi->data().push_back(1);
+        arrowi->data().push_back(2);
+
+        arrowi->data().push_back(0);
+        arrowi->data().push_back(2);
+        arrowi->data().push_back(3);
+
+        return arrow;        
     }
 
     template <typename T>

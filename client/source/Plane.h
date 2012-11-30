@@ -52,17 +52,23 @@ public:
 		m_pVertexArray->bind();
 		m_pGpuProgram->use();
 
+
+		::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
 		math::mat4 model = Transform::translate(m_Position.x, m_Position.y, m_Position.z) * Transform::rotate_y(0);
 		math::mat4 view = cam->view_matrix();
 		math::mat4 projection = cam->projection_matrix();
 
+		auto& color = m_pGpuProgram->uniform<vec3>("r_Color");
+		color = vec3(0.4, 0.6, 0.9);
+
 		//auto& mv = m_pGpuProgram->uniform<mat4>("r_ModelView");
 		//auto& p = m_pGpuProgram->uniform<mat4>("r_Projection");
 		auto& mvp = m_pGpuProgram->uniform<mat4>("r_MVP");
-		auto& diffmap = m_pGpuProgram->uniform<i32>("diffuseMap");
-		diffmap = 0;
+		//auto& diffmap = m_pGpuProgram->uniform<i32>("diffuseMap");
+		//diffmap = 0;
 
-		m_DiffuseMap->bind();
+		//m_DiffuseMap->bind();
 
 		mvp = projection * view * model;
 
