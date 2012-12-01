@@ -1,15 +1,19 @@
 package agi_p2_server;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
 public class GameState implements Runnable {
 
 
-	public ArrayList<Airplane> airplanes;
-	public ArrayList<Bullet> bullets;
+	public LinkedList<Airplane> airplanes;
+	private ListIterator<Airplane> aIt;
+	public LinkedList<Bullet> bullets;
+	private ListIterator<Bullet> bIt;
 	private int planeIdPool;
 	private int bulletIdPool;
 	private final double MAX_DISTANCE = 128;
 	private final long UPDATEFREQUENCY = 4000000;
+	
 	
 	private Server srv;
 
@@ -18,8 +22,8 @@ public class GameState implements Runnable {
 	public GameState(Server srv)
 	{
 		this.srv = srv;
-		airplanes = new ArrayList<Airplane>();
-		bullets = new ArrayList<Bullet>();
+		airplanes = new LinkedList<Airplane>();
+		bullets = new LinkedList<Bullet>();
 		planeIdPool = 0;
 		bulletIdPool = 0;
 	}
@@ -32,8 +36,6 @@ public class GameState implements Runnable {
 		System.out.println("Gamestate loop started");
 		long start = 0;
 		long end = 100;
-		long waitstart;
-		long waitend;
 		while(true)
 		{
 			//System.err.println("Gamestate!");
@@ -85,23 +87,28 @@ public class GameState implements Runnable {
 	 */
 	public void moveEverything()
 	{
+		aIt = airplanes.listIterator();
 		// Move all planes
-		for(int i = 0 ; i<airplanes.size() ; i++)
+		while(aIt.hasNext())
 		{
-			airplanes.get(i).move();
+			aIt.next().move();
 		}
 		// Move all bullets
-		for(int i=0 ; i<bullets.size() ; i++)
+		bIt = bullets.listIterator();
+		while(bIt.hasNext())
 		{
-			bullets.get(i).move();
+			bIt.next().move();
 		}
 		//Find centre of all planes and turn any planes that are too far away into the centre again
 		Coord centre = getCentre();
-		for(int i=0 ; i<airplanes.size() ; i++)
+		aIt = airplanes.listIterator();
+		Airplane temp;
+		while(aIt.hasNext())
 		{
-			if(airplanes.get(i).getPos().distance(centre)>=MAX_DISTANCE)
+			temp = aIt.next();
+			if(temp.getPos().distance(centre)>=MAX_DISTANCE)
 			{
-				airplanes.get(i).setAngle(airplanes.get(i).getPos().getAngle(centre));
+				temp.setAngle(temp.getPos().getAngle(centre));
 			}
 		}
 	}
@@ -117,22 +124,28 @@ public class GameState implements Runnable {
 	 */
 	public void calculateCollisions()
 	{
-		for(int i = 0 ; i<airplanes.size(); i++)
+		aIt = airplanes.listIterator();
+		Airplane tempPlane;
+		Bullet tempBullet;
+		while(aIt.hasNext())
 		{
-			for(int j = 0 ; j<bullets.size() ; j++)
+			tempPlane = aIt.next();
+			bIt = bullets.listIterator();
+			while(bIt.hasNext())
 			{
+				tempBullet = bIt.next();
 				// If plane is already dead, skip consequent calculations on plane
-				if(airplanes.get(i).getStatus()==-1) 
+				if(tempPlane.getStatus()==-1) 
 					break;
 				// For every bullet that is still alive and not owned by the current plane, check for collision.
-				if(bullets.get(j).getStatus()>=0 && airplanes.get(i)!=bullets.get(j).getOwner() && airplanes.get(i).getPos().distance(bullets.get(j).getPos())<planeHitbox)
+				if(tempBullet.getStatus()>=0 && tempPlane!=tempBullet.getOwner() && tempPlane.getPos().distance(tempBullet.getPos())<planeHitbox)
 				{
-					if(airplanes.get(i).hit()) // Register a hit, if true plane has been killed.
+					if(tempPlane.hit()) // Register a hit, if true plane has been killed.
 					{
-						bullets.get(j).getOwner().incrementKills();
+						tempBullet.getOwner().incrementKills();
 					}
-					bullets.get(j).getOwner().incrementHits();
-					bullets.get(j).setStatus(-1); // Set status of bullet as a hit. (Not alive anymore)
+					tempBullet.getOwner().incrementHits();
+					tempBullet.setStatus(-1); // Set status of bullet as a hit. (Not alive anymore)
 				}
 			}
 		}
@@ -144,18 +157,22 @@ public class GameState implements Runnable {
 	 */
 	public Coord getCentre()
 	{
-		Coord temp = new Coord();
+		Coord tempC = new Coord(0,0);
+		
 		if(airplanes.size() !=0)
 		{
-			for(int i=0 ; i<airplanes.size(); i++)
+			Airplane tempA;
+			aIt = airplanes.listIterator();
+			while(aIt.hasNext())
 			{
-				temp.x += airplanes.get(i).getPos().x;
-				temp.y += airplanes.get(i).getPos().y;
+				tempA = aIt.next();
+				tempC.x += tempA.getPos().x;
+				tempC.y += tempA.getPos().y;
 			}
-			temp.x /= airplanes.size();
-			temp.y /= airplanes.size();
+			tempC.x /= airplanes.size();
+			tempC.y /= airplanes.size();
 		}
-		return temp;
+		return tempC;
 	}
 	
 	public int nextAId()
@@ -170,20 +187,36 @@ public class GameState implements Runnable {
 	
 	public void purgeDead()
 	{
-		for(int i = 0 ; i<airplanes.size(); i++)
+		aIt = airplanes.listIterator();
+		Airplane tempA;
+		while(aIt.hasNext())
 		{
-			if(airplanes.get(i).getStatus()<0)
-				airplanes.remove(i--);
-			else if(airplanes.get(i).getStatus()>0)
-				airplanes.get(i).setStatus(0);
+			tempA = aIt.next();
+			if(tempA.getStatus()<0)
+				aIt.remove();
+			else if(tempA.getStatus()>0)
+				tempA.setStatus(0);
 		}
-		for(int i=0 ; i<bullets.size(); i++)
+		bIt = bullets.listIterator();
+		Bullet tempB;
+		while(bIt.hasNext())
 		{
-			if(bullets.get(i).getStatus()<0)
-				bullets.remove(i--);
-			else if(bullets.get(i).getStatus()>0)
-				bullets.get(i).setStatus(0);
+			tempB = bIt.next();
+			if(tempB.getStatus()<0)
+				bIt.remove();
+			else if(tempB.getStatus()>0)
+				tempB.setStatus(0);
 		}
+	}
+	
+	public ListIterator<Airplane> getPlaneIterator()
+	{
+		return airplanes.listIterator();
+	}
+	
+	public ListIterator<Bullet> getBulletIterator()
+	{
+		return bullets.listIterator();
 	}
 
 

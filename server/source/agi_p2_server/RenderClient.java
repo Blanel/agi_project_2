@@ -3,6 +3,7 @@ package agi_p2_server;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ListIterator;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -53,55 +54,59 @@ public class RenderClient {
 
 			Element planes = doc.createElement("planes");
 			rootElement.appendChild(planes);
-
-			for(int i=0 ; i< gs.airplanes.size() ; i++)
+			ListIterator<Airplane> aIt = gs.getPlaneIterator();
+			Entity temp;
+			while(aIt.hasNext())
 			{
+				temp = aIt.next();
 				Element p = doc.createElement("p");
 				planes.appendChild(p);
 				Attr id = doc.createAttribute("id");
-				id.setValue(""+gs.airplanes.get(i).getId());
+				id.setValue(""+temp.getId());
 				p.setAttributeNode(id);
 
 				Element x = doc.createElement("x");
-				x.appendChild(doc.createTextNode(""+gs.airplanes.get(i).getPos().x));
+				x.appendChild(doc.createTextNode(""+temp.getPos().x));
 				p.appendChild(x);
 
 				Element y = doc.createElement("y");
-				y.appendChild(doc.createTextNode(""+gs.airplanes.get(i).getPos().y));
+				y.appendChild(doc.createTextNode(""+temp.getPos().y));
 				p.appendChild(y);
 
 				Element a = doc.createElement("a");
-				a.appendChild(doc.createTextNode(""+gs.airplanes.get(i).getAngle()));
+				a.appendChild(doc.createTextNode(""+temp.getAngle()));
 				p.appendChild(a);
 
 				Element status = doc.createElement("status");
-				status.appendChild(doc.createTextNode(""+gs.airplanes.get(i).getStatus()));
+				status.appendChild(doc.createTextNode(""+temp.getStatus()));
 				p.appendChild(status);
 			}
 			Element bullets = doc.createElement("bullets");
 			rootElement.appendChild(bullets);
-			for(int i=0 ; i<gs.bullets.size(); i++)
+			ListIterator<Bullet> bIt = gs.getBulletIterator();
+			while(bIt.hasNext())
 			{
+				temp = bIt.next();
 				Element b = doc.createElement("b");
 				bullets.appendChild(b);
 				Attr id = doc.createAttribute("id");
-				id.setValue(""+gs.bullets.get(i).getId());
+				id.setValue(""+temp.getId());
 				b.setAttributeNode(id);
 				
 				Element x = doc.createElement("x");
-				x.appendChild(doc.createTextNode(""+gs.bullets.get(i).getPos().x));
+				x.appendChild(doc.createTextNode(""+temp.getPos().x));
 				b.appendChild(x);
 
 				Element y = doc.createElement("y");
-				y.appendChild(doc.createTextNode(""+gs.bullets.get(i).getPos().y));
+				y.appendChild(doc.createTextNode(""+temp.getPos().y));
 				b.appendChild(y);
 
 				Element a = doc.createElement("a");
-				a.appendChild(doc.createTextNode(""+gs.bullets.get(i).getAngle()));
+				a.appendChild(doc.createTextNode(""+temp.getAngle()));
 				b.appendChild(a);
 
 				Element status = doc.createElement("status");
-				status.appendChild(doc.createTextNode(""+gs.bullets.get(i).getStatus()));
+				status.appendChild(doc.createTextNode(""+temp.getStatus()));
 				b.appendChild(status);
 			}
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();

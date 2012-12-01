@@ -6,13 +6,10 @@ public class Airplane extends Entity{
 	private int hits;
 	private int kills;
 	private String name;
-	private int gear;
 	//private final static double[] speeds = {1,2,3,4};
 	
 	private final static double BASESPEED = 0.01;
 	private final static double SPM = 0.01;
-	
-	private double speed;
 	
 	/*
 	 * Statuses for planes:
@@ -25,7 +22,6 @@ public class Airplane extends Entity{
 	{
 		
 		super(id, x,y,angle, BASESPEED);
-		gear = 0;
 		this.name = name;
 		life = 5;
 	}
