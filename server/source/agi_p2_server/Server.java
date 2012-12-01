@@ -15,13 +15,25 @@ public class Server {
 	private ServerSocket androidServsoc;
 	private ServerSocket renderServsoc;
 	
+	private static final String serverMessage = "Usage: server <androidport> <renderport> <backlogConnections> \n\tandroidport: Integer for portnumber accepting connections from android\n\trendererport: Integer for portnumber accepting connections from renderer\n\tbacklogConnections: How many that can queue for connection to the server";
+	
 	public static void main(String[] args)
 	{
-		if(args.length<2)
+		if(args.length!=3)
 		{
-			System.out.println("No valid input given!");
+			 System.out.println("No input given\n"+serverMessage+"\nDefault Settings applied");
+			 new Server(1234, 20, 1233, 20);
 		}
-		 new Server(Integer.parseInt(args[0]), Integer.parseInt(args[2]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+		else
+		{
+			try{
+			new Server(Integer.parseInt(args[0]), Integer.parseInt(args[2]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+			}
+			catch(NumberFormatException e)
+			{
+				System.out.println("Invalid input\n"+serverMessage+"\n\nServer Stoped");
+			}
+		}
 	}
 	
 	public Server(int aport, int abacklog, int rport, int rbacklog)

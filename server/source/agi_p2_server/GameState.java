@@ -34,8 +34,8 @@ public class GameState implements Runnable {
 	public void run()
 	{
 		System.out.println("Gamestate loop started");
-		long start = 0;
-		long end = 100;
+		long start = System.nanoTime();
+		long end = 0;
 		while(true)
 		{
 			//System.err.println("Gamestate!");

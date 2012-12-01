@@ -16,8 +16,8 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-//import android.os.Handler;
-//import android.os.Message;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Editable;
 //import android.util.Log;
 import android.view.Display;
@@ -40,7 +40,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	 * Adding classes 
 	 */
 	//private Client client = new Client();	
-	public Airplane airplane = new Airplane();
+	public Airplane airplane;
 
 	private static StateSender ss;
 
@@ -80,6 +80,10 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	private int lastFire = -1;
 	private int lastGas = -1;
 	private final Object touchMutex = new Object();
+	private boolean shootingToggle = false;
+	private boolean shootingDown = false;
+	
+	
 
 	/**
 	 * Video
@@ -93,6 +97,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	//private static MediaPlayer motorsStartSound;
 	//private static MediaPlayer motorsSound;
 	//private static MediaPlayer motorsEndSound;
+	private boolean musicOn = false;
 
 	/**
 	 * Starting Threads
@@ -116,8 +121,9 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		airplane = new Airplane(this);
 		ss = new StateSender(this);
-
+		
 		retry = false;
 		final Context context = this;
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
@@ -177,7 +183,8 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		 */
 		backgroundMusic = MediaPlayer.create(this, R.raw.roxcity);
 		backgroundMusic.setVolume(2.8f, 2.8f);
-		backgroundMusic.start();
+		if(musicOn)
+			backgroundMusic.start();
 
 		/**
 		 * Sending Image size to server and client type in this case Android.
@@ -223,24 +230,23 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		/**
 		 * Vad fan är det som händer egentligen
 		 */
-		/*threadImage = new Thread(){
+		(new Thread(){
 			@Override
 			public void run(){
-				while(MainActivity.airplane.isAlive()){
+				while(airplane.isAlive()){
 					try {
 						Thread.sleep(100);
-						(Message.obtain(MainActivity.this.mainHandler, 0)).sendToTarget();
-						if (!backgroundMusic.isPlaying())
+						(Message.obtain(mainHandler, 0)).sendToTarget();
+						if (!backgroundMusic.isPlaying() && musicOn)
 							backgroundMusic.start();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 				}
 			}
-		};
+		}).start();
 
-		threadImage.setDaemon(true);
-		threadImage.start();*/
+		
 		//threadInput.setDaemon(true);
 		//threadInput.start();
 	}
@@ -359,9 +365,8 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 					this.fireSoundPool[this.fireSoundPtr] = MediaPlayer.create(this, R.raw.shot);
 				this.fireSoundPool[this.fireSoundPtr++].start();
 				this.fireSoundPtr %= this.fireSoundPool.length;
-
-				//msg += "fire\n";
-				ss.setShooting(true);
+				shootingToggle=true;
+				
 			}
 			if (gas != this.lastGas){
 				//msg += gas != -1 ? "+gas"+e.getY()+"\n" : "-gas\n";
@@ -378,7 +383,16 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 					e1.printStackTrace();
 				}
 			}*/
-
+			if(shootingToggle && !shootingDown)
+			{
+				ss.setShooting(true);
+				shootingDown = true;
+			}
+			else
+			{
+				shootingDown = false;
+			}
+			shootingToggle = false;
 			this.lastGas = gas;
 			this.lastFire = fire;
 			return true;
@@ -418,22 +432,25 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 
 	public void lifeSpan() {	
 		this.viewLifeImage.setImageResource(lifeResources[airplane.getLife()]);
-
-		//isHit = true;
-		//isHitNumber = airplane.life;
+		imageRedFlash.setBackgroundColor(Color.parseColor("#86E00000"));
 		(new Thread(){
 			@Override
 			public void run(){
 				try {
-					imageRedFlash.setBackgroundColor(Color.parseColor("#86E00000"));
+					
 					Thread.sleep(300);
-					imageRedFlash.setBackgroundColor(Color.parseColor("#00E00000"));
+					
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				//(Message.obtain(MainActivity.this.mainHandler, 1)).sendToTarget();
+				(Message.obtain(mainHandler, 2)).sendToTarget();
 			}
 		}).start();
+	}
+	
+	private void endFlash()
+	{
+		imageRedFlash.setBackgroundColor(Color.parseColor("#00E00000"));
 	}
 
 	public void  setRenderer(GLSurfaceView.Renderer renderer){	
@@ -445,17 +462,16 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		vd.setVideoURI(uri);
 		vd.start();;
 	}
-	/*public Handler mainHandler = new Handler() {
+	public Handler mainHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
-            if (msg.what == 0) {
-            	System.err.println("STUFF!!!!");
+            if (msg.what == 1) {
             	lifeSpan();
             }
-            if (msg.what == 1) {
+            if (msg.what == 2) {
             	endFlash();
             }
         };
-    }; */
+    }; 
 }
 
 
