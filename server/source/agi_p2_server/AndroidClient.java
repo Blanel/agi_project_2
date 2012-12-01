@@ -1,7 +1,9 @@
 package agi_p2_server;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.Socket;
@@ -35,7 +37,8 @@ public class AndroidClient implements Runnable{
 	private double speedMod;
 	private InputStream is;
 	private OutputStream os;
-	private Scanner sc;
+	private BufferedReader br;
+	private InputStreamReader isr;
 	private GameState gs;
 	private int cachedLife;
 	private Thread timeoutThread;
@@ -47,8 +50,9 @@ public class AndroidClient implements Runnable{
 
 		this.sock = soc;
 		is = soc.getInputStream();
+		isr = new InputStreamReader(is);
 		os = soc.getOutputStream();
-		sc = new Scanner(is);
+		br = new BufferedReader(isr);
 		this.gs = gs;
 
 		isShooting = false;
@@ -96,44 +100,50 @@ public class AndroidClient implements Runnable{
 		while(!sock.isClosed())
 		{
 
-			if(sc.hasNextLine())
+
+			String line=null;
+			try {
+				line = br.readLine();
+			} catch (IOException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
+			if(line.startsWith("<?xml") && line.endsWith("</androidClient>") && line!=null)
 			{
-				String line = sc.nextLine();
-				if(line.startsWith("<?xml") && line.endsWith("</androidClient>"))
-				{
-					timeoutThread.interrupt();
-					//System.err.println(line);
+				timeoutThread.interrupt();
+				//System.err.println(line);
+				try {
+					DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+					DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+					Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
+					//Document doc = docBuilder.parse(line);
+					rotation = Double.parseDouble(doc.getElementsByTagName("rotation").item(0).getTextContent());
+					isShooting = Boolean.parseBoolean(doc.getElementsByTagName("shooting").item(0).getTextContent());
+
+
+
+
+				} catch ( IOException e) {
+					System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
 					try {
-						DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-						DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-						Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
-						//Document doc = docBuilder.parse(line);
-						rotation = Double.parseDouble(doc.getElementsByTagName("rotation").item(0).getTextContent());
-						isShooting = Boolean.parseBoolean(doc.getElementsByTagName("shooting").item(0).getTextContent());
-
-
-
-
-					} catch ( IOException e) {
-						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
-						try {
-							sock.close();
-						} catch (IOException e1) {
-							System.err.println("an IO derp");
-						}
-						return;
-					} catch (ParserConfigurationException | SAXException e) {
-						System.err.println(line);
-						
+						sock.close();
+					} catch (IOException e1) {
+						System.err.println("an IO derp");
 					}
+					return;
+				} catch (ParserConfigurationException | SAXException e) {
+					System.err.println(line);
 
 				}
-				else
-				{
-					System.err.println(line);
-				}
+
+			}
+			else
+			{
+				System.err.println(line);
+				//is.
 			}
 		}
+
 	}
 
 

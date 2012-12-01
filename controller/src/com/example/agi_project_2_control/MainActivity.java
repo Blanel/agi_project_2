@@ -39,10 +39,9 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	/**
 	 * Adding classes 
 	 */
-	//private Client client = new Client();	
 	public Airplane airplane;
 
-	private static StateSender ss;
+	private StateSender ss;
 
 	/**
 	 * Image Viewers
@@ -50,12 +49,12 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	private ImageView fireImage;
 	private ImageView gasImage;
 
-	public ImageView viewLifeImage;
-	public ImageView imageRedFlash; 
-	public ImageView imageViewNavigation;
-	public ImageView circle;
+	private ImageView viewLifeImage;
+	private ImageView imageRedFlash; 
+	//private ImageView imageViewNavigation;
+	private ImageView circle;
 
-	private static final int[] lifeResources = { R.drawable.life, R.drawable.life1, R.drawable.life2, R.drawable.life3, R.drawable.life4 }; 
+	private final int[] lifeResources = { R.drawable.life, R.drawable.life1, R.drawable.life2, R.drawable.life3, R.drawable.life4 }; 
 
 
 
@@ -82,6 +81,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	private final Object touchMutex = new Object();
 	private boolean shootingToggle = false;
 	private boolean shootingDown = false;
+	//public float rotation = 0; 
 	
 	
 
@@ -89,15 +89,16 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	 * Video
 	 */
 	public VideoView viewBKVideo;
+	private String srcPath = "android.resource://com.example.agi_project_2_control/raw/introvideo";
 	/**
 	 * Sound
 	 */
-	//private static MediaPlayer fireSounds;
-	private static MediaPlayer backgroundMusic;
-	//private static MediaPlayer motorsStartSound;
-	//private static MediaPlayer motorsSound;
-	//private static MediaPlayer motorsEndSound;
+	private MediaPlayer backgroundMusic;
 	private boolean musicOn = false;
+	private int fireSoundPtr = 0;
+	private int motorsSoundPtr = 0;
+	private MediaPlayer[] fireSoundPool = new MediaPlayer[20];
+	private MediaPlayer[] motorsSoundPool = new MediaPlayer[3];
 
 	/**
 	 * Starting Threads
@@ -109,7 +110,6 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	private boolean initialised = false;
 	private String host = "192.168.0.16";
 	private int port;
-	private boolean retry = false;
 	//private AlertDialog.Builder alertDialogBuilder;
 	//static boolean getHost = false;
 
@@ -124,7 +124,6 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		airplane = new Airplane(this);
 		ss = new StateSender(this);
 		
-		retry = false;
 		final Context context = this;
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 				context);
@@ -210,7 +209,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		this.gasImage 				= (ImageView)findViewById(R.id.imageGas);
 		this.viewLifeImage 			= (ImageView)findViewById(R.id.imageViewLife);
 		this.imageRedFlash 			= (ImageView)findViewById(R.id.imageRedFlash);
-		this.imageViewNavigation 	= (ImageView)findViewById(R.id.imageViewNavigation);
+		//this.imageViewNavigation 	= (ImageView)findViewById(R.id.imageViewNavigation);
 
 		/**
 		 * Accelerometer
@@ -276,7 +275,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
-	public float rotation = 0; 
+	
 
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -317,15 +316,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		Bitmap result = Bitmap.createBitmap(rot, off, off, myImg.getWidth(), myImg.getHeight());
 		circle.setImageBitmap(result);
 	}
-	private int fireSoundPtr = 0;
-	//private int motorsStartSoundPtr = 0;
-	//private int motorsEndSoundPtr = 0;
-	private int motorsSoundPtr = 0;
 
-	private MediaPlayer[] fireSoundPool = new MediaPlayer[20];
-	//private MediaPlayer[] motorsStartSoundPool = new MediaPlayer[3];
-	//private MediaPlayer[] motorsEndPool = new MediaPlayer[3];
-	private MediaPlayer[] motorsSoundPool = new MediaPlayer[3];
 
 	@Override
 	public boolean onTouchEvent(MotionEvent e){
@@ -455,7 +446,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 
 	public void  setRenderer(GLSurfaceView.Renderer renderer){	
 	}
-	private String srcPath = "android.resource://com.example.agi_project_2_control/raw/introvideo";
+	
 	private void showVideo(){
 		VideoView vd = (VideoView)findViewById(R.id.videoViewBK);
 		Uri uri = Uri.parse(srcPath);
