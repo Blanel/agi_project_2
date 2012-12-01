@@ -125,7 +125,10 @@ public class Server {
 			if(androids.get(i).isOpen())
 				androids.get(i).sendEvents();
 			else
+			{
+				System.out.println("Android Client Disconnected: "+androids.get(i).getSocket().getInetAddress());
 				androids.remove(i--);
+			}
 		}
 	}
 	

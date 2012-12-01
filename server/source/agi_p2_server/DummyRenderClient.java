@@ -10,10 +10,10 @@ public class DummyRenderClient {
 	public static void main(String[] args)
 	{
 		try{
-			Socket soc = new Socket("192.168.0.197",1234);
+			Socket soc = new Socket(args[0],Integer.parseInt(args[1]));
 			InputStream is = soc.getInputStream();
 			Scanner sc = new Scanner(is);
-			while(true)
+			while(!soc.isClosed())
 			{
 				if(sc.hasNextLine())
 				{

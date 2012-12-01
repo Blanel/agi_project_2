@@ -23,11 +23,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 public class AndroidClient implements Runnable{
-	
+
 	private Airplane plane;
-	private Socket soc;
+	private Socket sock;
 	private boolean isShooting;
 	//private boolean hasShot;
 	private double rotation;
@@ -37,17 +38,19 @@ public class AndroidClient implements Runnable{
 	private Scanner sc;
 	private GameState gs;
 	private int cachedLife;
-	
-	
+	private Thread timeoutThread;
+	private static final long TIMEOUT =10000; 
+
+
 	public AndroidClient(Socket soc, GameState gs) throws IOException
 	{
-		
-		this.soc = soc;
+
+		this.sock = soc;
 		is = soc.getInputStream();
 		os = soc.getOutputStream();
 		sc = new Scanner(is);
 		this.gs = gs;
-		
+
 		isShooting = false;
 		//hasShot = false;
 		rotation = 0;
@@ -56,8 +59,25 @@ public class AndroidClient implements Runnable{
 		plane = new Airplane(gs.nextAId(),centre.x+Math.cos(angle+Math.PI), centre.y+Math.sin(angle+Math.PI),angle);
 		gs.airplanes.add(plane);
 		cachedLife = plane.getLife();
+
+		timeoutThread = new Thread()
+		{
+			public void run()
+			{
+
+				while(!sock.isClosed())
+				{
+					try {
+						sleep(TIMEOUT);
+						sock.close();
+					} catch (InterruptedException | IOException e) {
+						// Do nothing!
+					}
+				}
+			}
+		};
 	}
-	
+
 	public void update()
 	{
 		plane.addAngle(rotation*0.001);
@@ -70,46 +90,56 @@ public class AndroidClient implements Runnable{
 
 	}
 
-	
+
 	public void run() {
-		while(!soc.isClosed())
+		timeoutThread.start();
+		while(!sock.isClosed())
 		{
+
 			if(sc.hasNextLine())
 			{
 				String line = sc.nextLine();
-				//System.err.println(line);
-				try {
-					DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-					DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-					Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
-					//Document doc = docBuilder.parse(line);
-					rotation = Double.parseDouble(doc.getElementsByTagName("rotation").item(0).getTextContent());
-					isShooting = Boolean.parseBoolean(doc.getElementsByTagName("shooting").item(0).getTextContent());
-
-					
-					
-					
-				} catch (ParserConfigurationException  | IOException e) {
-					System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
+				if(line.startsWith("<?xml") && line.endsWith("</androidClient>"))
+				{
+					timeoutThread.interrupt();
+					//System.err.println(line);
 					try {
-						soc.close();
-					} catch (IOException e1) {
-						System.err.println("an IO derp");
-					}
-					return;
-				} catch (SAXException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+						DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+						DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+						Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
+						//Document doc = docBuilder.parse(line);
+						rotation = Double.parseDouble(doc.getElementsByTagName("rotation").item(0).getTextContent());
+						isShooting = Boolean.parseBoolean(doc.getElementsByTagName("shooting").item(0).getTextContent());
 
-				
+
+
+
+					} catch ( IOException e) {
+						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
+						try {
+							sock.close();
+						} catch (IOException e1) {
+							System.err.println("an IO derp");
+						}
+						return;
+					} catch (ParserConfigurationException | SAXException e) {
+						System.err.println(line);
+						
+					}
+
+				}
+				else
+				{
+					System.err.println(line);
+				}
 			}
 		}
 	}
 
-	
+
 	public void sendEvents()
 	{
+		//System.err.println("StuffSent");
 		if(plane.getLife()<cachedLife)
 		{
 			// Send hit info to android
@@ -117,29 +147,29 @@ public class AndroidClient implements Runnable{
 				DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 				DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 				Document doc = docBuilder.newDocument();
-				
+
 				Element rootElement = doc.createElement("androidResponse");
 				doc.appendChild(rootElement);
 				Attr ts = doc.createAttribute("ts");
 				ts.setValue(""+System.currentTimeMillis());
 				rootElement.setAttributeNode(ts);
-				
+
 				Element lifeTag = doc.createElement("life");
 				rootElement.appendChild(lifeTag);
 				lifeTag.appendChild(doc.createTextNode(""+plane.getLife()));
-				
+
 				TransformerFactory transformerFactory = TransformerFactory.newInstance();
 				Transformer transformer = transformerFactory.newTransformer();
 				DOMSource source = new DOMSource(doc);
-				
+
 				StreamResult result = new StreamResult(os);
 				transformer.transform(source,result);
 				os.write("\n".getBytes());
-			
+
 			} catch (ParserConfigurationException | TransformerException e1) {
 				System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
 				try {
-					soc.close();
+					sock.close();
 				} catch (IOException e) {
 					System.err.println("an IO derp");
 				}
@@ -148,28 +178,28 @@ public class AndroidClient implements Runnable{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			
+
+
 			if(plane.getLife()<=0)
 			{
 				try {
-					soc.close();
+					sock.close();
 				} catch (IOException e) {
 					System.err.println("an IO derp");
 				}
 			}
 		}
-			
+
 	}
-	
+
 	public boolean isOpen()
 	{
-		return !soc.isClosed();
+		return !sock.isClosed();
 	}
 	public Socket getSocket()
 	{
-		return soc;
+		return sock;
 	}
-	
+
 
 }
