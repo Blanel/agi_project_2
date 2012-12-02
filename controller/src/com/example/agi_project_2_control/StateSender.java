@@ -25,7 +25,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class StateSender {
-	
+
 	private double speedFrac;
 	private int screenHeight;
 	private boolean shooting;
@@ -37,9 +37,9 @@ public class StateSender {
 	private InputStream is;
 	private InputStreamReader isr;
 	private BufferedReader br;
-	
+
 	private final static long INTERVALL=40;
-	
+
 	public StateSender(MainActivity m)
 	{
 		ma = m;
@@ -56,6 +56,8 @@ public class StateSender {
 		this.soc = soc;
 		is = soc.getInputStream();
 		os = soc.getOutputStream();
+		isr = new InputStreamReader(is);
+		br = new BufferedReader(isr);
 	}
 	public StateSender(MainActivity m, Socket soc) throws IOException
 	{
@@ -67,7 +69,7 @@ public class StateSender {
 		rotX = 0;
 		rotY = 0;
 	}
-	
+
 	public StateSender(MainActivity m, Socket soc, int h) throws IOException
 	{
 		ma = m;
@@ -78,8 +80,8 @@ public class StateSender {
 		rotX = 0;
 		rotY = 0;
 	}
-	
-	
+
+
 	private double getRotation()
 	{
 		return -((Math.atan2(rotX, rotY)+Math.PI/2)*10/Math.PI);
@@ -91,47 +93,47 @@ public class StateSender {
 		{
 			public void run()
 			{
-				Scanner sc = new Scanner(is);
+
 				while(!soc.isClosed())
 				{
-					if(sc.hasNextLine())
-					{
-						String line = sc.nextLine();
 
-						try {
-							DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-							DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-							Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
-							ma.airplane.setLife(Integer.parseInt(doc.getElementsByTagName("life").item(0).getTextContent()));
-							ma.lifeSpan();
-						} catch (IOException e) {
-							System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
-							/*try {
+					
+
+					try {
+						String line = br.readLine();
+						DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+						DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+						Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
+						ma.airplane.setLife(Integer.parseInt(doc.getElementsByTagName("life").item(0).getTextContent()));
+						ma.lifeSpan();
+					} catch (IOException e) {
+						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
+						/*try {
 							soc.close();
 						} catch (IOException e) {
 							System.err.println("an IO derp");
-						}*/
-							return;
-						} catch (SAXException e) {
-							System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
-							/*try {
-							soc.close();
-						} catch (IOException e) {
-							System.err.println("an IO derp");
-						}*/
-							return;
-						} catch (ParserConfigurationException e) {
-							System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
-							/*try {
-							soc.close();
-						} catch (IOException e) {
-							System.err.println("an IO derp");
-						}*/
-							return;
 						}
-
-
+						return;*/
+					} catch (SAXException e) {
+						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
+						/*try {
+							soc.close();
+						} catch (IOException e) {
+							System.err.println("an IO derp");
+						}
+						return;*/
+					} catch (ParserConfigurationException e) {
+						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
+						/*try {
+							soc.close();
+						} catch (IOException e) {
+							System.err.println("an IO derp");
+						}
+						return;*/
 					}
+
+
+
 				}
 			}
 		}).start();
@@ -162,11 +164,11 @@ public class StateSender {
 						rootElement.appendChild(shootingTag);
 						shootingTag.appendChild(doc.createTextNode(""+shooting));
 						shooting = false;
-						
+
 						Element speedmodTag = doc.createElement("speedmod");
 						rootElement.appendChild(speedmodTag);
 						speedmodTag.appendChild(doc.createTextNode(""+speedFrac));
-						
+
 						TransformerFactory transformerFactory = TransformerFactory.newInstance();
 						Transformer transformer = transformerFactory.newTransformer();
 						DOMSource source = new DOMSource(doc);
@@ -196,12 +198,12 @@ public class StateSender {
 					}
 
 
-					
+
 				}
 			}
 		}).start();
 	}
-	
+
 
 	public double getSpeedFrac() {
 		return speedFrac;
@@ -242,9 +244,9 @@ public class StateSender {
 	public void setRotY(float rotY) {
 		this.rotY = rotY;
 	}
-	
-	
-	
-	
+
+
+
+
 
 }

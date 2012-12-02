@@ -102,13 +102,18 @@ public class AndroidClient implements Runnable{
 
 
 			String line=null;
+			
 			try {
 				line = br.readLine();
 			} catch (IOException e2) {
 				// TODO Auto-generated catch block
-				e2.printStackTrace();
+				System.err.println("IOException when reading line!");
+				//is.
+				//e2.printStackTrace();
+				
 			}
-			if(line.startsWith("<?xml") && line.endsWith("</androidClient>") && line!=null)
+			
+			if(line!=null && line.startsWith("<?xml") && line.endsWith("</androidClient>") )
 			{
 				timeoutThread.interrupt();
 				//System.err.println(line);
@@ -139,7 +144,8 @@ public class AndroidClient implements Runnable{
 			}
 			else
 			{
-				System.err.println(line);
+				if(line != null)
+					System.err.println(line);
 				//is.
 			}
 		}

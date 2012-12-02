@@ -60,9 +60,9 @@ public class GameState implements Runnable {
 					end = System.nanoTime();
 				}
 			}
-			else
+			else if((end-start)-UPDATEFREQUENCY>1000000000)
 			{
-				System.err.println("Server can't keep up! "+(((end-start)-UPDATEFREQUENCY))+" ns too slow");
+				System.err.println("Server can't keep up! "+((Math.floor((float)(end-start)-UPDATEFREQUENCY)/1000000000f))+" ns too slow");
 			}
 			//waitend = System.nanoTime();
 			//System.err.print("Waittime: "+(waitend-waitstart)+"      ");
