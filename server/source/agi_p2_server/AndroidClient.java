@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.Socket;
 import java.util.Random;
-import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,7 +24,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 public class AndroidClient implements Runnable{
 
@@ -104,10 +102,20 @@ public class AndroidClient implements Runnable{
 			String line=null;
 			
 			try {
+
 				line = br.readLine();
 			} catch (IOException e2) {
 				// TODO Auto-generated catch block
 				System.err.println("IOException when reading line!");
+				e2.printStackTrace();
+
+				System.err.println(sock.isClosed());
+				try {
+					sock.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				//is.
 				//e2.printStackTrace();
 				
@@ -158,6 +166,8 @@ public class AndroidClient implements Runnable{
 		//System.err.println("StuffSent");
 		if(plane.getLife()<cachedLife)
 		{
+			System.err.println("Sending packet to android...");
+			cachedLife = plane.getLife();
 			// Send hit info to android
 			try {
 				DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -181,9 +191,11 @@ public class AndroidClient implements Runnable{
 				StreamResult result = new StreamResult(os);
 				transformer.transform(source,result);
 				os.write("\n".getBytes());
+				os.flush();
 
 			} catch (ParserConfigurationException | TransformerException e1) {
 				System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
+				//e1.printStackTrace();
 				try {
 					sock.close();
 				} catch (IOException e) {

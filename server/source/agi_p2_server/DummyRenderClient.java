@@ -17,7 +17,7 @@ public class DummyRenderClient {
 			{
 				if(sc.hasNextLine())
 				{
-					System.out.println(sc.nextLine());
+					System.out.println(sc.nextLine().substring(79));
 				}
 				
 			}

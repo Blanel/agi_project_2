@@ -116,6 +116,7 @@ public class RenderClient {
 			StreamResult result = new StreamResult(os);
 			transformer.transform(source,result);
 			os.write("\n".getBytes());
+			os.flush();
 		}
 		catch (ParserConfigurationException pce) {
 			System.err.println("Parser exception! Did a renderer disconnect?");

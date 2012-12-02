@@ -105,7 +105,6 @@ public class StateSender {
 						DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 						Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
 						ma.airplane.setLife(Integer.parseInt(doc.getElementsByTagName("life").item(0).getTextContent()));
-						ma.lifeSpan();
 					} catch (IOException e) {
 						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
 						/*try {
@@ -131,10 +130,16 @@ public class StateSender {
 						}
 						return;*/
 					}
-
+					/*try {
+						Thread.sleep(33);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}*/
 
 
 				}
+				System.err.println("The socket was closed! Reciever");
 			}
 		}).start();
 		//Server Sender
@@ -145,6 +150,7 @@ public class StateSender {
 				while(!soc.isClosed()) // TODO Create sane operation here
 				{
 					// Send hit info to android
+					//System.err.println(soc.isClosed());
 					try {
 						DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 						DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -176,6 +182,7 @@ public class StateSender {
 						StreamResult result = new StreamResult(os);
 						transformer.transform(source,result);
 						os.write("\n".getBytes());
+						os.flush();
 
 					} catch (ParserConfigurationException e1) {
 						System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
@@ -196,10 +203,18 @@ public class StateSender {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
 
 
 				}
+				System.err.println("The socket was closed! Sender");
 			}
 		}).start();
 	}
