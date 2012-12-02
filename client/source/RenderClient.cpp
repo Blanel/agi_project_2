@@ -18,7 +18,7 @@
 #include <string>
 #include "SDL.h"
 
-#include "ServerConn.h"
+//#include "ServerConn.h"
 
 #include "Image2D.h"
 #include "SimplexNoise.h"
@@ -41,10 +41,13 @@ using namespace revel::renderer;
 #include <pugixml.hpp>
 #include <thread>
 
+#include "TerrainGen.h"
 
 #include "Image3D.h"
 
 #include <sstream>
+
+#include "PerlinNoise.h"
 
 namespace revel
 {
@@ -61,6 +64,7 @@ RenderClient::RenderClient()
 	m_pWindow = Device::graphics()->create_window(screenw, screenh, title);
 
 	m_Running = false;
+	m_Connected = false;
 
 	::glEnable(GL_TEXTURE_2D);
 }
@@ -76,27 +80,22 @@ RenderClient::is_running() const
 	return m_Running;
 }
 
+bool
+RenderClient::is_connected() const
+{
+	return m_Connected;
+}
+
 i32
 RenderClient::run()
 {
 	m_Running = true;
 
-	//TODO: Check boost sockets
-    
-    pugi::xml_document doc;    
-
-    std::string xmlframe;
-
-	//ServerConn serverconnection("192.168.0.197");    
-
-	//serverconnection.start();
-
 	std::string ip = Config::get<std::string>("ip");
 	u32 port = Config::get<u32>("port");
 
-	boost::asio::io_service io_service;
-	boost::asio::ip::tcp::endpoint ep(boost::asio::ip::address::from_string(ip), port);
-	boost::asio::ip::tcp::socket socket(io_service);
+    pugi::xml_document doc;    
+    std::string xmlframe;
 
 	auto& ctx = active_window()->context();
 
@@ -105,34 +104,12 @@ RenderClient::run()
     clearstate->set_color(Color4<f32>(0.3f, 0.4f, 0.5f, 1.0f));
 
     auto scenestate = std::make_shared<SceneState>();
-    auto renderstate = std::make_shared<RenderState>();
-    auto mesh = geo::Mesh::create_cube();
-    auto va = ctx->create_vertex_array(mesh);
-
-    // Load assets
-    // Manually create a mesh
-    //SDL_Surface* image = IMG_Load("E:/ground_grass_1024_tile.jpg");
-    //SDL_FreeSurface(image);
-
-    //auto imgtest = Image2D<pixel::RGBA_u8>("E:/ground_grass_1024_tile.jpg");
-
-    //auto text = Device::graphics()->create_texture_2d();
-
-
-
-    auto sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/passthrough_vs.glsl", 
-    															  "../client/source/shaders/passthrough_fs.glsl"); 
-
-
+    //auto renderstate = std::make_shared<RenderState>();
 
 	auto planemesh = geo::Mesh::create_arrow();
 	auto planemeshva = ctx->create_vertex_array(planemesh);
-
     auto planesp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/plane.vs", 
 	    	    												  	   "../client/source/shaders/plane.fs");
-    
-    //auto drawstate = std::make_shared<DrawState>(renderstate, sp, va);
-
     //Create and setup scene
 	auto camera = std::make_shared<PerspectiveCamera>();
 
@@ -144,79 +121,77 @@ RenderClient::run()
 
 	Image3D<pixel::Gray_f32> image3d(16, 16, 16);
 
-	//auto p = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::translate(1, 0, -100) * Transform::rotate_x(math::PI * 2);
-	//mvp.set_value();
+	/*
+	PerlinNoise perlin(0x4711);
+
+	Image2D<pixel::Gray_f32> pi(256, 256);
+
+	for (u32 y = 0; y < 256; ++y)
+	{
+		for (u32 x = 0; x < 256; ++x)
+		{
+			pi(x, y).val = perlin.noise(x, y, 0.5);
+			pi(x, y).val = (pi(x, y).val + 1.0f)/2.0f;
+		}
+	}
+	*/
+
+	SimplexNoise simplex(0x4711);
+	simplex.set_amplitude(1.0f);
+	simplex.set_frequency(4.0f / 256.0f);
+	simplex.set_octaves(1);
+	//simplex.set_persistance(.5f);
+
+	Image2D<pixel::Gray_f32> pi(256, 256);
+
+	for (u32 y = 0; y < 256; ++y)
+	{
+		for (u32 x = 0; x < 256; ++x)
+		{
+			pi(x, y).val = simplex.noise(x, y);
+			//pi(x, y).val = (pi(x, y).val + 1.0f)/2.0f;
+		}
+	}
+
+
+	Image2D<pixel::RGBA_u8> heightmap(pi);
+
+	TGA::write("e:/heightmap.tga", heightmap);
 
 	auto framebuffer = ctx->create_framebuffer();
 	
-
-	//R_LOG_INFO(p);
-
     Scene scene(ctx);
     scene.set_camera(camera);
 
-    //scene.root().add_child(GeoNode(mesh));
-
-    
     auto tex3d = Device::graphics()->create_texture_3d();
 
-
-    //auto heightmap 	= Terrain::generate_heightmap(128, 128, 24.0f, 2.5f);
-    //auto tmesh 		= Terrain::heightmap_to_mesh(heightmap);
-
-
 	GameState gs;
-	TerrainManager tm(ctx, 100, 3, 128, 10, 2.5);
-	tm.generate(gs);
+	//TerrainManager tm(ctx, 100, 3, 128, 10, 2.5);
+	//tm.generate(gs);
 	
-	auto tmeshva1  = tm.get_chunk(0,0);
-
-	
-
+	//auto tmeshva1  = tm.get_chunk(0,0);
 
     //TGA::write("D:/hello.tga", terrain);
-
     //Generate clouds
     //Set render target
     //std::vector<Texture2D> cloud;
 
-    // mat4 projection = Transform::perspective(60.0f, 16.0/9.0, 0.1, 1000.0);
-    // mat4 viewmatrix = Transform::translate(1, 0, -10);
-    // mat4 modelmatrix = mat4::Identity;
+	Terrain terrain(ctx);
 
 	StopWatch timer;
 
-	std::vector<Plane> players;
-	players.push_back(Plane(planemeshva, planesp, 0.0f, 0.0f));
-
-	//StopWatch frametimer;
-
 	camera->set_eye(0, 0, 100);
 
-	socket.connect(ep);
+	//ServerConn serverconn(ip, port);
 
-	u32 counter = 0;
-
-/*
-	while(true)
+	/*
+	if (!ip.empty())
 	{
-    	boost::asio::streambuf buffer;
-    
-      	size_t len = boost::asio::read_until(socket, buffer, "\n");
-	      	
-      	std::istream is(&buffer);
-		std::getline(is, xmlframe);
-
-      	//std::cout << xmlframe << std::endl;
-      	counter++;
-
-        if (timer.elapsed_time() > 1)
-        {
-        	R_LOG_INFO("COUNTER: " << counter);
-        }
-
+		serverconn.start();
 	}
-*/
+	*/
+	
+
 
 	while (this->is_running())
 	{
@@ -261,31 +236,98 @@ RenderClient::run()
     	//update data
     	//poll socket
 
-    	boost::asio::streambuf buffer;
-    
+    	
+    	/*
+    	boost::asio::streambuf buffer;  
       	size_t len = boost::asio::read_until(socket, buffer, "\n");
-
-      	
       	std::istream is(&buffer);
-		//std::getline(is, xmlframe);
+		std::getline(is, xmlframe);
+
 
 		pugi::xml_parse_result result = doc.load(is);
-		R_LOG_INFO("TS: "  << doc.child("tick").attribute("attr").value());
+		*/
 
+		/*		
+		auto planes = doc.child("tick").child("planes");
 
+		for (auto p = planes.child("p"); p; p = p.next_sibling("p"))
+		{
+			auto id = p.attribute("id").as_int();
+			f32 x = p.child("x").text().as_double();
+			f32 y = p.child("y").text().as_double();
+			f32 a = p.child("a").text().as_double();
+			i32 status = p.child("status").text().as_int();
+
+			if (status == 1)
+			{
+				gs.get_planes().push_back(AirPlane());
+				gs.get_planes().back().x = x;
+				gs.get_planes().back().y = y;
+				gs.get_planes().back().angle = a;
+			}
+			else
+			{
+				gs.get_planes()[id].x = x;
+				gs.get_planes()[id].y = y;
+				gs.get_planes()[id].angle = a;
+			}
+		}
+		*/
+		
+
+		//camera->set_eye(gs.getCentre().first, gs.getCentre().second, 100);
+		//doc.save(std::cout);
+		//R_LOG_INFO("TS: " << doc.child("tick").attribute("ts").value());
 
       	//std::cout << xmlframe << std::endl;
+
+      	/*
       	counter++;
 
         if (timer.elapsed_time() > 1)
         {
         	R_LOG_INFO("COUNTER: " << counter);
         }
+        */
 
-		tm.generate(gs);
+		//tm.generate(gs);
 		
     	//draw data
 		ctx->clear(clearstate);
+
+		terrain.draw(ctx, camera);
+
+		//draw gamestate
+		/*
+		{
+
+			planemeshva->bind();
+			planesp->use();
+
+			for (auto& plane : gs.get_planes())
+			{
+
+				::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+				math::mat4 model = Transform::translate(plane.x, plane.y, 50) * Transform::rotate_y(plane.angle);
+				math::mat4 view = camera->view_matrix();
+				math::mat4 projection = camera->projection_matrix();
+
+				auto& color = planesp->uniform<vec3>("r_Color");
+				color = vec3(0.4, 0.6, 0.9);
+			
+				R_LOG_INFO("Plane pos: " << plane.x << ", " << plane.y);
+
+				auto& mvp = planesp->uniform<mat4>("r_MVP");
+
+				mvp = projection * view * model;
+
+				::glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			}
+
+			planemeshva->unbind();	
+		}
+		*/
 		//ctx->render(scene);
 
 		/*
@@ -302,26 +344,22 @@ RenderClient::run()
 		//tmeshva1->bind();
 		//sp->use();
 		//mvp = Transform::perspective(60.0f, 16.0/9.0, 0.1f, 1000.0f) * Transform::rotate_x(-math::PI/12) * Transform::translate(0, 0, -75);
-		//::glDrawElements(GL_TRIANGLES, tmeshva1->index_count(), GL_UNSIGNED_INT, 0);
-		
+		//::glDrawElements(GL_TRIANGLES, tmeshva1->index_count(), GL_UNSIGNED_INT, 0);		
 
-		tm.draw(camera);
-		
-
-
+		//tm.draw(camera);		
 
 		//mvp = camera->projection_matrix() * (Transform::rotate_z(0.1 * timer.elapsed_time()) * Transform::translate(0, 0, 100)).inversed() * Transform::translate(0, 0, -1*timer.elapsed_time());
-		//mvp = camera->projection_matrix() * camera->view_matrix() * Transform::translate(0, 0, 0);
-
-		
+		//mvp = camera->projection_matrix() * camera->view_matrix() * Transform::translate(0, 0, 0);		
 
 		::glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
+/*
 		for (auto& plane : players)
 		{
 			//plane.update(...);
 			plane.draw(ctx, camera);
 		}		
+*/
 
 		//::glDrawElements(GL_POINTS, tmeshp->data().size(), GL_UNSIGNED_INT, 0);
     	//va->bind();
@@ -342,10 +380,5 @@ RenderClient::active_window()
 	return m_pWindow;
 }
 
-void
-RenderClient::update()
-{
-
-}
 	
 }

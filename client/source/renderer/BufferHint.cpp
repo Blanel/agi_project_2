@@ -1,11 +1,1 @@
-#include "BufferHint.h"
-
-namespace revel
-{
-namespace renderer
-{
-
-
-}
-
-}
+// This file is intentionally blank

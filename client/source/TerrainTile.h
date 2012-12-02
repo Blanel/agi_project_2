@@ -7,6 +7,7 @@
 namespace revel
 {
 
+/*
 class TerrainTile
 {	
 public:
@@ -16,6 +17,7 @@ public:
 	std::shared_ptr<renderer::VertexArray> va;
 	std::shared_ptr<renderer::ShaderProgram> sp;
 };
+*/
 
 }
 

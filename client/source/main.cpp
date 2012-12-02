@@ -2,7 +2,6 @@
 #include "RenderClient.h"
 #include "Config.h"
 
-
 #include "TerrainManager.h"
 
 using namespace std;
@@ -23,10 +22,6 @@ int main(int argc, char *argv[])
 		Config::set("ip", ip);
 		Config::set("port", port);
 	}
-
-	//SimplexNoise::debug();
-	//TerrainManager test(20, 5, 5,5);
-	//test.generate();
 
 	RenderClient renderclient;
 	return renderclient.run();

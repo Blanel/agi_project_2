@@ -8,6 +8,7 @@
 
 namespace revel
 {
+/*	
 	TerrainManager::TerrainManager(const std::shared_ptr<revel::renderer::RenderContext>& ctx, int optimalChunks, int radiusChunks, int chunkRes, float chunkLen, float chunkHei)
 		: m_Context(ctx)
 		, m_OptimalChunks(optimalChunks)
@@ -68,12 +69,13 @@ namespace revel
 			While optimal ammount of chunks < Generated chunks
 				Remove furthest chunk.
 		*/
+/*
 	}
 
 	void TerrainManager::draw(const std::shared_ptr<Camera>& cam)
 	{
-		::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-		//::glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+		//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+		::glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 
 		m_pShaderProgram->use();		
@@ -81,7 +83,7 @@ namespace revel
 
 		
 		auto& mvp = m_pShaderProgram->uniform<math::mat4>("r_MVP");
-		//auto& mv= m_pShaderProgram->uniform<math::mat4>("r_ModelView");
+		auto& mv= m_pShaderProgram->uniform<math::mat4>("r_ModelView");
 
 		/*
 		auto& lp = m_pShaderProgram->uniform<vec4>("LightPosition");
@@ -113,24 +115,28 @@ namespace revel
 		lightDir = vec3(0.7f, 0.3f, 0.0f).normalized();
 */
 
+/*
 		auto terrainptr = m_Tiles[std::pair<i32, i32>(0, 0)];
 
 		terrainptr->va->bind();
 
 		mvp = cam->projection_matrix() * cam->view_matrix() * math::Transform::translate(0 * 127, 0 * 127, 0);
-		//mv = cam->view_matrix() * math::Transform::translate(0 * 127, 0 * 127, 0);
+		mv = cam->view_matrix() * math::Transform::translate(0 * 127, 0 * 127, 0);
 
 		::glDrawElements(GL_TRIANGLES, terrainptr->va->index_count(), GL_UNSIGNED_INT, 0);
+*/
 
 
 /*
 		for (auto iter = m_Tiles.begin(); iter != m_Tiles.end(); ++iter)
 		{
 			mvp = cam->projection_matrix() * cam->view_matrix() * math::Transform::translate(iter->first.first * 127, iter->first.second * 127, 0);
+			// mv = cam->view_matrix() * math::Transform::translate(iter->first.first * 127, iter->first.second * 127, 0);
 
 			iter->second->va->bind();
 			::glDrawElements(GL_TRIANGLES, iter->second->va->index_count(), GL_UNSIGNED_INT, 0);
 		}
-*/
+
 	}
+*/
 }

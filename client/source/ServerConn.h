@@ -1,17 +1,21 @@
 #ifndef SERVER_CONN_H_
 #define SERVER_CONN_H_
 
-#include <string>
-#include "Types.h"
+//#include <string>
+//#include "Types.h"
 
+/*
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
 #include <boost/algorithm/string.hpp>
+*/
 
 namespace revel
 {
 
+/*
 class ServerConn
+	: public std::enable_shared_from_this<ServerConn>
 {
 	std::string m_IP;
 	u32 m_Port;
@@ -21,6 +25,15 @@ class ServerConn
 	boost::asio::ip::tcp::socket m_Socket;
 
 public:
+	typedef std::shared_ptr<ServerConn> ptr;
+
+	static ptr create(boost::asio::io_service& io)
+	{
+		return ptr(new ServerConn(io));
+	}
+
+
+
 	ServerConn(const std::string& ip = "127.0.0.1", u32 port = 1234)
 		: m_IP(ip)
 		, m_Port(port)
@@ -51,6 +64,7 @@ public:
 	}
 	
 };
+*/
 	
 }
 

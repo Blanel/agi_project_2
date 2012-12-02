@@ -30,59 +30,58 @@ class SimplexNoise
 		{}
 	};
 
-	static f32 dot(const Grad& g, f32 x, f32 y)
+	f32 dot(const Grad& g, f32 x, f32 y)
 	{
 		return g.x * x + g.y * y;
 	}
 
-	static f32 dot(const Grad& g, f32 x, f32 y, f32 z)
+	f32 dot(const Grad& g, f32 x, f32 y, f32 z)
 	{
 		return g.x * x + g.y * y + g.z * z;
 	}
 
-	static f32 dot(const Grad& g, f32 x, f32 y, f32 z, f32 w)
+	f32 dot(const Grad& g, f32 x, f32 y, f32 z, f32 w)
 	{
 		return g.x * x + g.y * y + g.z * z + g.w * w;
 	}
 
 
-	static std::array<u8, 512> p;
-	static std::array<u8, 512> pmod12;
+	std::vector<u8> p;
+	std::vector<u8> pmod12;
 
 	static std::array<Grad, 12> grad3;
 	static std::array<Grad, 32> grad4;
-
 	static f32 F2, G2, F3, G3, F4, G4;
 
+	f32 m_Amplitude;
+	f32 m_Frequency;
+	f32 m_Persitence;
+	u32 m_Octaves;
 
-	static std::array<u8, 512> init_array(int seed)
-	{
-		std::mt19937 g(seed);
-		std::shuffle(p.begin(), p.end(), g);
-		std::array<u8, 512> array = p;
-
-		for (auto& i : array)
-		{
-			i = i%12;
-		}
-
-		return array;
-	}
+	f32 noise_value(f32 x, f32 y);
+	f32 noise_value(f32 x, f32 y, f32 z);
+	f32 noise_value(f32 x, f32 y, f32 z, f32 w);
 
 public:
-	static f32 noise(f32 x, f32 y);
+	SimplexNoise();
+	SimplexNoise(u32 seed);
 
-	static f32 noise(f32 x, f32 y, f32 z);
+	void set_amplitude(f32 a);
+	f32 amplitude() const;
 
-	static f32 noise(f32 x, f32 y, f32 z, f32 w);
+	void set_frequency(f32 f);
+	f32 frequency() const;
+
+	void set_persistance(f32 p);
+	f32 persistance() const;
+
+	void set_octaves(u32 o);
+	u32 octaves() const;
 
 
-	static void debug()
-	{
-		R_LOG_INFO("DEBUG: " << (i32)pmod12[0]);
-		R_LOG_INFO("DEBUG: " << grad3[0].y);
-	}
-
+	f32 noise(f32 x, f32 y);
+	f32 noise(f32 x, f32 y, f32 z);
+	f32 noise(f32 x, f32 y, f32 z, f32 w);
 
 };
 	

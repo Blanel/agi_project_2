@@ -14,7 +14,7 @@ VertexBufferAttribGL::VertexBufferAttribGL(u32 index, const std::shared_ptr<Vert
 {
     pBuffer->bind();
 
-    R_LOG_INFO("ATTRIB <" << index << ">: " << numOfComponents);
+    //R_LOG_INFO("ATTRIB <" << index << ">: " << numOfComponents);
 
     GLint       gl_size = numOfComponents;
     GLenum      gl_type;

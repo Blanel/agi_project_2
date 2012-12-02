@@ -5,6 +5,7 @@ namespace revel
 namespace renderer
 {
 
+
 DepthRange::DepthRange(f32 near, f32 far)
     : m_Near(near)
     , m_Far(far)
@@ -34,6 +35,7 @@ DepthRange::set_far(f32 far)
 {
     m_Far = far;
 }
+
 
 } // ::revel::renderer
 } // ::revel

@@ -14,7 +14,7 @@ class DepthRange
     f32 m_Near;
     f32 m_Far;
 public:
-    DepthRange(f32 near = 0.0, f32 far = 1.0);
+    DepthRange(f32 n = 0.0f, f32 f = 1.0f);
 
     f32 near() const;
     f32 far() const;
@@ -22,6 +22,7 @@ public:
     void set_near(f32 near);
     void set_far(f32 far);
 };
+
 
 } // ::revel::renderer
 } // ::revel

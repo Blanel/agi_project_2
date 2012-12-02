@@ -14,6 +14,7 @@
 
 namespace revel
 {
+/*	
 	class TerrainManager
 	{
 		std::shared_ptr<renderer::RenderContext> m_Context;
@@ -38,5 +39,6 @@ namespace revel
 
 		void draw(const std::shared_ptr<Camera>& cam);
 	};
+*/
 }
 #endif

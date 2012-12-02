@@ -5,34 +5,36 @@
 
 namespace revel
 {
+
+/*
 	TerrainTile::TerrainTile(std::shared_ptr<renderer::RenderContext> ctx, float x, float y, int res, float len, float hei)
 	{
+		SimplexNoise simplex;
+
+		simplex.set_amplitude(1.0f);
+		simplex.set_frequency(4.0f / 128.0f);
+		simplex.set_octaves(1);
+		simplex.set_persistance(0.5);
+	
 		auto mesh = std::make_shared<geo::Mesh>();    
 	    auto meshp = mesh->create_vertex_attrib<point3>("position");
 	    auto meshn = mesh->create_vertex_attrib<vec3>("normals");
 	    auto mesht = mesh->create_vertex_attrib<vec2>("uv0");
 	    
 
+	    Image2D<pixel::Gray_f32> hmap(128, 128);
+
 	    auto meshi = mesh->indices<u32>();
 		
-		//Image2D<pixel::Gray_f32> hmap(res, res);
-
-
 		f32 d = (f32)len/(f32)res;
 		for(int i=0; i<res ; i++)
 		{
 			for(int j=0 ; j<res ; j++)
 			{
-				//std::cout<<SimplexNoise::noise(x+j*d,y+i*d)<<" ";
-				//vec3_f32 vert(x+j*d, y+i*d, SimplexNoise::noise(x+j*d,y+i*d)); 
-
-				//tilep->data().push_back(vert);
-				//f32 h = SimplexNoise::noise(x+j*d,y+i*d)*hei;
-				//hmap(j, i).val = h;
-				meshp->data().push_back(point3(j,i,SimplexNoise::noise(x+j*d,y+i*d)*hei));
+				hmap(j, i).val = simplex.noise(x+j*d,y+i*d)*hei;
+				meshp->data().push_back(point3(j,i,simplex.noise(x+j*d,y+i*d)*hei));
 				mesht->data().push_back(vec2(j / (128.0f / 16), i / (128.0f / 16)));
 			}
-			//std::cout<<"\n";
 		}
 
 		for(int i = 0 ; i < res -1 ; i++)
@@ -45,10 +47,7 @@ namespace revel
 		}
 
 
-		std::vector<vec3> normals;
-		normals.reserve(128*128);
-/*
-		
+		std::vector<vec3> normals(128 * 128, vec3::UnitZ);
 
 
 		for (i32 y = 1; y < res - 1; ++y)
@@ -62,10 +61,10 @@ namespace revel
 				vec3 r = point3(x+1, y, hmap(x+1, y).val) - point3(x, y, hmap(x, y).val);
 				vec3 d = point3(x, y-1, hmap(x, y-1).val) - point3(x, y, hmap(x, y).val);
 
-				vec3 uln = math::cross(u, l);
-				vec3 urn = math::cross(r, u);
-				vec3 lrn = math::cross(d, r);
-				vec3 lln = math::cross(l, d);
+				vec3 uln = math::cross(math::normalize(u), math::normalize(l));
+				vec3 urn = math::cross(math::normalize(r), math::normalize(u));
+				vec3 lrn = math::cross(math::normalize(d), math::normalize(r));
+				vec3 lln = math::cross(math::normalize(l), math::normalize(d));
 
 				math::normalize(uln);
 				math::normalize(urn);
@@ -76,10 +75,10 @@ namespace revel
 			}
 		}
 
-		meshn->data() = normals;
-*/
+		for (auto n : normals)
+			meshn->data().push_back(n);
 
-		
+		/*
 
 		for (u32 i = 0; i < res - 1; ++i)
 		{
@@ -146,7 +145,7 @@ namespace revel
 				meshn->data().push_back(-sum / length);
 			}
 		}
-
+*/
 /*
 		R_LOG_INFO("Mesh Normals: " << meshn->data().size());
 
@@ -180,7 +179,7 @@ namespace revel
 		}
 */
 
-
+/*
 		va = ctx->create_vertex_array(mesh);
 	}
 
@@ -188,4 +187,5 @@ namespace revel
 	{
 
 	}
+*/
 }
