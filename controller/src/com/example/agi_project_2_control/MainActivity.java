@@ -39,7 +39,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	/**
 	 * Adding classes 
 	 */
-	public Airplane airplane;
+	//public Airplane airplane;
 
 	private StateSender ss;
 
@@ -121,7 +121,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		airplane = new Airplane(this);
+		//airplane = new Airplane(this);
 		ss = new StateSender(this);
 		
 		final Context context = this;
@@ -218,21 +218,13 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
-		(new Thread(){
-			@Override
-			public void run(){
-				while(airplane.isAlive()){
-
-				}
-			}
-		}).start();
 		/**
 		 * Vad fan är det som händer egentligen
 		 */
 		(new Thread(){
 			@Override
 			public void run(){
-				while(airplane.isAlive()){
+				while(ss.isAlive()){
 					try {
 						Thread.sleep(100);
 						(Message.obtain(mainHandler, 0)).sendToTarget();
@@ -422,7 +414,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	//private int isHitNumber = 5;
 
 	public void lifeSpan() {	
-		this.viewLifeImage.setImageResource(lifeResources[airplane.getLife()]);
+		this.viewLifeImage.setImageResource(lifeResources[ss.getLife()]);
 		imageRedFlash.setBackgroundColor(Color.parseColor("#86E00000"));
 		(new Thread(){
 			@Override

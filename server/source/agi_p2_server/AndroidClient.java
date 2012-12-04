@@ -179,7 +179,15 @@ public class AndroidClient implements Runnable{
 				Attr ts = doc.createAttribute("ts");
 				ts.setValue(""+System.currentTimeMillis());
 				rootElement.setAttributeNode(ts);
-
+				
+				Attr id = doc.createAttribute("id");
+				id.setValue(""+plane.getId());
+				rootElement.setAttributeNode(id);
+				
+				
+				
+				
+				
 				Element lifeTag = doc.createElement("life");
 				rootElement.appendChild(lifeTag);
 				lifeTag.appendChild(doc.createTextNode(""+plane.getLife()));

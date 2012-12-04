@@ -24,6 +24,8 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import android.os.Message;
+
 public class StateSender {
 
 	private double speedFrac;
@@ -37,6 +39,11 @@ public class StateSender {
 	private InputStream is;
 	private InputStreamReader isr;
 	private BufferedReader br;
+	
+	private int cachedLife = 5;
+	private int life = 5;
+	
+	private int id = -1;
 
 	private final static long INTERVALL=40;
 
@@ -104,38 +111,33 @@ public class StateSender {
 						DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 						DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 						Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
-						ma.airplane.setLife(Integer.parseInt(doc.getElementsByTagName("life").item(0).getTextContent()));
-					} catch (IOException e) {
+						setLife(Integer.parseInt(doc.getElementsByTagName("life").item(0).getTextContent()));
+					} catch (IOException e1) {
 						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
-						/*try {
+						try {
 							soc.close();
 						} catch (IOException e) {
 							System.err.println("an IO derp");
 						}
-						return;*/
-					} catch (SAXException e) {
+						return;
+					} catch (SAXException e1) {
 						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
-						/*try {
+						try {
 							soc.close();
 						} catch (IOException e) {
 							System.err.println("an IO derp");
 						}
-						return;*/
-					} catch (ParserConfigurationException e) {
+						return;
+					} catch (ParserConfigurationException e1) {
 						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
-						/*try {
+						try {
 							soc.close();
 						} catch (IOException e) {
 							System.err.println("an IO derp");
 						}
-						return;*/
+						return;
 					}
-					/*try {
-						Thread.sleep(33);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}*/
+					
 
 
 				}
@@ -186,19 +188,19 @@ public class StateSender {
 
 					} catch (ParserConfigurationException e1) {
 						System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
-						/*try {
+						try {
 							soc.close();
 						} catch (IOException e) {
 							System.err.println("an IO derp");
-						}*/
+						}
 						return;
 					} catch (TransformerException e1) {
 						System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
-						/*try {
+						try {
 							soc.close();
 						} catch (IOException e) {
 							System.err.println("an IO derp");
-						}*/
+						}
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -258,6 +260,25 @@ public class StateSender {
 
 	public void setRotY(float rotY) {
 		this.rotY = rotY;
+	}
+	
+	public void setLife(int l)
+	{
+		life = l;
+		if(life<cachedLife)
+		{
+			(Message.obtain(ma.mainHandler, 1)).sendToTarget();
+		}
+		cachedLife = l;
+	}
+	
+	public int getLife()
+	{
+		return life;
+	}
+	
+	public boolean isAlive(){
+		return (life>0);
 	}
 
 
