@@ -78,6 +78,26 @@ public:
 	void set_octaves(u32 o);
 	u32 octaves() const;
 
+	f32 noise_fractal_brownian_motion(i32 octaves, f32 x, f32 y, f32 z)
+	{
+		const f32 lacunarity = 1.9;
+		const f32 gain = 0.65;
+
+		f32 sum = 0.0f;
+		f32 amplitude = 1.0f;
+
+		for (i32 i = 0; i < octaves; ++i)
+		{
+			sum += noise_value(x, y, z);
+			amplitude *= gain;
+
+			x*=lacunarity;
+			y*=lacunarity;
+			z*=lacunarity;
+		}
+
+		return sum;
+	}
 
 	f32 noise(f32 x, f32 y);
 	f32 noise(f32 x, f32 y, f32 z);

@@ -90,12 +90,12 @@ SimplexNoise::noise(f32 x, f32 y)
 
     for (u32 k = 0; k < m_Octaves; ++k)
     {
-        t += noise_value(y * f, x * f) * a;
+        t += noise_value(x * f, y * f) * a;
         a *= m_Persitence;
         f *= 2;
     }
 
-    return t * (m_Amplitude);
+    return t * m_Amplitude;
 }
 
 f32
@@ -107,7 +107,7 @@ SimplexNoise::noise(f32 x, f32 y, f32 z)
 
     for (u32 k = 0; k < m_Octaves; ++k)
     {
-        t += noise_value(z * f, y * f, x * f) * a;
+        t += noise_value(x * f, y * f, z * f) * a;
         a *= m_Persitence;
         f *= 2;
     }
@@ -124,7 +124,7 @@ SimplexNoise::noise(f32 x, f32 y, f32 z, f32 w)
 
     for (u32 k = 0; k < m_Octaves; ++k)
     {
-        t += noise_value(w * f, z * f, y * f, x * f) * a;
+        t += noise_value(z * f, y * f, z * f, w * f) * a;
         a *= m_Persitence;
         f *= 2;
     }
