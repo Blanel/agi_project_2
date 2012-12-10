@@ -4,7 +4,7 @@ namespace revel
 {
 
 Camera::Camera()
-    : m_Eye(0, 0, 1)
+    : m_Position(0, 0, 1)
     , m_Target(0, 0, 0)
     , m_Rotation()
     , m_Forward(0, 0, -1)
@@ -20,6 +20,105 @@ Camera::Camera()
 Camera::~Camera()
 {
 }
+
+const point3& 
+Camera::position() const 
+{ 
+    return m_Position; 
+}
+
+void 
+Camera::set_position(const point3& p) 
+{ 
+    m_Position = p; 
+}
+
+void 
+Camera::set_position(f32 x, f32 y, f32 z) 
+{ 
+    m_Position.x = x; m_Position.y = y; m_Position.z = z; 
+}
+
+
+const point3& 
+Camera::target() const 
+{ 
+    return m_Target; 
+}
+
+void 
+Camera::set_target(const point3& target) 
+{ 
+    m_Target = target; 
+}
+
+void 
+Camera::set_target(f32 x, f32 y, f32 z) 
+{ 
+    m_Target.x = x; m_Target.y = y; m_Target.z = z; 
+}
+
+f32 
+Camera::near_plane() const 
+{ 
+    return m_NearPlaneDistance; 
+}
+
+void 
+Camera::set_near_plane(f32 distance) 
+{ 
+    m_NearPlaneDistance = distance; 
+}
+
+f32 
+Camera::far_plane() const 
+{ 
+    return m_FarPlaneDistance; 
+}
+
+void 
+Camera::set_far_plane(f32 distance) 
+{ 
+    m_FarPlaneDistance = distance; 
+}
+
+f32 
+Camera::fov() 
+{ 
+    return m_FieldOfView; 
+}
+
+void 
+Camera::set_fov(f32 degrees) 
+{ 
+    m_FieldOfView = degrees; 
+}
+
+const vec3& 
+Camera::up() 
+{ 
+    return m_Up; 
+}
+
+const vec3& 
+Camera::forward() 
+{ 
+    return m_Forward; 
+}
+
+const vec3& 
+Camera::right() 
+{ 
+    return m_Right; 
+}
+
+Camera& 
+Camera::move_forward(f32 speed)
+{
+    m_Position = (m_Position) + (m_Forward * speed);
+}
+
+
 /*
 math::mat4
 PerspectiveCamera::projection_matrix() const

@@ -36,13 +36,13 @@ class Terrain
 
 	bool m_DrawNormals;
 
-	vec2_u32 m_TileSize;
+	vec2_i32 m_TileSize;
 
 	void create_tile(const vec2_i32& p);
 	void create_tile(i32 x, i32 y);
 
 public:
-	Terrain(const std::shared_ptr<renderer::RenderContext>& ctx, u32 w = 128, u32 h = 128);
+	Terrain(const std::shared_ptr<renderer::RenderContext>& ctx, i32 w = 128, i32 h = 128);
 	~Terrain();
 
 	void update(const GameState& gs);

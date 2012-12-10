@@ -9,6 +9,8 @@
 #include "renderer/ShaderProgram.h"
 #include "geo/Mesh.h"
 
+#include "Light.h"
+
 #include "Color.h"
 
 #include "Device.h"
@@ -18,7 +20,7 @@
 #include <string>
 #include "SDL.h"
 
-//#include "ServerConn.h"
+#include "ServerConn.h"
 
 #include "Image2D.h"
 #include "SimplexNoise.h"
@@ -101,7 +103,7 @@ RenderClient::run()
 
     auto clearstate = std::make_shared<ClearState>();
     clearstate->set_buffers(ClearBuffers::ALL);
-    clearstate->set_color(Color4<f32>(0.3f, 0.4f, 0.5f, 1.0f));
+    clearstate->set_color(Color4<f32>(0.2f, 0.3f, 0.4f, 1.0f));
 
     auto scenestate = std::make_shared<SceneState>();
     //auto renderstate = std::make_shared<RenderState>();
@@ -112,51 +114,10 @@ RenderClient::run()
 	    	    												  	   "../client/source/shaders/plane.fs");
     //Create and setup scene
 	auto camera = std::make_shared<PerspectiveCamera>();
-
+	
 	//ctx->texture_unit(0).set_texture();
-
 	//Only use one (dynamic?) light source
-	//Light sun(LightType::DIRECTIONAL);
-	//sun.set_direction(vec3(0, -1, 0));
-
-	Image3D<pixel::Gray_f32> image3d(16, 16, 16);
-
-	/*
-	PerlinNoise perlin(0x4711);
-
-	Image2D<pixel::Gray_f32> pi(256, 256);
-
-	for (u32 y = 0; y < 256; ++y)
-	{
-		for (u32 x = 0; x < 256; ++x)
-		{
-			pi(x, y).val = perlin.noise(x, y, 0.5);
-			pi(x, y).val = (pi(x, y).val + 1.0f)/2.0f;
-		}
-	}
-	*/
-
-	SimplexNoise simplex(0x4711);
-	simplex.set_amplitude(1.0f);
-	simplex.set_frequency(4.0f / 256.0f);
-	simplex.set_octaves(1);
-	//simplex.set_persistance(.5f);
-
-	Image2D<pixel::Gray_f32> pi(256, 256);
-
-	for (u32 y = 0; y < 256; ++y)
-	{
-		for (u32 x = 0; x < 256; ++x)
-		{
-			pi(x, y).val = simplex.noise(x, y);
-			//pi(x, y).val = (pi(x, y).val + 1.0f)/2.0f;
-		}
-	}
-
-
-	Image2D<pixel::RGBA_u8> heightmap(pi);
-
-	TGA::write("e:/heightmap.tga", heightmap);
+	DirectionalLight sun(vec3(-0.4, -1, 0.3).normalized());
 
 	auto framebuffer = ctx->create_framebuffer();
 	
@@ -169,34 +130,22 @@ RenderClient::run()
 	//TerrainManager tm(ctx, 100, 3, 128, 10, 2.5);
 	//tm.generate(gs);
 	
-	//auto tmeshva1  = tm.get_chunk(0,0);
-
-    //TGA::write("D:/hello.tga", terrain);
-    //Generate clouds
-    //Set render target
-    //std::vector<Texture2D> cloud;
-
 	Terrain terrain(ctx);
 
 	StopWatch timer;
 
-	camera->set_eye(0, 0, 100);
+	camera->set_position(0, 0, 100);
 
-	//ServerConn serverconn(ip, port);
+	auto io = std::make_shared<boost::asio::io_service>();
+	ClientSocket socket(io);
 
-	/*
-	if (!ip.empty())
-	{
-		serverconn.start();
-	}
-	*/
-	
+	//socket.open("127.0.0.1", 1234);
 
+	active_window()->show_cursor(false);
 
 	while (this->is_running())
 	{
 		SDL_Event e;
-
 
 		//Poll events
 	    while (SDL_PollEvent(&e))
@@ -225,7 +174,7 @@ RenderClient::run()
 	        	if (e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 	        		m_Running = false;
 	        	else if (e.key.keysym.scancode == SDL_SCANCODE_A);
-	        		camera->set_eye(0, 0, 120);
+	        		camera->set_position(0, 0, 120);
 	        	break;
 
 	        case SDL_QUIT:
@@ -233,21 +182,15 @@ RenderClient::run()
 	        }
 
     	}
+
     	//update data
     	//poll socket
-
     	
+    	//auto xmlframe = clientsocket.get_frame_data();
+
     	/*
-    	boost::asio::streambuf buffer;  
-      	size_t len = boost::asio::read_until(socket, buffer, "\n");
-      	std::istream is(&buffer);
-		std::getline(is, xmlframe);
+		pugi::xml_parse_result result = doc.load(xmlframe);
 
-
-		pugi::xml_parse_result result = doc.load(is);
-		*/
-
-		/*		
 		auto planes = doc.child("tick").child("planes");
 
 		for (auto p = planes.child("p"); p; p = p.next_sibling("p"))
@@ -274,7 +217,6 @@ RenderClient::run()
 		}
 		*/
 		
-
 		//camera->set_eye(gs.getCentre().first, gs.getCentre().second, 100);
 		//doc.save(std::cout);
 		//R_LOG_INFO("TS: " << doc.child("tick").attribute("ts").value());
@@ -339,7 +281,7 @@ RenderClient::run()
 		::glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		*/
 		
-		::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+		// ::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 		//tmeshva1->bind();
 		//sp->use();
@@ -351,7 +293,7 @@ RenderClient::run()
 		//mvp = camera->projection_matrix() * (Transform::rotate_z(0.1 * timer.elapsed_time()) * Transform::translate(0, 0, 100)).inversed() * Transform::translate(0, 0, -1*timer.elapsed_time());
 		//mvp = camera->projection_matrix() * camera->view_matrix() * Transform::translate(0, 0, 0);		
 
-		::glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+		// ::glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 /*
 		for (auto& plane : players)

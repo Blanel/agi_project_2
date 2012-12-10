@@ -22,10 +22,10 @@ TerrainTile::vertex_array()
 }
 
 
-Terrain::Terrain(const std::shared_ptr<renderer::RenderContext>& ctx, u32 tile_w, u32 tile_h)
+Terrain::Terrain(const std::shared_ptr<renderer::RenderContext>& ctx, i32 tile_w, i32 tile_h)
 {
 	m_pCtx = ctx;
-	m_TileSize = vec2_u32(tile_w, tile_h);
+	m_TileSize = vec2_i32(tile_w, tile_h);
 
 	m_pNoiseGen = std::unique_ptr<SimplexNoise>(new SimplexNoise());
 	m_pNoiseGen->set_frequency(2.0f/128.0f);
@@ -58,8 +58,8 @@ Terrain::create_tile(i32 x, i32 y)
 void
 Terrain::create_tile(const vec2_i32& p)
 {
-	u32 w, h;
-	w = h = 128;
+	u32 w = m_TileSize.x;
+	u32 h = m_TileSize.y;
 
 	std::unique_ptr<TerrainTile> tile(new TerrainTile());
 
@@ -71,230 +71,241 @@ Terrain::create_tile(const vec2_i32& p)
 
     Image2D<pixel::Gray_f32> hmap(w, h);
 
-	for(int y=0; y<h ; y++)
-	{
-		for(int x=0 ; x<w ; x++)
-		{
-			f32 n = (m_pNoiseGen->noise(p.x * 128 + x, p.y * 128 + y));
+    i32 offset_x = p.x * m_TileSize.x;
+    i32 offset_y = p.y * m_TileSize.y;
 
+	for(i32 y=0; y<h ; y++)
+	{
+		for(i32 x=0 ; x<w ; x++)
+		{
+			f32 n = m_pNoiseGen->noise(offset_x + x, offset_y + y);
 			hmap(x, y).val = n;
+
 			meshp->data().push_back(point3(x,y,n));
 			mesht->data().push_back(vec2(x / (128.0f / 16), y / (128.0f / 16)));
 		}
 	}
 
-	for(int y = 0; y < h-1 ; y++)
+	//Triangulate mesh
+	for(i32 y = 0; y < h-1 ; y++)
 	{
-		for(int x = 0; x < w-1 ; x++)
+		for(i32 x = 0; x < w-1 ; x++)
 		{
 			meshi->add_triangle((y+1)*w+x, (y+1)*w+(x+1), y*w+(x+1));
     		meshi->add_triangle(y*w+(x+1), y*w+x, (y+1)*w+x);
 		}		
 	}
 
-
-	std::vector<vec3> normals(128 * 128, vec3::UnitZ);
-
+	std::vector<vec3> normals(w * h, vec3::UnitZ);
 
 	//TODO: storing half of the normals would suffice
-	for (i32 y = 1; y < 128-1; ++y)
+	for (i32 y = 1; y < h-1; ++y)
 	{
-		for (i32 x = 1; x < 128-1; ++x)
+		for (i32 x = 1; x < w-1; ++x)
 		{
 			//upper left
-
-			vec3 u = point3(x, y+1, hmap(x, y+1).val) - point3(x, y, hmap(x, y).val);
+			vec3 u = point3(x, y-1, hmap(x, y-1).val) - point3(x, y, hmap(x, y).val);
 			vec3 l = point3(x-1, y, hmap(x-1, y).val) - point3(x, y, hmap(x, y).val);
 			vec3 r = point3(x+1, y, hmap(x+1, y).val) - point3(x, y, hmap(x, y).val);
-			vec3 d = point3(x, y-1, hmap(x, y-1).val) - point3(x, y, hmap(x, y).val);
+			vec3 d = point3(x, y+1, hmap(x, y+1).val) - point3(x, y, hmap(x, y).val);
 
-			vec3 uln = math::cross(math::normalize(u), math::normalize(l));
-			vec3 urn = math::cross(math::normalize(r), math::normalize(u));
-			vec3 lrn = math::cross(math::normalize(d), math::normalize(r));
-			vec3 lln = math::cross(math::normalize(l), math::normalize(d));
+			math::normalize(u);
+			math::normalize(d);
+			math::normalize(l);
+			math::normalize(r);
 
-			math::normalize(uln);
-			math::normalize(urn);
-			math::normalize(lrn);
-			math::normalize(lln);
+			vec3 uln = math::cross(u, l);
+			vec3 urn = math::cross(r, u);
+			vec3 lrn = math::cross(d, r);
+			vec3 lln = math::cross(l, d);
 
-			normals[y * (128) + x] = (uln + urn + lrn + lln)/4;
+			normals[y * h + x] = -(uln + urn + lrn + lln)/4;
 		}
 	}
 
 	//fix edge cases
-	std::vector<point3> up(128);
-	std::vector<point3> down(128);
-	std::vector<point3> left(128);
-	std::vector<point3> right(128);
+	std::vector<point3> up(w);
+	std::vector<point3> down(w);
+	std::vector<point3> left(h);
+	std::vector<point3> right(h);
 
-	for (i32 i = 0; i < 128+1; ++i)
+	//points for adjacent tiles
+	for (i32 x = 0; x < w; ++x)
 	{
-		up.push_back(point3(i,0-1,m_pNoiseGen->noise(i,-1)));
-		down.push_back(point3(i, 128+1, m_pNoiseGen->noise(i,128+1)));
-		left.push_back(point3(0-1, i, m_pNoiseGen->noise(0-1, i)));
-		right.push_back(point3(128+1, i, m_pNoiseGen->noise(128+1, i)));
+		up.push_back(point3(p.x * w + x, p.y * h - 1, m_pNoiseGen->noise(p.x * w + x, p.y * h - 1)));
+		down.push_back(point3(p.x * w + x, p.y * h + 1, m_pNoiseGen->noise(p.x * w + x, p.y * h + 1)));
 	}
-
+	for (i32 y = 0; y < h; ++y)
+	{
+		left.push_back(point3(p.x * w - 1, p.y * h + y, m_pNoiseGen->noise(p.x * w - 1, p.y * h + y)));
+		right.push_back(point3(p.x * w + 1, p.y * h + y, m_pNoiseGen->noise(p.x * w + 1, p.y * h + y)));
+	}
+	
 	//upper
-	for (i32 x = 0; x < 128; ++x)
+	for (i32 x = 0; x < w; ++x)
 	{
 		vec3 u, l, r, d;
+		point3 p = meshp->data()[0 * w + x];
 
 		if (x == 0)
 		{
-			u = up[x];
-			l = left[x];
-			r = normals[0 * 128 + (x+1)];
-			d = normals[1 * 128 + (x)];
+			u = up[x] - p;
+			l = left[0] - p;
+			r = meshp->data()[0 * w + (x+1)] - p;
+			d = meshp->data()[h-1 * w + (x)] - p;
 		}
-		else if (x == 127)
+		else if (x == w-1)
 		{
-			u = up[x];
-			l = normals[0 * 128 + (x-1)];
-			r = right[x];
-			d = normals[1 * 128 + (x)];
+			u = up[x] - p;
+			l = meshp->data()[0 * w + (x-1)] - p;
+			r = right[0] -p;
+			d = meshp->data()[h-1 * w + (x)] - p;
 		}
 		else
 		{
-			u = up[x];
-			l = normals[0 * 128 + (x-1)];
-			r = normals[0 * 128 + (x+1)];
-			d = normals[1 * 128 + (x)];
+			u = up[x] - p;
+			l = meshp->data()[0 * w + (x-1)] - p;
+			r = meshp->data()[0 * w + (x+1)] - p;
+			d = meshp->data()[1 * w + (x)] - p;
 		}
 
-		vec3 uln = math::cross(math::normalize(u), math::normalize(l));
-		vec3 urn = math::cross(math::normalize(r), math::normalize(u));
-		vec3 lrn = math::cross(math::normalize(d), math::normalize(r));
-		vec3 lln = math::cross(math::normalize(l), math::normalize(d));
+		math::normalize(u);
+		math::normalize(d);
+		math::normalize(l);
+		math::normalize(r);
 
-		math::normalize(uln);
-		math::normalize(urn);
-		math::normalize(lrn);
-		math::normalize(lln);
+		vec3 uln = math::cross(u, l);
+		vec3 urn = math::cross(r, u);
+		vec3 lrn = math::cross(d, r);
+		vec3 lln = math::cross(l, d);
 
-		normals[0 * (128) + x] = (uln + urn + lrn + lln)/4;
-	}
+		normals[0 * w + x] = (uln + urn + lrn + lln)/4;
+	}	
 
 	//lower
-	for (i32 x = 0; x < 128; ++x)
+	for (i32 x = 0; x < w; ++x)
 	{
 		vec3 u, l, r, d;
+		point3 p = meshp->data()[(h-1) * w + x];
 
 		if (x == 0)
 		{
-			u = normals[(128-1) * 128 + x];
-			l = left[127];
-			r = normals[(128-1) * 128 + (x+1)];
-			d = down[x];
+			u = meshp->data()[(h-2) * w + x] - p;
+			l = left[h-1] - p;
+			r = meshp->data()[(h-1) * w + (x+1)] - p;
+			d = down[0] - p;
 		}
-		else if (x == 127)
+		else if (x == w-1)
 		{
-			u = normals[(128-1) * 128 + x];
-			l = normals[(128-1) * 128 + (x-1)];
-			r = right[x];
-			d = down[x];
+			u = meshp->data()[(h-2) * w + x] - p;
+			l = meshp->data()[(h-1) * w + (x-1)] - p;
+			r = right[h-1] - p;
+			d = down[w-1] - p;
 		}
 		else
 		{
-			u = normals[(128-1-1) * 128 + x];
-			l = normals[(128-1) * 128 + (x-1)];
-			r = right[x];
-			d = down[x];
+			u = meshp->data()[(h-2) * w + x] - p;
+			l = meshp->data()[(h-1) * w + (x-1)] - p;
+			r = meshp->data()[(h-1) * w + (x+1)] - p;
+			d = down[x] - meshp->data()[(h-1) * w + x];
 		}
 
-		vec3 uln = math::cross(math::normalize(u), math::normalize(l));
-		vec3 urn = math::cross(math::normalize(r), math::normalize(u));
-		vec3 lrn = math::cross(math::normalize(d), math::normalize(r));
-		vec3 lln = math::cross(math::normalize(l), math::normalize(d));
+		math::normalize(u);
+		math::normalize(d);
+		math::normalize(l);
+		math::normalize(r);
 
-		math::normalize(uln);
-		math::normalize(urn);
-		math::normalize(lrn);
-		math::normalize(lln);
+		vec3 uln = math::cross(u, l);
+		vec3 urn = math::cross(r, u);
+		vec3 lrn = math::cross(d, r);
+		vec3 lln = math::cross(l, d);
 
-		normals[127 * (128) + x] = (uln + urn + lrn + lln)/4;
+		normals[h-1 * w + x] = (uln + urn + lrn + lln)/4;
+		// normals[h-1 * w + x] = vec3::UnitZ;
 	}
 
 	//left
-	for (i32 y = 0; y < 128; ++y)
+	for (i32 y = 0; y < h; ++y)
 	{
 		vec3 u, l, r, d;
+		point3 p = meshp->data()[y * h + 0];
 
 		if (y == 0)
-		{
-			u = up[0];
-			l = left[y];
-			r = normals[(128-1) * 128 + (0+1)];
-			d = normals[(128-1) * 128 + 0];
+		{			
+			u = up[0] - p;
+			l = left[0] - p;
+			r = meshp->data()[y * w + 1] - p;
+			d = meshp->data()[(y+1) * w + 0] - p;
 		}
-		else if (y == (128-1))
+		else if (y == (h-1))
 		{
-			u = normals[(y-1) * 128 + 0];
-			l = left[y];
-			r = normals[y * 128 + (0+1)];
-			d = down[y];
+			u = meshp->data()[(y-1) * w + 0] - p;
+			l = left[y] - p;
+			r = meshp->data()[y * w + 1] - p;
+			d = down[0] - p;
 		}
 		else
 		{
-			u = normals[(y-1) * 128 + 0];
-			l = left[y];
-			r = normals[y * 128 + (0+1)];
-			d = normals[(y+1) * 128 + (0+1)];
+			u = meshp->data()[(y-1) * w + 0] - p;
+			l = left[y] - p;
+			r = meshp->data()[y * w + 1] - p;
+			d = meshp->data()[(y+1) * w + 0] - p;
 		}
 
-		vec3 uln = math::cross(math::normalize(u), math::normalize(l));
-		vec3 urn = math::cross(math::normalize(r), math::normalize(u));
-		vec3 lrn = math::cross(math::normalize(d), math::normalize(r));
-		vec3 lln = math::cross(math::normalize(l), math::normalize(d));
+		math::normalize(u);
+		math::normalize(d);
+		math::normalize(l);
+		math::normalize(r);
 
-		math::normalize(uln);
-		math::normalize(urn);
-		math::normalize(lrn);
-		math::normalize(lln);
+		vec3 uln = math::cross(u, l);
+		vec3 urn = math::cross(r, u);
+		vec3 lrn = math::cross(d, r);
+		vec3 lln = math::cross(l, d);
 
-		normals[y * (128) + 0] = (uln + urn + lrn + lln)/4;
+		normals[y * w + 0] = (uln + urn + lrn + lln)/4;
+		//normals[y * w + 0] = vec3::UnitZ;
 	}
 
 	//right
-	for (i32 y = 0; y < 128; ++y)
+	for (i32 y = 0; y < h; ++y)
 	{
 		vec3 u, l, r, d;
+		point3 p = meshp->data()[y * h + (w-1)];
 
 		if (y == 0)
 		{
-			u = up[128-1];
-			l = normals[(0) * 128 + (0-1)];
-			r = right[y];
-			d = normals[(y+1) * 128 + 0];
+			u = up[w-1] - p;
+			l = meshp->data()[0 * w + (w-2)] - p;
+			r = right[y] - p;
+			d = meshp->data()[(y+1) * w + (w-1)] - p;
 		}
-		else if (y == (128-1))
+		else if (y == (h-1))
 		{
-			u = normals[(y-1) * 128 + 0];
-			l = left[y];
-			r = normals[y * 128 + (0+1)];
-			d = down[128-1];
+			u = meshp->data()[(y-1) * w + (w-1)] - p;
+			l = meshp->data()[0 * w + (w-2)] - p;
+			r = right[y] - p;
+			d = down[w-1] - p;
 		}
 		else
 		{
-			u = normals[(y-1) * 128 + 0];
-			l = normals[y * 128 + (0-1)];
-			r = normals[y * 128 + (0+1)];
-			d = normals[(y+1) * 128 + 0];
+			u = meshp->data()[(y-1) * w + (w-1)] - p;
+			l = meshp->data()[0 * w + (w-2)] - p;
+			r = right[y] - p;
+			d = meshp->data()[(y+1) * w + (w-1)] - p;
 		}
 
-		vec3 uln = math::cross(math::normalize(u), math::normalize(l));
-		vec3 urn = math::cross(math::normalize(r), math::normalize(u));
-		vec3 lrn = math::cross(math::normalize(d), math::normalize(r));
-		vec3 lln = math::cross(math::normalize(l), math::normalize(d));
+		math::normalize(u);
+		math::normalize(d);
+		math::normalize(l);
+		math::normalize(r);
 
-		math::normalize(uln);
-		math::normalize(urn);
-		math::normalize(lrn);
-		math::normalize(lln);
+		vec3 uln = math::cross(u, l);
+		vec3 urn = math::cross(r, u);
+		vec3 lrn = math::cross(d, r);
+		vec3 lln = math::cross(l, d);
 
-		normals[y * (128) + 127] = (uln + urn + lrn + lln)/4;
-	}
+		normals[y * w + (w-1)] = (uln + urn + lrn + lln)/4;
+	}	
 
 	for (auto n : normals)
 		meshn->data().push_back(n);

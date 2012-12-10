@@ -68,12 +68,8 @@ namespace revel
 			return bullets;
 		}
 
-
-
-
 		std::pair<f32,f32> getCentre();
 		std::pair<std::pair<f32,f32>,std::pair<f32,f32>> getBoundingBox();
-
 	};
 
 
