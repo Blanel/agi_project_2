@@ -104,7 +104,7 @@ public class StateSender {
 						sleep(1000);
 						if(soc !=null && soc.isClosed())
 						{
-							System.out.println("Reconnect Attempted");
+							System.err.println("Reconnect Attempted");
 							try {
 								connect();
 							} catch (UnknownHostException e) {
@@ -114,10 +114,6 @@ public class StateSender {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-						}
-						else
-						{
-							System.err.println("Still Connected!");
 						}
 					}
 					catch(InterruptedException e)
@@ -159,7 +155,7 @@ public class StateSender {
 		isr = new InputStreamReader(is);
 		br = new BufferedReader(isr);
 		startListenerThreads();
-		System.out.println("Connection created");
+		System.err.println("Connection created");
 	}
 	/*public StateSender(MainActivity m, Socket soc) throws IOException
 	{
