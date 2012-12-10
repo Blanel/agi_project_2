@@ -41,7 +41,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	 */
 	//public Airplane airplane;
 
-	private StateSender ss;
+	private static StateSender ss;
 
 	/**
 	 * Image Viewers
@@ -108,8 +108,8 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	//private Thread threadInputAlert;
 
 	private boolean initialised = false;
-	private String host = "192.168.0.16";
-	private int port;
+	//private String host = "192.168.0.16";
+	//private int port;
 	//private AlertDialog.Builder alertDialogBuilder;
 	//static boolean getHost = false;
 
@@ -122,7 +122,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		setContentView(R.layout.activity_main);
 
 		//airplane = new Airplane(this);
-		ss = new StateSender(this);
+		ss.init(this);
 		
 		final Context context = this;
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
@@ -146,19 +146,22 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 
 				//Log.d("MyApp","2\n");
 				try {
-					host = hosttemp.toString().split(":")[0];
-					port = Integer.parseInt(hosttemp.toString().split(":")[1]);
-					ss.setSoc(new Socket(host,port));
+					String host = hosttemp.toString().split(":")[0];
+					int port = Integer.parseInt(hosttemp.toString().split(":")[1]);
+					ss.setHost(host,port);
+					ss.connect();
 					//client.connect(host, port, MainActivity.this);
 					initialised = true;
 					continueRunning();
 
 				} catch (UnknownHostException e) {
-					//e.printStackTrace();
+					e.printStackTrace();
 				} catch (IOException e) {
-					//e.printStackTrace();
+					e.printStackTrace();
 				} catch (ArrayIndexOutOfBoundsException e){
+					e.printStackTrace();
 				} catch (NumberFormatException e) {
+					e.printStackTrace();
 				}
 
 

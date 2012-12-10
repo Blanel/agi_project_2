@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -33,21 +34,29 @@ public class StateSender {
 	private boolean shooting;
 	private float rotX;
 	private float rotY;
-	private Socket soc;
 	private MainActivity ma;
-	private OutputStream os;
-	private InputStream is;
-	private InputStreamReader isr;
-	private BufferedReader br;
+	
+	private Socket soc =null;
+	private OutputStream os = null;
+	private InputStream is = null;
+	private InputStreamReader isr = null;
+	private BufferedReader br = null;
+	private String host =null;
+	private int port = 1234;
 	
 	private int cachedLife = 5;
 	private int life = 5;
+	
+	private Thread timeoutThread; 
+	private final long TIMEOUT = 2000;
+	
+	private Thread reconnectThread;
 	
 	private int id = -1;
 
 	private final static long INTERVALL=40;
 
-	public StateSender(MainActivity m)
+	public void init(MainActivity m)
 	{
 		ma = m;
 		speedFrac = 0;
@@ -55,18 +64,84 @@ public class StateSender {
 		screenHeight = 1;
 		rotX = 0;
 		rotY = 0;
+		timeoutThread = new Thread()
+		{
+			public void run()
+			{
+
+				while(!soc.isClosed())
+				{
+					try {
+						sleep(TIMEOUT);
+						//shutDown();
+						System.err.println("Server timed out!");
+					} catch (InterruptedException e) {
+						// Do nothing!
+					}
+				}
+			}
+		};
+		
+		reconnectThread = new Thread()
+		{
+			public void run()
+			{
+				while(true)
+				{
+					try{
+						sleep(1000);
+					}
+					catch(InterruptedException e)
+					{
+						
+					}
+					if((soc !=null && host != null) && soc.isClosed())
+					{
+						System.out.println("Reconnect Attempted");
+						try {
+							connect();
+						} catch (UnknownHostException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+			
+		};
 	}
 	public Socket getSoc() {
 		return soc;
 	}
-	public void setSoc(Socket soc) throws IOException {
+	/*public void setSoc(Socket soc) throws IOException {
 		this.soc = soc;
 		is = soc.getInputStream();
 		os = soc.getOutputStream();
 		isr = new InputStreamReader(is);
 		br = new BufferedReader(isr);
+	}*/
+	
+	public void connect() throws UnknownHostException, IOException
+	{
+		if(soc != null)
+		{
+			
+			is.close();
+			os.close();
+			isr.close();
+			br.close();			
+		}
+		soc = new Socket(host,port);
+		is = soc.getInputStream();
+		os = soc.getOutputStream();
+		isr = new InputStreamReader(is);
+		br = new BufferedReader(isr);
+		System.out.println("Connection created");
 	}
-	public StateSender(MainActivity m, Socket soc) throws IOException
+	/*public StateSender(MainActivity m, Socket soc) throws IOException
 	{
 		ma = m;
 		setSoc(soc);
@@ -86,7 +161,7 @@ public class StateSender {
 		screenHeight = h;
 		rotX = 0;
 		rotY = 0;
-	}
+	}*/
 
 
 	private double getRotation()
@@ -95,19 +170,21 @@ public class StateSender {
 	}
 	public void startListenerThreads()
 	{
+		reconnectThread.start();
 		//Server Listener
 		(new Thread()
 		{
 			public void run()
 			{
-
+				timeoutThread.start();
 				while(!soc.isClosed())
 				{
-
+					
 					
 
 					try {
 						String line = br.readLine();
+						timeoutThread.interrupt();
 						DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 						DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 						Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
@@ -163,6 +240,10 @@ public class StateSender {
 						Attr ts = doc.createAttribute("ts");
 						ts.setValue(""+System.currentTimeMillis());
 						rootElement.setAttributeNode(ts);
+						
+						Element itTag = doc.createElement("id");
+						rootElement.appendChild(itTag);
+						itTag.appendChild(doc.createTextNode(""+id));
 
 						Element rotationTag = doc.createElement("rotation");
 						rootElement.appendChild(rotationTag);
@@ -185,6 +266,7 @@ public class StateSender {
 						transformer.transform(source,result);
 						os.write("\n".getBytes());
 						os.flush();
+						//System.err.println("Sent: "+System.currentTimeMillis());
 
 					} catch (ParserConfigurationException e1) {
 						System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
@@ -279,6 +361,12 @@ public class StateSender {
 	
 	public boolean isAlive(){
 		return (life>0);
+	}
+	
+	public void setHost(String host, int port)
+	{
+		this.host = host;
+		this.port = port;
 	}
 
 

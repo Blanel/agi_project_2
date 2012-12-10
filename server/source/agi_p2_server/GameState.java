@@ -218,6 +218,20 @@ public class GameState implements Runnable {
 	{
 		return bullets.listIterator();
 	}
+	
+	public Airplane getPlaneById(int id)
+	{
+		aIt = airplanes.listIterator();
+		Airplane tempA = null;
+		while(aIt.hasNext())
+		{
+			tempA = aIt.next();
+			if(tempA.getId()==id)
+				break;
+			tempA = null;
+		}
+		return tempA;
+	}
 
 
 

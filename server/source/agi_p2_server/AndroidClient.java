@@ -40,6 +40,8 @@ public class AndroidClient implements Runnable{
 	private GameState gs;
 	private int cachedLife;
 	private Thread timeoutThread;
+	private Thread pingThread;
+	private static final long PING = 1000;
 	private static final long TIMEOUT =10000; 
 
 
@@ -56,11 +58,13 @@ public class AndroidClient implements Runnable{
 		isShooting = false;
 		//hasShot = false;
 		rotation = 0;
-		double angle = new Random().nextDouble()*Math.PI*2;
-		Coord centre = gs.getCentre();
-		plane = new Airplane(gs.nextAId(),centre.x+Math.cos(angle+Math.PI), centre.y+Math.sin(angle+Math.PI),angle);
-		gs.airplanes.add(plane);
-		cachedLife = plane.getLife();
+		//double angle = new Random().nextDouble()*Math.PI*2;
+		//Coord centre = gs.getCentre();
+		
+		plane=null;
+		//plane = new Airplane(gs.nextAId(),centre.x+Math.cos(angle+Math.PI), centre.y+Math.sin(angle+Math.PI),angle);
+		//gs.airplanes.add(plane);
+		//cachedLife = plane.getLife();
 
 		timeoutThread = new Thread()
 		{
@@ -71,9 +75,30 @@ public class AndroidClient implements Runnable{
 				{
 					try {
 						sleep(TIMEOUT);
-						sock.close();
-					} catch (InterruptedException | IOException e) {
+						shutDown();
+						System.err.println("Android timed out!");
+					} catch (InterruptedException e) {
 						// Do nothing!
+					}
+				}
+			}
+		};
+		
+		pingThread = new Thread()
+		{
+			public void run()
+			{
+				while(!sock.isClosed())
+				{
+					try
+					{
+						sleep(PING);
+						sendEvents(true);
+						
+					}
+					catch(InterruptedException e)
+					{
+						
 					}
 				}
 			}
@@ -82,6 +107,8 @@ public class AndroidClient implements Runnable{
 
 	public void update()
 	{
+		if(plane != null)
+		{
 		plane.addAngle(rotation*0.001);
 		plane.speedMod(speedMod);
 		if(isShooting)
@@ -89,12 +116,14 @@ public class AndroidClient implements Runnable{
 			gs.bullets.add(new Bullet(gs.nextBId(), plane));
 			isShooting=false;
 		}
+		}
 
 	}
 
 
 	public void run() {
 		timeoutThread.start();
+		pingThread.start();
 		while(!sock.isClosed())
 		{
 
@@ -102,34 +131,46 @@ public class AndroidClient implements Runnable{
 			String line=null;
 			
 			try {
-
 				line = br.readLine();
 			} catch (IOException e2) {
-				// TODO Auto-generated catch block
 				System.err.println("IOException when reading line!");
-				e2.printStackTrace();
-
-				System.err.println(sock.isClosed());
-				try {
-					sock.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				//is.
-				//e2.printStackTrace();
-				
+				shutDown();
 			}
-			
 			if(line!=null && line.startsWith("<?xml") && line.endsWith("</androidClient>") )
 			{
 				timeoutThread.interrupt();
-				//System.err.println(line);
 				try {
 					DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 					DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 					Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
 					//Document doc = docBuilder.parse(line);
+					if(plane==null)
+					{
+						int id = Integer.parseInt(doc.getElementsByTagName("id").item(0).getTextContent());
+						Coord centre = gs.getCentre();
+						double angle = new Random().nextDouble()*Math.PI*2;
+						if(id == -1)
+						{
+							System.out.println("New Plane created!");
+							plane = new Airplane(gs.nextAId(),centre.x+Math.cos(angle+Math.PI), centre.y+Math.sin(angle+Math.PI),angle);
+							gs.airplanes.add(plane);
+						}
+						else
+						{
+							plane = gs.getPlaneById(id);
+							if(plane == null)
+							{
+								System.out.println("New Plane created!");
+								plane = new Airplane(gs.nextAId(),centre.x+Math.cos(angle+Math.PI), centre.y+Math.sin(angle+Math.PI),angle);
+								gs.airplanes.add(plane);
+							}
+							else
+							{
+								System.out.println("Reconnect Succesful!");
+							}
+						}
+						cachedLife = plane.getLife();
+					}
 					rotation = Double.parseDouble(doc.getElementsByTagName("rotation").item(0).getTextContent());
 					isShooting = Boolean.parseBoolean(doc.getElementsByTagName("shooting").item(0).getTextContent());
 
@@ -137,16 +178,11 @@ public class AndroidClient implements Runnable{
 
 
 				} catch ( IOException e) {
-					System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
-					try {
-						sock.close();
-					} catch (IOException e1) {
-						System.err.println("an IO derp");
-					}
-					return;
+					System.err.println("Something went catostrophacally wrong while recieving data (IO)! Disconnecting android...");
+					shutDown();
 				} catch (ParserConfigurationException | SAXException e) {
-					System.err.println(line);
-
+					System.err.println("Something went catostrophacally wrong while recieving data (Parser)! Disconnecting android...");
+					shutDown();
 				}
 
 			}
@@ -154,19 +190,24 @@ public class AndroidClient implements Runnable{
 			{
 				if(line != null)
 					System.err.println(line);
-				//is.
 			}
 		}
 
 	}
 
 
-	public void sendEvents()
+	public void sendEvents(boolean forced)
 	{
 		//System.err.println("StuffSent");
-		if(plane.getLife()<cachedLife)
+		
+			
+		if(plane!=null && ((plane.getLife()<cachedLife) || forced))
 		{
-			System.err.println("Sending packet to android...");
+			if(!forced)
+			{
+				pingThread.interrupt();
+			}
+			//System.err.println("Sending packet to android...");
 			cachedLife = plane.getLife();
 			// Send hit info to android
 			try {
@@ -202,27 +243,19 @@ public class AndroidClient implements Runnable{
 				os.flush();
 
 			} catch (ParserConfigurationException | TransformerException e1) {
-				System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
+				System.err.println("Something went catostrophacally wrong while sending data (Parser)! Disconnecting android...");
 				//e1.printStackTrace();
-				try {
-					sock.close();
-				} catch (IOException e) {
-					System.err.println("an IO derp");
-				}
+				shutDown();
 				return;
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.err.println("Something went catostrophacally wrong while sending data (IO)! Disconnecting android...");
+				shutDown();
 			}
 
 
 			if(plane.getLife()<=0)
 			{
-				try {
-					sock.close();
-				} catch (IOException e) {
-					System.err.println("an IO derp");
-				}
+				shutDown();
 			}
 		}
 
@@ -236,6 +269,27 @@ public class AndroidClient implements Runnable{
 	{
 		return sock;
 	}
-
+	
+	public boolean shutDown()
+	{
+		System.err.println("Shutdown started!");
+		try
+		{
+		br.close();
+		isr.close();
+		is.close();
+		os.close();
+		sock.close();
+		timeoutThread.interrupt();
+		}
+		catch(IOException e)
+		{
+			System.err.println("Shutdown failed!");
+			e.printStackTrace();
+			return false;
+		}
+		System.err.println("Shutdown success!");
+		return true;
+	}
 
 }
