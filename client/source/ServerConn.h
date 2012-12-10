@@ -42,6 +42,8 @@ public:
 
 	void open(const std::string& ip, u32 port)
 	{
+		m_pSocket = std::make_shared<boost::asio::ip::tcp::socket>(*m_pIOService);
+
 		boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string(ip), port);
 		m_pSocket->connect(endpoint);
 	}

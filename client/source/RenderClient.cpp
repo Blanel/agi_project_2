@@ -139,7 +139,14 @@ RenderClient::run()
 	auto io = std::make_shared<boost::asio::io_service>();
 	ClientSocket socket(io);
 
-	//socket.open("127.0.0.1", 1234);
+	try
+	{
+		socket.open("127.0.0.1", 1234);
+	}
+	catch(std::exception &e)
+	{
+		R_LOG_ERR(e.what());
+	}
 
 	active_window()->show_cursor(false);
 
