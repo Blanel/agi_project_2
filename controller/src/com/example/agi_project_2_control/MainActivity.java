@@ -41,7 +41,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	 */
 	//public Airplane airplane;
 
-	private static StateSender ss;
+	private StateSender ss;
 
 	/**
 	 * Image Viewers
@@ -122,7 +122,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		setContentView(R.layout.activity_main);
 
 		//airplane = new Airplane(this);
-		ss.init(this);
+		ss = new StateSender(this);
 		
 		final Context context = this;
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
@@ -195,7 +195,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		this.screenWidth = display.getWidth();
 		this.screenHeight = display.getHeight();
 		ss.setScreenHeight(screenHeight);
-		ss.startListenerThreads();
+		//ss.startListenerThreads();
 		/*
 		try {
 			client.sendAction("Android");
@@ -221,9 +221,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
-		/**
-		 * Vad fan är det som händer egentligen
-		 */
+
 		(new Thread(){
 			@Override
 			public void run(){

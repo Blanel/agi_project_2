@@ -221,9 +221,14 @@ public class AndroidClient implements Runnable{
 				ts.setValue(""+System.currentTimeMillis());
 				rootElement.setAttributeNode(ts);
 				
-				Attr id = doc.createAttribute("id");
+				
+				
+				Element idTag = doc.createElement("id");
+				rootElement.appendChild(idTag);
+				idTag.appendChild(doc.createTextNode(""+plane.getId()));
+				/*Attr id = doc.createAttribute("id");
 				id.setValue(""+plane.getId());
-				rootElement.setAttributeNode(id);
+				rootElement.setAttributeNode(id);*/
 				
 				
 				

@@ -35,7 +35,7 @@ public class StateSender {
 	private float rotX;
 	private float rotY;
 	private MainActivity ma;
-	
+
 	private Socket soc =null;
 	private OutputStream os = null;
 	private InputStream is = null;
@@ -43,20 +43,20 @@ public class StateSender {
 	private BufferedReader br = null;
 	private String host =null;
 	private int port = 1234;
-	
+
 	private int cachedLife = 5;
 	private int life = 5;
-	
+
 	private Thread timeoutThread; 
-	private final long TIMEOUT = 2000;
-	
+	private final long TIMEOUT = 3000;
+
 	private Thread reconnectThread;
-	
+
 	private int id = -1;
 
 	private final static long INTERVALL=40;
 
-	public void init(MainActivity m)
+	public StateSender(MainActivity m)
 	{
 		ma = m;
 		speedFrac = 0;
@@ -69,19 +69,31 @@ public class StateSender {
 			public void run()
 			{
 
-				while(!soc.isClosed())
+				while(true)
 				{
+
 					try {
 						sleep(TIMEOUT);
-						//shutDown();
-						System.err.println("Server timed out!");
+						if(soc != null && !soc.isClosed())
+						{
+							//shutDown();
+							System.err.println("Server timed out!");
+
+							try{
+								soc.close();
+							}
+							catch(IOException e)
+							{
+								System.err.println("IO Exception!");
+							}
+						}
 					} catch (InterruptedException e) {
 						// Do nothing!
 					}
 				}
 			}
 		};
-		
+
 		reconnectThread = new Thread()
 		{
 			public void run()
@@ -90,28 +102,35 @@ public class StateSender {
 				{
 					try{
 						sleep(1000);
+						if(soc !=null && soc.isClosed())
+						{
+							System.out.println("Reconnect Attempted");
+							try {
+								connect();
+							} catch (UnknownHostException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+						else
+						{
+							System.err.println("Still Connected!");
+						}
 					}
 					catch(InterruptedException e)
 					{
-						
+
 					}
-					if((soc !=null && host != null) && soc.isClosed())
-					{
-						System.out.println("Reconnect Attempted");
-						try {
-							connect();
-						} catch (UnknownHostException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
+
 				}
 			}
-			
+
 		};
+		reconnectThread.start();
+		timeoutThread.start();
 	}
 	public Socket getSoc() {
 		return soc;
@@ -123,12 +142,12 @@ public class StateSender {
 		isr = new InputStreamReader(is);
 		br = new BufferedReader(isr);
 	}*/
-	
+
 	public void connect() throws UnknownHostException, IOException
 	{
 		if(soc != null)
 		{
-			
+
 			is.close();
 			os.close();
 			isr.close();
@@ -139,6 +158,7 @@ public class StateSender {
 		os = soc.getOutputStream();
 		isr = new InputStreamReader(is);
 		br = new BufferedReader(isr);
+		startListenerThreads();
 		System.out.println("Connection created");
 	}
 	/*public StateSender(MainActivity m, Socket soc) throws IOException
@@ -170,17 +190,17 @@ public class StateSender {
 	}
 	public void startListenerThreads()
 	{
-		reconnectThread.start();
+
 		//Server Listener
 		(new Thread()
 		{
 			public void run()
 			{
-				timeoutThread.start();
+				
 				while(!soc.isClosed())
 				{
-					
-					
+
+
 
 					try {
 						String line = br.readLine();
@@ -189,6 +209,10 @@ public class StateSender {
 						DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 						Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
 						setLife(Integer.parseInt(doc.getElementsByTagName("life").item(0).getTextContent()));
+						if(id==-1)
+						{
+							id = Integer.parseInt(doc.getElementsByTagName("id").item(0).getTextContent());
+						}
 					} catch (IOException e1) {
 						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
 						try {
@@ -214,7 +238,7 @@ public class StateSender {
 						}
 						return;
 					}
-					
+
 
 
 				}
@@ -240,10 +264,10 @@ public class StateSender {
 						Attr ts = doc.createAttribute("ts");
 						ts.setValue(""+System.currentTimeMillis());
 						rootElement.setAttributeNode(ts);
-						
-						Element itTag = doc.createElement("id");
-						rootElement.appendChild(itTag);
-						itTag.appendChild(doc.createTextNode(""+id));
+
+						Element idTag = doc.createElement("id");
+						rootElement.appendChild(idTag);
+						idTag.appendChild(doc.createTextNode(""+id));
 
 						Element rotationTag = doc.createElement("rotation");
 						rootElement.appendChild(rotationTag);
@@ -287,7 +311,7 @@ public class StateSender {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
+
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
@@ -343,7 +367,7 @@ public class StateSender {
 	public void setRotY(float rotY) {
 		this.rotY = rotY;
 	}
-	
+
 	public void setLife(int l)
 	{
 		life = l;
@@ -353,16 +377,16 @@ public class StateSender {
 		}
 		cachedLife = l;
 	}
-	
+
 	public int getLife()
 	{
 		return life;
 	}
-	
+
 	public boolean isAlive(){
 		return (life>0);
 	}
-	
+
 	public void setHost(String host, int port)
 	{
 		this.host = host;
