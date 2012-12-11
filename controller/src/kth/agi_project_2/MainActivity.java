@@ -1,4 +1,4 @@
-package com.example.agi_project_2_control;
+package kth.agi_project_2;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -30,6 +30,8 @@ import android.widget.VideoView;
 
 import java.io.*;
 import java.net.*;
+
+import kth.agi_project_2.R;
 
 import android.view.GestureDetector.OnGestureListener;
 import android.view.GestureDetector;
@@ -76,7 +78,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	 * Video
 	 */
 	public VideoView viewBKVideo;
-	private String srcPath = "android.resource://com.example.agi_project_2_control/raw/introvideo";
+	private String srcPath = "android.resource://kth.agi_project_2/raw/introvideo";
 	
 	/**
 	 * Sound

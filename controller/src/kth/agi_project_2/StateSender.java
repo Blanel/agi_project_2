@@ -1,4 +1,4 @@
-package com.example.agi_project_2_control;
+package kth.agi_project_2;
 
 import java.io.BufferedReader;
 import java.io.IOException;
