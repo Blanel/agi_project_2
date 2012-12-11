@@ -1,21 +1,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    
-    
+
     android:orientation					="horizontal"
     android:layout_width				="match_parent"
     android:layout_height				="match_parent"
-    tools:context						=".MainActivity" >
-	
-	<ImageView
-	    android:id						="@+id/imageViewBK"
+    tools:context						=".MainActivity" 
+    
+    >
+	<VideoView
+	    android:id						="@+id/videoViewBK"
 	    android:layout_width			="wrap_content"
 	    android:layout_height			="wrap_content"
 	    android:layout_alignParentLeft	="true"
 	    android:layout_alignParentTop	="true"
-	    android:src						="@drawable/airp"
 	/>
-    
 	<ImageView
 	    android:id						="@+id/imageFire"
 	    android:layout_width			="wrap_content"
@@ -25,9 +23,7 @@
 	    android:layout_alignParentTop	="true"
 	    android:src						="@drawable/mod_target"
 	    android:background				="#8600ACE0" 
-	    
 	/>
-
 	<ImageView
 	    android:id						="@+id/imageGas"
 	    android:layout_width			="wrap_content"
@@ -38,9 +34,6 @@
 	    android:src						="@drawable/propeller"
 	    android:background				="#8600ACE0" 
 	/>
-	
-
-
 	<ImageView
 	    android:id						="@+id/imageViewLife"
 	    android:layout_width			="wrap_content"
@@ -49,8 +42,27 @@
 	    android:layout_alignParentTop	="true"
 	    android:src						="@drawable/life5" 
 	/>
-
 	<ImageView
+	    android:id						="@+id/imageViewNavigation"
+	    android:layout_width			="wrap_content"
+	    android:layout_height			="wrap_content"
+	    android:layout_marginRight		="50sp"
+	    android:layout_marginLeft		="250sp"
+	    android:layout_marginTop		="100sp"
+	    android:layout_alignParentLeft	="true"
+	    android:src						="@drawable/navigation2" 
+	/>
+	<ImageView
+	    android:id						="@+id/imageViewArrow"
+	    android:layout_width			="wrap_content"
+	    android:layout_height			="wrap_content"
+	    android:layout_marginRight		="50sp"
+	    android:layout_marginLeft		="250sp"
+	    android:layout_marginTop		="100sp"
+	    android:layout_alignParentLeft	="true"
+	    android:src						="@drawable/a0" 
+	/>
+		<ImageView
 	    android:id						="@+id/imageRedFlash"
 	    android:layout_width			="wrap_content"
 	    android:layout_height			="wrap_content"
@@ -64,6 +76,11 @@
 </RelativeLayout>
 
 <!-- 
+	    
+	    
+	    
+	
+	    
 	    
 	android:background				="#86E00000" 
 
@@ -102,5 +119,12 @@
 	    
 	/>
 
-
+	<ImageView
+	    android:id						="@+id/imageViewBK"
+	    android:layout_width			="wrap_content"
+	    android:layout_height			="wrap_content"
+	    android:layout_alignParentLeft	="true"
+	    android:layout_alignParentTop	="true"
+	    android:src						="@drawable/airp"
+	/>
   	-->
