@@ -3,6 +3,9 @@
 #include "renderer/GpuException.h"
 #include "renderer/gl/ShaderObjectGL.h"
 
+#include "Log.h"
+#include <cstdlib>
+
 namespace revel
 {
 namespace renderer
@@ -33,6 +36,25 @@ ShaderObjectGL::ShaderObjectGL(ShaderType type, const std::string& source)
     }
 
     this->compile();
+
+    GLint length, result;
+
+    glGetShaderiv(m_Identifier, GL_COMPILE_STATUS, &result);
+    if(result == GL_FALSE) {
+        char *log;
+
+        /* get the shader info log */
+        glGetShaderiv(m_Identifier, GL_INFO_LOG_LENGTH, &length);
+        log = (char*)malloc(length);
+        glGetShaderInfoLog(m_Identifier, length, &result, log);
+
+        /* print an error message and the info log */
+        R_LOG_ERR("ShaderCompile: Unable to compile: " << log);
+        free(log);
+
+        //glDeleteShader(m_Identifier);
+        //return 0;
+    }
 
     if (!this->is_compiled())
         throw GpuException("Could not compile shader");

@@ -110,10 +110,11 @@ RenderClient::run()
 
 	auto planemesh = geo::Mesh::create_arrow();
 	auto planemeshva = ctx->create_vertex_array(planemesh);
+    /*
     auto planesp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/plane.vs", 
 	    	    												  	   "../client/source/shaders/plane.fs");
 
-    /*
+
     auto blur_v_sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/blur_v.vs", 
 												  	    				 "../client/source/shaders/blur_v.fs");
 
@@ -186,6 +187,8 @@ RenderClient::run()
 		R_LOG_ERR(e.what());
 	}
 
+	u32 fps = 0;
+
 	active_window()->show_cursor(false);
 
 	while (this->is_running())
@@ -239,14 +242,14 @@ RenderClient::run()
 
       	//std::cout << xmlframe << std::endl;
 
-      	/*
-      	counter++;
+      	fps++;
 
         if (timer.elapsed_time() > 1)
         {
-        	R_LOG_INFO("COUNTER: " << counter);
+        	R_LOG_INFO("FPS: " << fps);
+        	timer.reset();
+        	fps = 0;
         }
-        */
 
 		//tm.generate(gs);
 		
