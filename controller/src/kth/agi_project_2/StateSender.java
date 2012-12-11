@@ -55,12 +55,15 @@ public class StateSender {
 	private Thread reconnectThread;
 	private boolean reconnecting = false;
 	
+	private Thread senderThread;
+	private Thread listenerThread;
+
 	private boolean running;
 
 	private int id = -1;
 
 	private final static long INTERVALL=40;
-	
+
 	public StateSender(MainActivity m)
 	{
 		running = true;
@@ -70,7 +73,7 @@ public class StateSender {
 		screenHeight = 1;
 		rotX = 0;
 		rotY = 0;
-		
+
 		// A timeout thread. If nothing is heard from the server in a long while, disconnect 
 		timeoutThread = new Thread()
 		{
@@ -102,7 +105,7 @@ public class StateSender {
 				}
 			}
 		};
-		
+
 		// A reconnect thread. If connection is lost, attempt to reconnect. 
 		reconnectThread = new Thread()
 		{
@@ -120,11 +123,21 @@ public class StateSender {
 							try {
 								connect();
 							} catch (UnknownHostException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
+								try {
+									disconnect(true);
+								} catch (IOException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
 							} catch (IOException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
+								try {
+									disconnect(true);
+								} catch (IOException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
 							}
 						}
 					}
@@ -137,66 +150,14 @@ public class StateSender {
 			}
 
 		};
-		
-		
-	}
-	
-	// Connects with the specified host and port 
-	public void connect() throws UnknownHostException, IOException
-	{
-		
-		InetSocketAddress sa = new InetSocketAddress(host, port);
-		soc = new Socket();
-		//soc.setSoTimeout(1500);
-		soc.connect(sa, 15000);
-		is = soc.getInputStream();
-		os = soc.getOutputStream();
-		isr = new InputStreamReader(is);
-		br = new BufferedReader(isr);
-		startListenerThreads();
-		System.err.println("Connection created");
-		
-		if(!timeoutThread.isAlive())
-		{
-			timeoutThread.start();
-		}
-		if(!reconnectThread.isAlive())
-		{
-			reconnectThread.start();
-		}
-		reconnecting = false;
-	}
-	
-	public void disconnect(boolean error) throws IOException
-	{
-		if(!reconnecting)
-		{
-		br.close();
-		isr.close();
-		os.close();
-		is.close();
-		soc.close();
-		if(!error)
-		{
-			running = false;
-		}
-		}
-		
-	}
-	
-	private double getRotation()
-	{
-		return -((Math.atan2(rotX, rotY)+Math.PI/2)*10/Math.PI);
-	}
-	public void startListenerThreads()
-	{
-		(new Thread()
+
+		listenerThread = new Thread()
 		{
 			public void run()
 			{
 				while(!soc.isClosed() && running)
 				{
-					
+
 					try {
 						if(br.ready())
 						{
@@ -239,9 +200,9 @@ public class StateSender {
 				}
 				System.err.println("The socket was closed! Reciever");
 			}
-		}).start();
-		//Server Sender
-		(new Thread()
+		};
+				
+		senderThread = new Thread()
 		{
 			public void run()
 			{
@@ -319,7 +280,61 @@ public class StateSender {
 				}
 				System.err.println("The socket was closed! Sender");
 			}
-		}).start();
+		};
+
+	}
+
+	// Connects with the specified host and port 
+	public void connect() throws UnknownHostException, IOException
+	{
+
+		InetSocketAddress sa = new InetSocketAddress(host, port);
+		soc = new Socket();
+		//soc.setSoTimeout(1500);
+		soc.connect(sa, 15000);
+		is = soc.getInputStream();
+		os = soc.getOutputStream();
+		isr = new InputStreamReader(is);
+		br = new BufferedReader(isr);
+		startListenerThreads();
+		System.err.println("Connection created");
+
+		if(!timeoutThread.isAlive())
+		{
+			timeoutThread.start();
+		}
+		if(!reconnectThread.isAlive())
+		{
+			reconnectThread.start();
+		}
+		reconnecting = false;
+	}
+
+	public void disconnect(boolean error) throws IOException
+	{
+		if(!reconnecting)
+		{
+			br.close();
+			isr.close();
+			os.close();
+			is.close();
+			soc.close();
+			if(!error)
+			{
+				running = false;
+			}
+		}
+
+	}
+
+	private double getRotation()
+	{
+		return -((Math.atan2(rotX, rotY)+Math.PI/2)*10/Math.PI);
+	}
+	public void startListenerThreads()
+	{
+		listenerThread.start();
+		senderThread.start();
 	}
 
 

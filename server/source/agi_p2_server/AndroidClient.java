@@ -44,6 +44,8 @@ public class AndroidClient implements Runnable{
 	private static final long PING = 1000;
 	private static final long TIMEOUT =10000; 
 
+	private boolean shuttingDown = false;
+
 
 	public AndroidClient(Socket soc, GameState gs) throws IOException
 	{
@@ -60,7 +62,7 @@ public class AndroidClient implements Runnable{
 		rotation = 0;
 		//double angle = new Random().nextDouble()*Math.PI*2;
 		//Coord centre = gs.getCentre();
-		
+
 		plane=null;
 		//plane = new Airplane(gs.nextAId(),centre.x+Math.cos(angle+Math.PI), centre.y+Math.sin(angle+Math.PI),angle);
 		//gs.airplanes.add(plane);
@@ -83,7 +85,7 @@ public class AndroidClient implements Runnable{
 				}
 			}
 		};
-		
+
 		pingThread = new Thread()
 		{
 			public void run()
@@ -94,11 +96,11 @@ public class AndroidClient implements Runnable{
 					{
 						sleep(PING);
 						sendEvents(true);
-						
+
 					}
 					catch(InterruptedException e)
 					{
-						
+
 					}
 				}
 			}
@@ -109,13 +111,13 @@ public class AndroidClient implements Runnable{
 	{
 		if(plane != null)
 		{
-		plane.addAngle(rotation*0.001);
-		plane.speedMod(speedMod);
-		if(isShooting)
-		{
-			gs.bullets.add(new Bullet(gs.nextBId(), plane));
-			isShooting=false;
-		}
+			plane.addAngle(rotation*0.001);
+			plane.speedMod(speedMod);
+			if(isShooting)
+			{
+				gs.bullets.add(new Bullet(gs.nextBId(), plane));
+				isShooting=false;
+			}
 		}
 
 	}
@@ -129,7 +131,7 @@ public class AndroidClient implements Runnable{
 
 
 			String line=null;
-			
+
 			try {
 				if(br.ready())
 				{
@@ -139,7 +141,7 @@ public class AndroidClient implements Runnable{
 				System.err.println("IOException when reading line!");
 				shutDown();
 			}
-			
+
 			if(line!=null && line.startsWith("<?xml") && line.endsWith("</androidClient>") )
 			{
 				timeoutThread.interrupt();
@@ -203,8 +205,8 @@ public class AndroidClient implements Runnable{
 	public void sendEvents(boolean forced)
 	{
 		//System.err.println("StuffSent");
-		
-			
+
+
 		if(plane!=null && ((plane.getLife()<cachedLife) || forced))
 		{
 			if(!forced)
@@ -224,20 +226,20 @@ public class AndroidClient implements Runnable{
 				Attr ts = doc.createAttribute("ts");
 				ts.setValue(""+System.currentTimeMillis());
 				rootElement.setAttributeNode(ts);
-				
-				
-				
+
+
+
 				Element idTag = doc.createElement("id");
 				rootElement.appendChild(idTag);
 				idTag.appendChild(doc.createTextNode(""+plane.getId()));
 				/*Attr id = doc.createAttribute("id");
 				id.setValue(""+plane.getId());
 				rootElement.setAttributeNode(id);*/
-				
-				
-				
-				
-				
+
+
+
+
+
 				Element lifeTag = doc.createElement("life");
 				rootElement.appendChild(lifeTag);
 				lifeTag.appendChild(doc.createTextNode(""+plane.getLife()));
@@ -278,27 +280,35 @@ public class AndroidClient implements Runnable{
 	{
 		return sock;
 	}
-	
+
 	public boolean shutDown()
 	{
-		System.err.println("Shutdown started!");
-		try
+		if(!shuttingDown)
 		{
-		br.close();
-		isr.close();
-		is.close();
-		os.close();
-		sock.close();
-		timeoutThread.interrupt();
+			System.err.println("Shutdown started!");
+			shuttingDown=true;
+			try
+			{
+				br.close();
+				isr.close();
+				is.close();
+				os.close();
+				sock.close();
+				timeoutThread.interrupt();
+			}
+			catch(IOException e)
+			{
+				shuttingDown=false;
+				System.err.println("Shutdown failed!");
+				e.printStackTrace();
+				return false;
+			}
+			shuttingDown = false;
+			System.err.println("Shutdown success!");
+			return true;
 		}
-		catch(IOException e)
-		{
-			System.err.println("Shutdown failed!");
-			e.printStackTrace();
-			return false;
-		}
-		System.err.println("Shutdown success!");
-		return true;
+		System.err.println("Shutdown already in progress!");
+		return false;
 	}
 
 }
