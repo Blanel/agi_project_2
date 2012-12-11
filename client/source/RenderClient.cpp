@@ -112,6 +112,15 @@ RenderClient::run()
 	auto planemeshva = ctx->create_vertex_array(planemesh);
     auto planesp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/plane.vs", 
 	    	    												  	   "../client/source/shaders/plane.fs");
+
+    /*
+    auto blur_v_sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/blur_v.vs", 
+												  	    				 "../client/source/shaders/blur_v.fs");
+
+    auto blur_h_sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/blur_h.vs", 
+												  	    				 "../client/source/shaders/blur_h.fs");
+	 */
+
     //Create and setup scene
 	auto camera = std::make_shared<PerspectiveCamera>();
 	
@@ -134,8 +143,11 @@ RenderClient::run()
 
 	camera->set_position(0, 0, 100);
 
+
+
 	auto io = std::make_shared<boost::asio::io_service>();
 	ClientSocket socket(io);
+
 
 	// CLOUD
 	CubeImage ci = CubeImage::generate_fractal_cube(); 
@@ -156,6 +168,15 @@ RenderClient::run()
 	::glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_pWindow->width(), m_pWindow->height());
 	::glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, cloud_depth);
 	
+	::glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, cloud_rt, 0);
+	GLenum buffers[] = {GL_COLOR_ATTACHMENT0};
+	::glDrawBuffers(1, buffers);
+
+	if(::glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		R_LOG_ERR("Invalid framebuffer");
+
+	cloud_fb->unbind();
+
 	try
 	{
 		socket.open("127.0.0.1", 1234);

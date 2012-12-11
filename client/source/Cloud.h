@@ -6,6 +6,9 @@
 #include "BoundingVolume.h"
 #include "Image2D.h"
 #include "Camera.h"
+#include "geo/Mesh.h"
+
+#include "pugixml.hpp"
 
 #include "SimplexNoise.h"
 
@@ -47,7 +50,7 @@ public:
 		SimplexNoise simplex;
 
 		simplex.set_amplitude(1.0f);
-		simplex.set_frequency(1.0f);
+		simplex.set_frequency(0.04f);
 		simplex.set_octaves(1);
 		simplex.set_persistance(1.0f);
 
@@ -55,11 +58,18 @@ public:
 		{
 			for (u32 x = 0; x < 256; ++x)
 			{
-				auto n = simplex.noise(x, y);
-				f32 nn = (n + 1.0f) * 128.0f - 1;
-				cube.front()->operator()(x,y) = pixel::RGBA_u8(nn, nn, nn, 255);
+				auto n1 = simplex.noise(0, x, y);
+				f32 n1n = (n1 + 1.0f) * 128.0f - 1;
+				
+				auto n2 = simplex.noise(x, y, 255);
+				f32 n2n = (n2 + 1.0f) * 128.0f - 1;
+
+
+				cube.front()->operator()(x,y) = pixel::RGBA_u8(n1n);
 			}			
 		}
+
+		TGA::write("E:/test123.tga", *(cube.front()));
 
 		return cube;
 	}
@@ -69,13 +79,23 @@ public:
 
 class Cloud
 {
-	// renderer::VertexArray m_VA;
+	std::shared_ptr<renderer::VertexArray> m_VA;
 	BBox m_BoundingBox;
 	//TextureCube m_FractalCube;
 
 	std::shared_ptr<ShaderProgram> m_pShaderProgram;
 
 public:
+	void load(const std::string& file)
+	{
+		pugi::xml_document doc;
+		pugi::xml_parse_result result = doc.load_file(file.c_str());
+
+
+		geo::Mesh cloud;
+
+	}
+
 	void draw(const std::shared_ptr<renderer::RenderContext>& ctx)
 	{
 		//create framebuffer and render to texture target
