@@ -40,30 +40,34 @@ namespace revel
 
 	class GameState
 	{
-		std::vector<AirPlane> airplanes;
-		std::vector<Bullet> bullets;
+		std::map<i32, AirPlane> airplanes;
+		std::map<i32, Bullet> bullets;
 	public:
 		GameState();
 		~GameState();
 
-		void create_plane(f32 x, f32 y, f32 angle, const std::string name = "")
+		void create_plane(i32 id,f32 x, f32 y, f32 angle)
 		{
 			AirPlane p;
 			p.x = x;
 			p.y = y;
 			p.angle = angle;
-			p.name = name;
 			p.alive = true;
 
-			airplanes.push_back(p);
+			airplanes.insert(std::pair<i32,AirPlane>(id,p));
+		}
+		
+		void update_plane(i32 id, f32 x, f32 y, f32 angle)
+		{
+		
 		}
 
-		std::vector<AirPlane>& get_planes() 
+		std::map<i32, AirPlane>& get_planes() 
 		{ 
 			return airplanes; 
 		}
 
-		std::vector<Bullet>& get_bullets()
+		std::map<i32, Bullet>& get_bullets()
 		{
 			return bullets;
 		}

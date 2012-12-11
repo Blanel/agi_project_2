@@ -20,16 +20,11 @@ FrameParser::parse_frame(const std::string& xmlframe, GameState& gs)
 
 		if (status == 1)
 		{
-			gs.get_planes().push_back(AirPlane());
-			gs.get_planes().back().x = x;
-			gs.get_planes().back().y = y;
-			gs.get_planes().back().angle = a;
+			gs.create_plane(id,x,y,a);
 		}
 		else
 		{
-			gs.get_planes()[id].x = x;
-			gs.get_planes()[id].y = y;
-			gs.get_planes()[id].angle = a;
+			gs.update_plane(id,x,y,a);
 		}
 	}
 }

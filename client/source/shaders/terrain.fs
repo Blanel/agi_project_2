@@ -2,7 +2,7 @@
 
 uniform sampler2D diffuseMap;
 
-layout (location = 0) out vec3 FragmentColor;
+layout (location = 0) out vec4 FragmentColor;
 
 in vec3 Normal;
 in vec2 UV;
