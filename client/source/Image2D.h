@@ -98,7 +98,7 @@ class Image2D
 	PixelFormat m_PixelFormat;
 
 public:	
-	Image2D(u32 w, u32 h, T val = 0)
+	Image2D(u32 w, u32 h, T val = T())
 		: m_Pixels(w * h, val)
 		, m_Width(w)
 		, m_Height(h)

@@ -50,6 +50,7 @@ using namespace revel::renderer;
 #include <sstream>
 
 #include "PerlinNoise.h"
+#include "Cloud.h"
 
 namespace revel
 {
@@ -118,8 +119,6 @@ RenderClient::run()
 	//Only use one (dynamic?) light source
 	DirectionalLight sun(vec3(-0.4, -1, 0.3).normalized());
 
-	auto framebuffer = ctx->create_framebuffer();
-	
     Scene scene(ctx);
     scene.set_camera(camera);
 
@@ -138,6 +137,25 @@ RenderClient::run()
 	auto io = std::make_shared<boost::asio::io_service>();
 	ClientSocket socket(io);
 
+	// CLOUD
+	CubeImage ci = CubeImage::generate_fractal_cube(); 
+
+	auto cloud_fb = ctx->create_framebuffer();
+	cloud_fb->bind();
+	GLuint cloud_rt;
+	::glGenTextures(1, &cloud_rt);
+	::glBindTexture(GL_TEXTURE_2D, cloud_rt);
+	::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_pWindow->width(), m_pWindow->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0); //Empty image
+	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	//Depth buffer
+	GLuint cloud_depth;
+	::glGenRenderbuffers(1, &cloud_depth);
+	::glBindRenderbuffer(GL_RENDERBUFFER, cloud_depth);
+	::glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_pWindow->width(), m_pWindow->height());
+	::glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, cloud_depth);
+	
 	try
 	{
 		socket.open("127.0.0.1", 1234);
@@ -193,9 +211,7 @@ RenderClient::run()
     	//poll socket
     	
     	//auto xmlframe = clientsocket.get_frame_data();
-
-
-		
+	
 		//camera->set_eye(gs.getCentre().first, gs.getCentre().second, 100);
 		//doc.save(std::cout);
 		//R_LOG_INFO("TS: " << doc.child("tick").attribute("ts").value());
