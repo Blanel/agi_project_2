@@ -13,7 +13,7 @@
 namespace revel
 {
 
-boost::asio::streambuf buffer;
+// boost::asio::streambuf buffer;
 
 // void handler(const boost::system::error_code& e, std::size_t size)
 // {
