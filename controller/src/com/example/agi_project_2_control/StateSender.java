@@ -51,25 +51,30 @@ public class StateSender {
 	private final long TIMEOUT = 3000;
 
 	private Thread reconnectThread;
+	
+	private boolean running;
 
 	private int id = -1;
 
 	private final static long INTERVALL=40;
-
+	
 	public StateSender(MainActivity m)
 	{
+		running = true;
 		ma = m;
 		speedFrac = 0;
 		shooting = false;
 		screenHeight = 1;
 		rotX = 0;
 		rotY = 0;
+		
+		// A timeout thread. If nothing is heard from the server in a long while, disconnect 
 		timeoutThread = new Thread()
 		{
 			public void run()
 			{
 
-				while(true)
+				while(running)
 				{
 
 					try {
@@ -80,7 +85,7 @@ public class StateSender {
 							System.err.println("Server timed out!");
 
 							try{
-								soc.close();
+								disconnect(true);
 							}
 							catch(IOException e)
 							{
@@ -93,12 +98,13 @@ public class StateSender {
 				}
 			}
 		};
-
+		
+		// A reconnect thread. If connection is lost, attempt to reconnect. 
 		reconnectThread = new Thread()
 		{
 			public void run()
 			{
-				while(true)
+				while(running)
 				{
 					try{
 						sleep(1000);
@@ -128,27 +134,10 @@ public class StateSender {
 		reconnectThread.start();
 		timeoutThread.start();
 	}
-	public Socket getSoc() {
-		return soc;
-	}
-	/*public void setSoc(Socket soc) throws IOException {
-		this.soc = soc;
-		is = soc.getInputStream();
-		os = soc.getOutputStream();
-		isr = new InputStreamReader(is);
-		br = new BufferedReader(isr);
-	}*/
-
+	
+	// Connects with the specified host and port 
 	public void connect() throws UnknownHostException, IOException
 	{
-		if(soc != null)
-		{
-
-			is.close();
-			os.close();
-			isr.close();
-			br.close();			
-		}
 		soc = new Socket(host,port);
 		is = soc.getInputStream();
 		os = soc.getOutputStream();
@@ -157,47 +146,33 @@ public class StateSender {
 		startListenerThreads();
 		System.err.println("Connection created");
 	}
-	/*public StateSender(MainActivity m, Socket soc) throws IOException
+	
+	public void disconnect(boolean error) throws IOException
 	{
-		ma = m;
-		setSoc(soc);
-		speedFrac = 0;
-		shooting = false;
-		screenHeight = 1;
-		rotX = 0;
-		rotY = 0;
+		br.close();
+		isr.close();
+		os.close();
+		is.close();
+		soc.close();
+		if(!error)
+		{
+			running = false;
+		}
+		
 	}
-
-	public StateSender(MainActivity m, Socket soc, int h) throws IOException
-	{
-		ma = m;
-		setSoc(soc);
-		speedFrac = 0;
-		shooting = false;
-		screenHeight = h;
-		rotX = 0;
-		rotY = 0;
-	}*/
-
-
+	
 	private double getRotation()
 	{
 		return -((Math.atan2(rotX, rotY)+Math.PI/2)*10/Math.PI);
 	}
 	public void startListenerThreads()
 	{
-
-		//Server Listener
 		(new Thread()
 		{
 			public void run()
 			{
-				
-				while(!soc.isClosed())
+				while(!soc.isClosed() && running)
 				{
-
-
-
 					try {
 						String line = br.readLine();
 						timeoutThread.interrupt();
@@ -212,7 +187,7 @@ public class StateSender {
 					} catch (IOException e1) {
 						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
 						try {
-							soc.close();
+							disconnect(true);
 						} catch (IOException e) {
 							System.err.println("an IO derp");
 						}
@@ -220,7 +195,7 @@ public class StateSender {
 					} catch (SAXException e1) {
 						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
 						try {
-							soc.close();
+							disconnect(true);
 						} catch (IOException e) {
 							System.err.println("an IO derp");
 						}
@@ -228,15 +203,12 @@ public class StateSender {
 					} catch (ParserConfigurationException e1) {
 						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
 						try {
-							soc.close();
+							disconnect(true);
 						} catch (IOException e) {
 							System.err.println("an IO derp");
 						}
 						return;
 					}
-
-
-
 				}
 				System.err.println("The socket was closed! Reciever");
 			}
@@ -246,7 +218,7 @@ public class StateSender {
 		{
 			public void run()
 			{
-				while(!soc.isClosed()) // TODO Create sane operation here
+				while(!soc.isClosed() && running) // TODO Create sane operation here
 				{
 					// Send hit info to android
 					//System.err.println(soc.isClosed());
@@ -291,7 +263,7 @@ public class StateSender {
 					} catch (ParserConfigurationException e1) {
 						System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
 						try {
-							soc.close();
+							disconnect(true);
 						} catch (IOException e) {
 							System.err.println("an IO derp");
 						}
@@ -299,7 +271,7 @@ public class StateSender {
 					} catch (TransformerException e1) {
 						System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
 						try {
-							soc.close();
+							disconnect(true);
 						} catch (IOException e) {
 							System.err.println("an IO derp");
 						}

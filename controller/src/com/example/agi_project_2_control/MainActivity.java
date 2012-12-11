@@ -36,10 +36,6 @@ import android.view.GestureDetector;
 
 public final class MainActivity extends Activity
 implements View.OnTouchListener, SensorEventListener, OnGestureListener {
-	/**
-	 * Adding classes 
-	 */
-	//public Airplane airplane;
 
 	private StateSender ss;
 
@@ -50,8 +46,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	private ImageView gasImage;
 
 	private ImageView viewLifeImage;
-	private ImageView imageRedFlash; 
-	//private ImageView imageViewNavigation;
+	private ImageView imageRedFlash;
 	private ImageView circle;
 
 	private final int[] lifeResources = { R.drawable.life, R.drawable.life1, R.drawable.life2, R.drawable.life3, R.drawable.life4 }; 
@@ -71,25 +66,18 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	private int screenWidth;
 	private int screenHeight;
 
-	/**
-	 * Is the android player alive
-	 */
-	//public static boolean alive = true;
-
 	private int lastFire = -1;
 	private int lastGas = -1;
 	private final Object touchMutex = new Object();
 	private boolean shootingToggle = false;
-	private boolean shootingDown = false;
-	//public float rotation = 0; 
-	
-	
+	private boolean shootingDown = false;	
 
 	/**
 	 * Video
 	 */
 	public VideoView viewBKVideo;
 	private String srcPath = "android.resource://com.example.agi_project_2_control/raw/introvideo";
+	
 	/**
 	 * Sound
 	 */
@@ -103,15 +91,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	/**
 	 * Starting Threads
 	 */
-	//private Thread threadImage;
-	//private Thread threadInput;
-	//private Thread threadInputAlert;
-
 	private boolean initialised = false;
-	//private String host = "192.168.0.16";
-	//private int port;
-	//private AlertDialog.Builder alertDialogBuilder;
-	//static boolean getHost = false;
 
 	/**
 	 * Called when the activity first creates.
@@ -121,7 +101,6 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		//airplane = new Airplane(this);
 		ss = new StateSender(this);
 		
 		final Context context = this;
@@ -140,17 +119,11 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 			public void onClick(DialogInterface dialog,int id) {
 				Editable hosttemp = input.getText();
 
-
-
-				//getHost = true;
-
-				//Log.d("MyApp","2\n");
 				try {
 					String host = hosttemp.toString().split(":")[0];
 					int port = Integer.parseInt(hosttemp.toString().split(":")[1]);
 					ss.setHost(host,port);
 					ss.connect();
-					//client.connect(host, port, MainActivity.this);
 					initialised = true;
 					continueRunning();
 
@@ -195,15 +168,6 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		this.screenWidth = display.getWidth();
 		this.screenHeight = display.getHeight();
 		ss.setScreenHeight(screenHeight);
-		//ss.startListenerThreads();
-		/*
-		try {
-			client.sendAction("Android");
-			client.sendAction("screenWidth" + screenWidth);
-			client.sendAction("screenHeight" + screenHeight);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
 
 		/**
 		 * Images
@@ -212,7 +176,6 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		this.gasImage 				= (ImageView)findViewById(R.id.imageGas);
 		this.viewLifeImage 			= (ImageView)findViewById(R.id.imageViewLife);
 		this.imageRedFlash 			= (ImageView)findViewById(R.id.imageRedFlash);
-		//this.imageViewNavigation 	= (ImageView)findViewById(R.id.imageViewNavigation);
 
 		/**
 		 * Accelerometer
@@ -222,6 +185,9 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
 
+		/*
+		 * Thread that handles music. (maybe should be moved to an accessible thread)
+		 */
 		(new Thread(){
 			@Override
 			public void run(){
@@ -238,9 +204,6 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 			}
 		}).start();
 
-		
-		//threadInput.setDaemon(true);
-		//threadInput.start();
 	}
 
 	/**
@@ -281,18 +244,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	public void onSensorChanged(SensorEvent event) {
 		float x = event.values[0];
 		float y = event.values[1];
-		//float z = event.values[2];
-
-		/*try {
-			client.sendAction("x"+Float.toString(x));
-			client.sendAction("y"+Float.toString(y));
-
-			//client.sendAction("z"+Float.toString(z)); No need to send at the moment we do not need to use it.
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-
+		
 		ss.setRotX(x);
 		ss.setRotY(y);
 
@@ -343,7 +295,6 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 				fire = -1;
 				fireImage.setBackgroundColor(Color.parseColor("#8600ACE0"));
 			}
-			//String msg = "";
 			if ((fire != this.lastFire) && (fire != -1)){
 				if (this.fireSoundPool[this.fireSoundPtr] == null)
 					this.fireSoundPool[this.fireSoundPtr] = MediaPlayer.create(this, R.raw.shot);
@@ -353,20 +304,11 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 				
 			}
 			if (gas != this.lastGas){
-				//msg += gas != -1 ? "+gas"+e.getY()+"\n" : "-gas\n";
-
 				if(gas !=-1)
 					ss.setSpeedFrac(1-e.getY()/(double)screenHeight);
 				else
 					ss.setSpeedFrac(0);
 			}
-			/*if (msg.isEmpty() == false){
-				try {
-					client.sendAction(msg + "\n");
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-			}*/
 			if(shootingToggle && !shootingDown)
 			{
 				ss.setShooting(true);
@@ -411,8 +353,6 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	public boolean onTouch(View arg0, MotionEvent arg1) {
 		return false;
 	}
-	//private boolean isHit = false;
-	//private int isHitNumber = 5;
 
 	public void lifeSpan() {	
 		this.viewLifeImage.setImageResource(lifeResources[ss.getLife()]);
