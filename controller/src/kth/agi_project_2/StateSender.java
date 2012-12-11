@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
@@ -51,6 +53,7 @@ public class StateSender {
 	private final long TIMEOUT = 3000;
 
 	private Thread reconnectThread;
+	private boolean reconnecting = false;
 	
 	private boolean running;
 
@@ -79,8 +82,9 @@ public class StateSender {
 
 					try {
 						sleep(TIMEOUT);
-						if(soc != null && !soc.isClosed())
+						if(soc != null && !soc.isClosed() && !reconnecting)
 						{
+
 							//shutDown();
 							System.err.println("Server timed out!");
 
@@ -110,6 +114,8 @@ public class StateSender {
 						sleep(1000);
 						if(soc !=null && soc.isClosed())
 						{
+							reconnecting = true;
+							sleep(130);
 							System.err.println("Reconnect Attempted");
 							try {
 								connect();
@@ -131,24 +137,40 @@ public class StateSender {
 			}
 
 		};
-		reconnectThread.start();
-		timeoutThread.start();
+		
+		
 	}
 	
 	// Connects with the specified host and port 
 	public void connect() throws UnknownHostException, IOException
 	{
-		soc = new Socket(host,port);
+		
+		InetSocketAddress sa = new InetSocketAddress(host, port);
+		soc = new Socket();
+		//soc.setSoTimeout(1500);
+		soc.connect(sa, 15000);
 		is = soc.getInputStream();
 		os = soc.getOutputStream();
 		isr = new InputStreamReader(is);
 		br = new BufferedReader(isr);
 		startListenerThreads();
 		System.err.println("Connection created");
+		
+		if(!timeoutThread.isAlive())
+		{
+			timeoutThread.start();
+		}
+		if(!reconnectThread.isAlive())
+		{
+			reconnectThread.start();
+		}
+		reconnecting = false;
 	}
 	
 	public void disconnect(boolean error) throws IOException
 	{
+		if(!reconnecting)
+		{
 		br.close();
 		isr.close();
 		os.close();
@@ -157,6 +179,7 @@ public class StateSender {
 		if(!error)
 		{
 			running = false;
+		}
 		}
 		
 	}
@@ -173,16 +196,20 @@ public class StateSender {
 			{
 				while(!soc.isClosed() && running)
 				{
+					
 					try {
-						String line = br.readLine();
-						timeoutThread.interrupt();
-						DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-						DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-						Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
-						setLife(Integer.parseInt(doc.getElementsByTagName("life").item(0).getTextContent()));
-						if(id==-1)
+						if(br.ready())
 						{
-							id = Integer.parseInt(doc.getElementsByTagName("id").item(0).getTextContent());
+							String line = br.readLine();
+							timeoutThread.interrupt();
+							DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+							DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+							Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
+							setLife(Integer.parseInt(doc.getElementsByTagName("life").item(0).getTextContent()));
+							if(id==-1)
+							{
+								id = Integer.parseInt(doc.getElementsByTagName("id").item(0).getTextContent());
+							}
 						}
 					} catch (IOException e1) {
 						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");

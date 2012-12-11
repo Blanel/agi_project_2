@@ -131,11 +131,15 @@ public class AndroidClient implements Runnable{
 			String line=null;
 			
 			try {
-				line = br.readLine();
+				if(br.ready())
+				{
+					line = br.readLine();
+				}
 			} catch (IOException e2) {
 				System.err.println("IOException when reading line!");
 				shutDown();
 			}
+			
 			if(line!=null && line.startsWith("<?xml") && line.endsWith("</androidClient>") )
 			{
 				timeoutThread.interrupt();
