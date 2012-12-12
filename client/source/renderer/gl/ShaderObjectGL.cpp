@@ -49,10 +49,10 @@ ShaderObjectGL::ShaderObjectGL(ShaderType type, const std::string& source)
         glGetShaderInfoLog(m_Identifier, length, &result, log);
 
         /* print an error message and the info log */
-        R_LOG_ERR("ShaderCompile: Unable to compile: " << log);
+        R_LOG_ERR("Unable to compile: " << log);
         free(log);
 
-        //glDeleteShader(m_Identifier);
+        glDeleteShader(m_Identifier);
         //return 0;
     }
 
