@@ -86,14 +86,15 @@ SimplexNoise::noise(f32 x, f32 y)
 {
     f32 t = 0.0f;
     f32 a = 1.0f;
+    f32 p = m_Persitence;
     f32 f = m_Frequency;
 
     for (u32 k = 0; k < m_Octaves; ++k)
     {
-        t += noise_value(x * f, y * f) * a;
-        //a *= m_Persitence;
-        a = pow(a, k);
+        a *= m_Persitence;
         f *= 2;
+                
+        t += noise_value(x * f, y * f) * a;
     }
 
     return t * m_Amplitude;

@@ -28,19 +28,30 @@ Terrain::Terrain(const std::shared_ptr<renderer::RenderContext>& ctx, i32 tile_w
 	m_pCtx = ctx;
 	m_TileSize = vec2_i32(tile_w, tile_h);
 
-	m_pNoiseGen = std::unique_ptr<SimplexNoise>(new SimplexNoise(0x4711));
-	m_pNoiseGen->set_frequency(0.95f/128.0f);
-	m_pNoiseGen->set_octaves(6);
-	m_pNoiseGen->set_amplitude(2.25f);
-	m_pNoiseGen->set_persistance(0.33f);
+	m_pNoiseGen = std::unique_ptr<SimplexNoise>(new SimplexNoise(111));
+	m_pNoiseGen->set_frequency(0.33f/256.0f);
+	m_pNoiseGen->set_octaves(8);
+	m_pNoiseGen->set_amplitude(15.f);
+	m_pNoiseGen->set_persistance(0.335f);
 
 	m_pShaderProgram = Device::graphics()->create_shader_program_from_file("../client/source/shaders/terrain.vs",
 																		   "../client/source/shaders/terrain.fs");
 
+	for (i32 i = -2; i < 2; ++i)
+	{
+		for (i32 j = -2; j < 2; ++j)
+		{
+			create_tile(i, j);
+		}
+	}
+
+	/*
 	create_tile(vec2_i32(0,0));
 	create_tile(vec2_i32(-1,0));
 	create_tile(vec2_i32(0,-1));
 	create_tile(vec2_i32(-1,-1));
+	*/
+
 
 	m_DrawNormals = true;
 }
@@ -75,18 +86,18 @@ Terrain::create_tile(const vec2_i32& p)
     i32 offset_x = p.x * m_TileSize.x;
     i32 offset_y = p.y * m_TileSize.y;
 
-    Noise2 noise2;
+    // Noise2 noise2;
 
 	for(i32 y=0; y<h ; y++)
 	{
 		for(i32 x=0 ; x<w ; x++)
 		{
-			f32 n = 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y + y, 0.6))*8;
+			f32 n = 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y + y));
 			//f32 n = (1 - noise2.noise(offset_x + x, offset_y + y));
 			hmap(x, y).val = n;
 
 			meshp->data().push_back(point3(x,y,n));
-			mesht->data().push_back(vec2(x / (128.0f / 16), y / (128.0f / 16)));
+			mesht->data().push_back(vec2(x / (256.0f / 16), y / (256.0f / 16)));
 		}
 	}
 
@@ -323,8 +334,8 @@ Terrain::create_tile(const vec2_i32& p)
 void 
 Terrain::draw(const std::shared_ptr<renderer::RenderContext>& ctx, const std::shared_ptr<Camera>& cam)
 {
-	::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-	//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	//::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	::glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 	m_pShaderProgram->use();		
 	//m_pDiffuseMap->bind();
@@ -334,9 +345,9 @@ Terrain::draw(const std::shared_ptr<renderer::RenderContext>& ctx, const std::sh
 
 	for (auto iter = m_Tiles.begin(); iter != m_Tiles.end(); ++iter)
 	{
-		mvp = cam->projection_matrix() * cam->view_matrix() * math::Transform::translate(iter->first.x * 127, iter->first.y * 127, 0);
+		mvp = cam->projection_matrix() * cam->view_matrix() * math::Transform::translate(iter->first.x * (m_TileSize.x - 1), iter->first.y * (m_TileSize.y - 1), 0);
 
-		// mv = cam->view_matrix() * math::Transform::translate(iter->first.first * 127, iter->first.second * 127, 0);
+		// mv = cam->view_matrix() * math::Transform::translate(iter->first.first * 255, iter->first.second * 255, 0);
 
 		auto& va = iter->second->vertex_array();
 		va->bind();

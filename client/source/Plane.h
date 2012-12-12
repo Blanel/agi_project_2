@@ -33,13 +33,15 @@ public:
 		  f32 angle = 0)
 		: m_pVertexArray(va)
 		, m_pGpuProgram(sp)
-		, m_Position(point3(x, y, 90))
+		, m_Position(point3(x, y, 200))
 		, m_Angle(angle)
 	{
+		/*
 		Image2D<pixel::RGB_u8> img("e:/test.tga");
 
 		m_DiffuseMap = Device::graphics()->create_texture_2d();
 		m_DiffuseMap->copy_from_sys_mem(img);	 
+		*/
 	}
 
 	virtual ~Plane()
@@ -55,7 +57,7 @@ public:
 
 		::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-		math::mat4 model 	  = Transform::translate(m_Position.x, m_Position.y, m_Position.z) * Transform::rotate_y(0);
+		math::mat4 model 	  = Transform::translate(m_Position.x, m_Position.y, m_Position.z) * Transform::rotate_y(0) * Transform::scale(5);
 		math::mat4 view 	  = cam->view_matrix();
 		math::mat4 projection = cam->projection_matrix();
 

@@ -19,8 +19,8 @@ private:
   std::map<std::string, std::string> configmap;
 
   configmap["graphics_api"] = "OpenGL";
-  configmap["screen_width"] = "1280";
-  configmap["screen_height"] = "720";
+  configmap["screen_width"] = "1920";
+  configmap["screen_height"] = "1080";
 
   return configmap;
  }

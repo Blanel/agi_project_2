@@ -69,7 +69,7 @@ public:
 			}			
 		}
 
-		TGA::write("E:/test123.tga", *(cube.front()));
+		//TGA::write("E:/test123.tga", *(cube.front()));
 
 		return cube;
 	}

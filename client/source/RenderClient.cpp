@@ -12,6 +12,7 @@
 #include "Light.h"
 
 #include "Color.h"
+#include "Noise2.h"
 
 #include "Device.h"
 #include "Config.h"
@@ -103,24 +104,25 @@ RenderClient::run()
 
     auto clearstate = std::make_shared<ClearState>();
     clearstate->set_buffers(ClearBuffers::ALL);
-    clearstate->set_color(Color4<f32>(0.2f, 0.3f, 0.4f, 1.0f));
+    clearstate->set_color(Color4<f32>(0.06, 0.03, 0.02, 1.0));
 
     auto scenestate = std::make_shared<SceneState>();
     //auto renderstate = std::make_shared<RenderState>();
 
 	auto planemesh = geo::Mesh::create_arrow();
 	auto planemeshva = ctx->create_vertex_array(planemesh);
-    /*
     auto planesp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/plane.vs", 
 	    	    												  	   "../client/source/shaders/plane.fs");
 
+
+    Plane p(planemeshva, planesp, 0.0f, 0.0f);
 
     auto blur_v_sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/blur_v.vs", 
 												  	    				 "../client/source/shaders/blur_v.fs");
 
     auto blur_h_sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/blur_h.vs", 
 												  	    				 "../client/source/shaders/blur_h.fs");
-	 */
+	 
 
     //Create and setup scene
 	auto camera = std::make_shared<PerspectiveCamera>();
@@ -138,17 +140,36 @@ RenderClient::run()
 	//TerrainManager tm(ctx, 100, 3, 128, 10, 2.5);
 	//tm.generate(gs);
 	
-	Terrain terrain(ctx);
+	Terrain terrain(ctx, 256, 256);
 
 	StopWatch timer;
 
-	camera->set_position(0, 0, 100);
-
-
+	camera->set_position(0, 0, 500);
 
 	auto io = std::make_shared<boost::asio::io_service>();
 	ClientSocket socket(io);
 
+/*
+	Noise2 noise2;
+
+	Image2D<pixel::RGB_u8> heightmap(256, 256);
+
+	for (u32 y = 0; y < 256; ++y)
+	{
+		for (u32 x = 0; x < 256; ++x)
+		{
+			f32 n = noise2.noise(x, y) * 128.0f + 128;
+			if (n < 0)
+				n = 0;
+			if (n > 255)
+				n = 255;
+			heightmap(x, y) = pixel::RGB_u8(n, n, n);
+		}
+	}
+
+
+	TGA::write("E:/testimage.tga", heightmap);
+*/
 
 	// CLOUD
 	CubeImage ci = CubeImage::generate_fractal_cube(); 
@@ -157,10 +178,10 @@ RenderClient::run()
 	cloud_fb->bind();
 	GLuint cloud_rt;
 	::glGenTextures(1, &cloud_rt);
-	::glBindTexture(GL_TEXTURE_2D, cloud_rt);
-	::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_pWindow->width(), m_pWindow->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0); //Empty image
-	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	::glBindTexture(GL_TEXTURE_RECTANGLE, cloud_rt);
+	::glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, m_pWindow->width(), m_pWindow->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0); //Empty image
+	::glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	::glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 	//Depth buffer
 	GLuint cloud_depth;
@@ -257,6 +278,7 @@ RenderClient::run()
 		ctx->clear(clearstate);
 
 		terrain.draw(ctx, camera);
+		p.draw(ctx, camera);
 
 		//draw gamestate
 		/*
