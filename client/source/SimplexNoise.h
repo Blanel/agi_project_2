@@ -99,6 +99,11 @@ public:
 		return sum;
 	}
 
+	f32 turbulence(f32 x, f32 y, i32 octaves, f32 lacunarity = 2.0f, f32 gain = 0.5f)
+	{
+		
+	}
+
 	f32 noise(f32 x, f32 y);
 	f32 noise(f32 x, f32 y, f32 z);
 	f32 noise(f32 x, f32 y, f32 z, f32 w);

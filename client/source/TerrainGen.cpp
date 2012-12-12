@@ -1,5 +1,6 @@
 #include "TerrainGen.h"
 #include "geo/Mesh.h"
+#include "Noise2.h"
 
 namespace revel
 {
@@ -27,11 +28,11 @@ Terrain::Terrain(const std::shared_ptr<renderer::RenderContext>& ctx, i32 tile_w
 	m_pCtx = ctx;
 	m_TileSize = vec2_i32(tile_w, tile_h);
 
-	m_pNoiseGen = std::unique_ptr<SimplexNoise>(new SimplexNoise());
-	m_pNoiseGen->set_frequency(2.0f/128.0f);
+	m_pNoiseGen = std::unique_ptr<SimplexNoise>(new SimplexNoise(0x4711));
+	m_pNoiseGen->set_frequency(0.95f/128.0f);
 	m_pNoiseGen->set_octaves(6);
-	m_pNoiseGen->set_amplitude(2.5f);
-	m_pNoiseGen->set_persistance(0.2f);
+	m_pNoiseGen->set_amplitude(2.25f);
+	m_pNoiseGen->set_persistance(0.33f);
 
 	m_pShaderProgram = Device::graphics()->create_shader_program_from_file("../client/source/shaders/terrain.vs",
 																		   "../client/source/shaders/terrain.fs");
@@ -74,11 +75,14 @@ Terrain::create_tile(const vec2_i32& p)
     i32 offset_x = p.x * m_TileSize.x;
     i32 offset_y = p.y * m_TileSize.y;
 
+    Noise2 noise2;
+
 	for(i32 y=0; y<h ; y++)
 	{
 		for(i32 x=0 ; x<w ; x++)
 		{
-			f32 n = m_pNoiseGen->noise(offset_x + x, offset_y + y);
+			f32 n = 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y + y, 0.6))*8;
+			//f32 n = (1 - noise2.noise(offset_x + x, offset_y + y));
 			hmap(x, y).val = n;
 
 			meshp->data().push_back(point3(x,y,n));
