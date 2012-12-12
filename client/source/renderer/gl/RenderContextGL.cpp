@@ -42,6 +42,7 @@ RenderContextGL::RenderContextGL(RenderWindowGL *win)
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetSwapInterval(0); 
 
+
     m_ContextHandle = SDL_GL_CreateContext(win->m_pSDLWindow);
 
     GLenum err = glewInit();

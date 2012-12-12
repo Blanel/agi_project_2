@@ -14,56 +14,97 @@ namespace revel
 	class AirPlane
 	{
 	public:
-		f32 x; 
-		f32 y;
-		f32 angle;
-		std::string name;
-		bool alive;
+		f32 m_x; 
+		f32 m_y;
+		f32 m_angle;
+		bool m_alive;
 
 		AirPlane();
+		AirPlane(f32 x, f32 y, f32 angle, bool alive)
+		{
+			m_x = x;
+			m_y = y;
+			m_angle = angle;
+			m_alive = alive;
+		}
 		~AirPlane();
+		
+		void set(f32 x, f32 y, f32 angle, bool alive)
+		{
+			m_x = x;
+			m_y = y;
+			m_angle = angle;
+			m_alive = alive;
+		}
 
 	};
 
 	class Bullet
 	{
 	public:
-		f32 x; 
-		f32 y;
-		f32 angle;
-		bool hit;
+		f32 m_x; 
+		f32 m_y;
+		f32 m_angle;
+		bool m_alive;
+		bool m_hit;
 
 		Bullet();
+		Bullet(f32 x, f32 y, f32 angle, bool alive, bool hit)
+		{
+			m_x = x;
+			m_y = y;
+			m_angle = angle;
+			m_alive = alive;
+			m_hit = hit;
+		}
 		~Bullet();
+		
+		void set(f32 x, f32 y, f32 angle, bool alive, bool hit)
+		{
+			m_x = x;
+			m_y = y;
+			m_angle = angle;
+			m_alive = alive;
+			m_hit = hit;
+		}
 	};
 
 
 	class GameState
 	{
-		std::vector<AirPlane> airplanes;
-		std::vector<Bullet> bullets;
+		std::map<i32, AirPlane> airplanes;
+		std::map<i32, Bullet> bullets;
 	public:
 		GameState();
 		~GameState();
 
-		void create_plane(f32 x, f32 y, f32 angle, const std::string name = "")
+		void create_plane(i32 id,f32 x, f32 y, f32 angle)
 		{
-			AirPlane p;
-			p.x = x;
-			p.y = y;
-			p.angle = angle;
-			p.name = name;
-			p.alive = true;
-
-			airplanes.push_back(p);
+			airplanes[id]=AirPlane(x,y,angle,true);
 		}
-
-		std::vector<AirPlane>& get_planes() 
+		
+		void update_plane(i32 id, f32 x, f32 y, f32 angle, bool alive)
+		{
+			airplanes[id]=AirPlane(x,y,angle,alive);
+		}
+		
+		void create_bullet(i32 id, f32 x, f32 y, f32 angle)
+		{
+			bullets[id]=Bullet(x,y,angle,true,false);
+			
+		}
+		
+		void update_bullet(i32 id, f32 x, f32 y, f32 angle, bool alive, bool hit)
+		{
+			bullets[id]=Bullet(x,y,angle,alive,hit);
+		}
+		
+		std::map<i32, AirPlane>& get_planes() 
 		{ 
 			return airplanes; 
 		}
 
-		std::vector<Bullet>& get_bullets()
+		std::map<i32, Bullet>& get_bullets()
 		{
 			return bullets;
 		}

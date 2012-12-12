@@ -43,6 +43,7 @@ using namespace revel::renderer;
 
 #include <pugixml.hpp>
 #include <thread>
+#include "FrameParser.h"
 
 #include "TerrainGen.h"
 
@@ -214,7 +215,7 @@ RenderClient::run()
 
 	try
 	{
-		socket.open("127.0.0.1", 1234);
+		socket.open(ip, port);
 	}
 	catch(std::exception &e)
 	{
@@ -222,11 +223,13 @@ RenderClient::run()
 	}
 
 	u32 fps = 0;
-
+	
+	FrameParser fp;
 	active_window()->show_cursor(false);
 
 	while (this->is_running())
 	{
+		//fp(
 		SDL_Event e;
 
 		//Poll events
@@ -268,7 +271,9 @@ RenderClient::run()
     	//update data
     	//poll socket
     	
-    	//auto xmlframe = clientsocket.get_frame_data();
+    	auto xmlframe = socket.read_frame_data();
+		
+		fp.parse_frame(xmlframe, gs);
 	
 		//camera->set_eye(gs.getCentre().first, gs.getCentre().second, 100);
 		//doc.save(std::cout);
