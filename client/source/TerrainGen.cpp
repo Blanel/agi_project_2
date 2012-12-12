@@ -91,7 +91,6 @@ Terrain::create_tile(const vec2_i32& p)
 		for(i32 x=0 ; x<w ; x++)
 		{
 			f32 n = 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y + y));
-			//f32 n = (1 - noise2.noise(offset_x + x, offset_y + y));
 			hmap(x, y).val = n;
 
 			meshp->data().push_back(point3(x,y,n));
@@ -117,10 +116,10 @@ Terrain::create_tile(const vec2_i32& p)
 		for (i32 x = 1; x < w-1; ++x)
 		{
 			//upper left
-			vec3 d = point3(x, y-1, hmap(x, y-1).val) - point3(x, y, hmap(x, y).val);
-			vec3 l = point3(x-1, y, hmap(x-1, y).val) - point3(x, y, hmap(x, y).val);
-			vec3 r = point3(x+1, y, hmap(x+1, y).val) - point3(x, y, hmap(x, y).val);
-			vec3 u = point3(x, y+1, hmap(x, y+1).val) - point3(x, y, hmap(x, y).val);
+			vec3 d = meshp->data()[(y-1) * w + x] - meshp->data()[y * w + x];
+			vec3 l = meshp->data()[y * w + x-1] - meshp->data()[y * w + x];
+			vec3 r = meshp->data()[y * w + x+1] - meshp->data()[y * w + x];
+			vec3 u = meshp->data()[(y+1) * w + x] - meshp->data()[y * w + x];
 
 			math::normalize(u);
 			math::normalize(d);

@@ -147,8 +147,9 @@ RenderClient::run()
 
 	StopWatch timer;
 
-	camera->set_position(0, 0, 100);
+	camera->set_position(0, 0, 500);
 
+	//Move this to a seperate thread
 	auto io = std::make_shared<boost::asio::io_service>();
 	ClientSocket socket(io);
 
