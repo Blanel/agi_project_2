@@ -8,8 +8,8 @@ public class Airplane extends Entity{
 	private String name;
 	//private final static double[] speeds = {1,2,3,4};
 	
-	private final static double BASESPEED = 0.01;
-	private final static double SPM = 0.01;
+	private final static double BASESPEED = 0.02;
+	private final static double SPM = 0.02;
 	
 	/*
 	 * Statuses for planes:

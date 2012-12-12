@@ -9,7 +9,8 @@ solution "AGI12 Project2"
 		files { "client/source/**.h", "client/source/**.cpp" }
 
 		if (os.is("windows")) then
-			includedirs { "K:/Applications/Mingw64/include", 
+
+			includedirs { "D:/Applications/mingw64/mingw64/include", 
 						  "client/source",
 						  "client/externals/mingw64/include",
 						  "client/externals/mingw64/include/SDL"

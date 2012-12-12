@@ -37,20 +37,10 @@ Terrain::Terrain(const std::shared_ptr<renderer::RenderContext>& ctx, i32 tile_w
 	m_pShaderProgram = Device::graphics()->create_shader_program_from_file("../client/source/shaders/terrain.vs",
 																		   "../client/source/shaders/terrain.fs");
 
-	for (i32 i = -2; i < 2; ++i)
-	{
-		for (i32 j = -2; j < 2; ++j)
-		{
-			create_tile(i, j);
-		}
-	}
-
-	/*
-	create_tile(vec2_i32(0,0));
+	create_tile(vec2_i32(0,0));	
 	create_tile(vec2_i32(-1,0));
 	create_tile(vec2_i32(0,-1));
 	create_tile(vec2_i32(-1,-1));
-	*/
 
 
 	m_DrawNormals = true;
@@ -331,7 +321,7 @@ Terrain::create_tile(const vec2_i32& p)
 void 
 Terrain::draw(const std::shared_ptr<renderer::RenderContext>& ctx, const std::shared_ptr<Camera>& cam)
 {
-	// ::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	//::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	::glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 	m_pShaderProgram->use();		

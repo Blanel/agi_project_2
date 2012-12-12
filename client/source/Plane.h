@@ -33,7 +33,7 @@ public:
 		  f32 angle = 0)
 		: m_pVertexArray(va)
 		, m_pGpuProgram(sp)
-		, m_Position(point3(x, y, 200))
+		, m_Position(point3(x, y, 50))
 		, m_Angle(angle)
 	{
 		/*

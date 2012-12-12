@@ -143,12 +143,15 @@ RenderClient::run()
 	GameState gs;
 	//TerrainManager tm(ctx, 100, 3, 128, 10, 2.5);
 	//tm.generate(gs);
+
+	gs.set_plane_va(planemeshva);
+	gs.set_plane_sp(planesp);
 	
 	Terrain terrain(ctx, 128, 128);
 
 	StopWatch timer;
 
-	camera->set_position(0, 0, 500);
+	camera->set_position(0, 0, 200);
 
 	//Move this to a seperate thread
 	auto io = std::make_shared<boost::asio::io_service>();
@@ -258,8 +261,8 @@ RenderClient::run()
 	        case SDL_KEYDOWN:
 	        	if (e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 	        		m_Running = false;
-	        	else if (e.key.keysym.scancode == SDL_SCANCODE_A);
-	        		camera->set_position(0, 0, 120);
+	        	//else if (e.key.keysym.scancode == SDL_SCANCODE_A);
+	        	//	camera->set_position(0, 0, 120);
 	        	break;
 
 	        case SDL_QUIT:
@@ -274,11 +277,13 @@ RenderClient::run()
     	auto xmlframe = socket.read_frame_data();
 		
 		fp.parse_frame(xmlframe, gs);
-	
+		//p.set_position(gs.get_planes()[0].m_x, gs.get_planes()[0].m_y);
+		//R_LOG_INFO("Plane [0] pos: " << gs.get_planes()[0].m_x << ", " << gs.get_planes()[0].m_y);
 		//camera->set_eye(gs.getCentre().first, gs.getCentre().second, 100);
 		//doc.save(std::cout);
 		//R_LOG_INFO("TS: " << doc.child("tick").attribute("ts").value());
 
+		//gs.draw(ctx, camera);
       	//std::cout << xmlframe << std::endl;
 
       	fps++;
@@ -296,7 +301,7 @@ RenderClient::run()
 		ctx->clear(clearstate);
 
 		terrain.draw(ctx, camera);
-		p.draw(ctx, camera);
+		//p.draw(ctx, camera);
 
 		//draw gamestate
 		/*

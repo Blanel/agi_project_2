@@ -11,7 +11,7 @@ public class GameState implements Runnable {
 	private ListIterator<Bullet> bIt;
 	private int planeIdPool;
 	private int bulletIdPool;
-	private final double MAX_DISTANCE = 128;
+	private final double MAX_DISTANCE = 8;
 	private final long UPDATEFREQUENCY = 4000000;
 	
 	
@@ -159,7 +159,7 @@ public class GameState implements Runnable {
 	{
 		Coord tempC = new Coord(0,0);
 		
-		if(airplanes.size() !=0)
+		if(airplanes.size() >1)
 		{
 			Airplane tempA;
 			aIt = airplanes.listIterator();
