@@ -9,7 +9,8 @@ in vec2 UV;
 
 void main()
 {	
-	//FragmentColor = vec4(Normal, 1.0) + texture(diffuseMap, UV) * 0.001;
+	// FragmentColor = vec4(Normal, 1.0) + texture(diffuseMap, UV) * 0.001;
+
 	vec3 n = normalize(Normal);
 	float nDotL = max(0.0, dot(n, normalize(vec3(1, 0, 1))));
 

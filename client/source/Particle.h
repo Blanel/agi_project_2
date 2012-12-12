@@ -53,6 +53,11 @@ public:
 		}
 	}
 
+	void draw()
+	{
+		
+	}
+
 };
 
 }

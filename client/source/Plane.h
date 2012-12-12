@@ -57,7 +57,7 @@ public:
 
 		::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-		math::mat4 model 	  = Transform::translate(m_Position.x, m_Position.y, m_Position.z) * Transform::rotate_y(0) * Transform::scale(5);
+		math::mat4 model 	  = Transform::translate(m_Position.x, m_Position.y, m_Position.z) * Transform::rotate_y(0) * Transform::scale(2);
 		math::mat4 view 	  = cam->view_matrix();
 		math::mat4 projection = cam->projection_matrix();
 

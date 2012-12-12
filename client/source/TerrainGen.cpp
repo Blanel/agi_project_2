@@ -28,7 +28,7 @@ Terrain::Terrain(const std::shared_ptr<renderer::RenderContext>& ctx, i32 tile_w
 	m_pCtx = ctx;
 	m_TileSize = vec2_i32(tile_w, tile_h);
 
-	m_pNoiseGen = std::unique_ptr<SimplexNoise>(new SimplexNoise(111));
+	m_pNoiseGen = std::unique_ptr<SimplexNoise>(new SimplexNoise(2));
 	m_pNoiseGen->set_frequency(0.33f/256.0f);
 	m_pNoiseGen->set_octaves(8);
 	m_pNoiseGen->set_amplitude(15.f);
@@ -83,12 +83,10 @@ Terrain::create_tile(const vec2_i32& p)
 
     Image2D<pixel::Gray_f32> hmap(w, h);
 
-    i32 offset_x = p.x * m_TileSize.x;
-    i32 offset_y = p.y * m_TileSize.y;
+    i32 offset_x = p.x * (m_TileSize.x - 1);
+    i32 offset_y = p.y * (m_TileSize.y - 1);
 
-    // Noise2 noise2;
-
-	for(i32 y=0; y<h ; y++)
+    for(i32 y=0; y<h ; y++)
 	{
 		for(i32 x=0 ; x<w ; x++)
 		{
@@ -106,8 +104,8 @@ Terrain::create_tile(const vec2_i32& p)
 	{
 		for(i32 x = 0; x < w-1 ; x++)
 		{
-			meshi->add_triangle((y+1)*w+x, (y+1)*w+(x+1), y*w+(x+1));
-    		meshi->add_triangle(y*w+(x+1), y*w+x, (y+1)*w+x);
+			meshi->add_triangle((y)*w+x, (y)*w+(x+1), (y+1)*w+(x+1));
+    		meshi->add_triangle((y+1)*w+(x+1), (y+1)*w+x, (y)*w+x);
 		}		
 	}
 
@@ -119,10 +117,10 @@ Terrain::create_tile(const vec2_i32& p)
 		for (i32 x = 1; x < w-1; ++x)
 		{
 			//upper left
-			vec3 u = point3(x, y-1, hmap(x, y-1).val) - point3(x, y, hmap(x, y).val);
+			vec3 d = point3(x, y-1, hmap(x, y-1).val) - point3(x, y, hmap(x, y).val);
 			vec3 l = point3(x-1, y, hmap(x-1, y).val) - point3(x, y, hmap(x, y).val);
 			vec3 r = point3(x+1, y, hmap(x+1, y).val) - point3(x, y, hmap(x, y).val);
-			vec3 d = point3(x, y+1, hmap(x, y+1).val) - point3(x, y, hmap(x, y).val);
+			vec3 u = point3(x, y+1, hmap(x, y+1).val) - point3(x, y, hmap(x, y).val);
 
 			math::normalize(u);
 			math::normalize(d);
@@ -134,7 +132,7 @@ Terrain::create_tile(const vec2_i32& p)
 			vec3 lrn = math::cross(d, r);
 			vec3 lln = math::cross(l, d);
 
-			normals[y * h + x] = -(uln + urn + lrn + lln)/4;
+			normals[y * h + x] = (uln + urn + lrn + lln)/4;
 		}
 	}
 
@@ -147,16 +145,17 @@ Terrain::create_tile(const vec2_i32& p)
 	//points for adjacent tiles
 	for (i32 x = 0; x < w; ++x)
 	{
-		up.push_back(point3(p.x * w + x, p.y * h - 1, m_pNoiseGen->noise(p.x * w + x, p.y * h - 1)));
-		down.push_back(point3(p.x * w + x, p.y * h + 1, m_pNoiseGen->noise(p.x * w + x, p.y * h + 1)));
+		up.push_back(point3(x, h, m_pNoiseGen->noise(offset_x + x, offset_y + h)));
+		down.push_back(point3(x, -1, m_pNoiseGen->noise(offset_x + x, offset_y - 1)));
 	}
+
 	for (i32 y = 0; y < h; ++y)
 	{
-		left.push_back(point3(p.x * w - 1, p.y * h + y, m_pNoiseGen->noise(p.x * w - 1, p.y * h + y)));
-		right.push_back(point3(p.x * w + 1, p.y * h + y, m_pNoiseGen->noise(p.x * w + 1, p.y * h + y)));
+		left.push_back(point3(-1, y, m_pNoiseGen->noise(offset_x - 1, offset_y + y)));
+		right.push_back(point3(w, y, m_pNoiseGen->noise(offset_x + w, offset_y + y)));
 	}
 	
-	//upper
+	//lower
 	for (i32 x = 0; x < w; ++x)
 	{
 		vec3 u, l, r, d;
@@ -164,24 +163,24 @@ Terrain::create_tile(const vec2_i32& p)
 
 		if (x == 0)
 		{
-			u = up[x] - p;
+			u = meshp->data()[1 * w + x] - p;
 			l = left[0] - p;
 			r = meshp->data()[0 * w + (x+1)] - p;
-			d = meshp->data()[h-1 * w + (x)] - p;
+			d = down[x] - p;
 		}
 		else if (x == w-1)
 		{
-			u = up[x] - p;
+			u = meshp->data()[1 * w + x] - p;
 			l = meshp->data()[0 * w + (x-1)] - p;
-			r = right[0] -p;
-			d = meshp->data()[h-1 * w + (x)] - p;
+			r = right[0] - p;
+			d = down[x] - p;
 		}
 		else
 		{
-			u = up[x] - p;
+			u = meshp->data()[1 * w + x] - p;
 			l = meshp->data()[0 * w + (x-1)] - p;
 			r = meshp->data()[0 * w + (x+1)] - p;
-			d = meshp->data()[1 * w + (x)] - p;
+			d = down[x] - p;
 		}
 
 		math::normalize(u);
@@ -197,7 +196,7 @@ Terrain::create_tile(const vec2_i32& p)
 		normals[0 * w + x] = (uln + urn + lrn + lln)/4;
 	}	
 
-	//lower
+	//upper
 	for (i32 x = 0; x < w; ++x)
 	{
 		vec3 u, l, r, d;
@@ -205,24 +204,24 @@ Terrain::create_tile(const vec2_i32& p)
 
 		if (x == 0)
 		{
-			u = meshp->data()[(h-2) * w + x] - p;
+			u = up[x] - p;
 			l = left[h-1] - p;
 			r = meshp->data()[(h-1) * w + (x+1)] - p;
-			d = down[0] - p;
+			d = meshp->data()[(h-2) * w + x] - p; 
 		}
 		else if (x == w-1)
 		{
-			u = meshp->data()[(h-2) * w + x] - p;
+			u = up[x] - p;
 			l = meshp->data()[(h-1) * w + (x-1)] - p;
 			r = right[h-1] - p;
-			d = down[w-1] - p;
+			d = meshp->data()[(h-2) * w + x] - p; 
 		}
 		else
 		{
-			u = meshp->data()[(h-2) * w + x] - p;
+			u = up[x] - p;
 			l = meshp->data()[(h-1) * w + (x-1)] - p;
 			r = meshp->data()[(h-1) * w + (x+1)] - p;
-			d = down[x] - meshp->data()[(h-1) * w + x];
+			d = meshp->data()[(h-2) * w + x] - p; 
 		}
 
 		math::normalize(u);
@@ -247,24 +246,24 @@ Terrain::create_tile(const vec2_i32& p)
 
 		if (y == 0)
 		{			
-			u = up[0] - p;
-			l = left[0] - p;
-			r = meshp->data()[y * w + 1] - p;
-			d = meshp->data()[(y+1) * w + 0] - p;
-		}
-		else if (y == (h-1))
-		{
-			u = meshp->data()[(y-1) * w + 0] - p;
+			u = meshp->data()[(y+1) * w + 0] - p;
 			l = left[y] - p;
 			r = meshp->data()[y * w + 1] - p;
 			d = down[0] - p;
 		}
-		else
+		else if (y == (h-1))
 		{
-			u = meshp->data()[(y-1) * w + 0] - p;
+			u = up[0] - p;
 			l = left[y] - p;
 			r = meshp->data()[y * w + 1] - p;
-			d = meshp->data()[(y+1) * w + 0] - p;
+			d = meshp->data()[(y-1) * w] - p;
+		}
+		else
+		{
+			u = meshp->data()[(y+1) * w + 0] - p;
+			l = left[y] - p;
+			r = meshp->data()[y * w + 1] - p;
+			d = meshp->data()[(y-1) * w + 0] - p;
 		}
 
 		math::normalize(u);
@@ -278,9 +277,8 @@ Terrain::create_tile(const vec2_i32& p)
 		vec3 lln = math::cross(l, d);
 
 		normals[y * w + 0] = (uln + urn + lrn + lln)/4;
-		//normals[y * w + 0] = vec3::UnitZ;
 	}
-
+	
 	//right
 	for (i32 y = 0; y < h; ++y)
 	{
@@ -289,24 +287,24 @@ Terrain::create_tile(const vec2_i32& p)
 
 		if (y == 0)
 		{
-			u = up[w-1] - p;
-			l = meshp->data()[0 * w + (w-2)] - p;
-			r = right[y] - p;
-			d = meshp->data()[(y+1) * w + (w-1)] - p;
-		}
-		else if (y == (h-1))
-		{
-			u = meshp->data()[(y-1) * w + (w-1)] - p;
-			l = meshp->data()[0 * w + (w-2)] - p;
+			u = meshp->data()[(y+1) * w + (w-1)] - p;
+			l = meshp->data()[y * w + (w-2)] - p;
 			r = right[y] - p;
 			d = down[w-1] - p;
 		}
+		else if (y == (h-1))
+		{
+			u = up[w-1] - p;
+			l = meshp->data()[y * w + (w-2)] - p;
+			r = right[y] - p;
+			d = meshp->data()[(y-1) * w + (w-1)] - p;
+		}
 		else
 		{
-			u = meshp->data()[(y-1) * w + (w-1)] - p;
-			l = meshp->data()[0 * w + (w-2)] - p;
+			u = meshp->data()[(y+1) * w + (w-1)] - p;
+			l = meshp->data()[y * w + (w-2)] - p;
 			r = right[y] - p;
-			d = meshp->data()[(y+1) * w + (w-1)] - p;
+			d = meshp->data()[(y-1) * w + (w-1)] - p;
 		}
 
 		math::normalize(u);
@@ -334,7 +332,7 @@ Terrain::create_tile(const vec2_i32& p)
 void 
 Terrain::draw(const std::shared_ptr<renderer::RenderContext>& ctx, const std::shared_ptr<Camera>& cam)
 {
-	//::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	// ::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	::glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 	m_pShaderProgram->use();		

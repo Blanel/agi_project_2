@@ -12,6 +12,9 @@
 
 #include "SimplexNoise.h"
 
+#include <string>
+#include <sstream>
+
 namespace revel
 {
 
@@ -91,8 +94,34 @@ public:
 		pugi::xml_document doc;
 		pugi::xml_parse_result result = doc.load_file(file.c_str());
 
+		auto cloud = std::make_shared<geo::Mesh>();
 
-		geo::Mesh cloud;
+	    auto cloudp = cloud->create_vertex_attrib<point3>("position");
+	    auto cloudn = cloud->create_vertex_attrib<vec3>("normal");
+
+		u32 vcount = doc.child("COLLADA").child("library_geometries").child("geometry").child("mesh").child("source").child("float_array").attribute("count").as_uint() / 3;
+		auto vtext = doc.child("COLLADA").child("library_geometries").child("geometry").child("mesh").child("source").child("float_array");
+
+		auto vstr = vtext.child_value();
+		std::stringstream vss(vstr);
+
+		f32 x, y, z;
+
+		for (u32 i = 0; i < vcount; ++i)
+		{
+			vss >> x;
+			vss >> y;
+			vss >> z;
+
+			cloudp->data().push_back(point3(x, y, z));
+		}
+
+		R_LOG_INFO("POINT: " << x << ", " << y << ", " << z);
+
+		point3 p(x, y, z);
+
+
+
 
 	}
 

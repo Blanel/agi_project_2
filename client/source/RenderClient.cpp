@@ -124,7 +124,7 @@ RenderClient::run()
 												  	    				 "../client/source/shaders/blur_h.fs");
 	 
 
-    //Create and setup scene
+	//Create and setup scene
 	auto camera = std::make_shared<PerspectiveCamera>();
 	
 	//ctx->texture_unit(0).set_texture();
@@ -134,17 +134,20 @@ RenderClient::run()
     Scene scene(ctx);
     scene.set_camera(camera);
 
+    Cloud c;
+    c.load("e:/cloud4.dae");
+
     auto tex3d = Device::graphics()->create_texture_3d();
 
 	GameState gs;
 	//TerrainManager tm(ctx, 100, 3, 128, 10, 2.5);
 	//tm.generate(gs);
 	
-	Terrain terrain(ctx, 256, 256);
+	Terrain terrain(ctx, 128, 128);
 
 	StopWatch timer;
 
-	camera->set_position(0, 0, 500);
+	camera->set_position(0, 0, 100);
 
 	auto io = std::make_shared<boost::asio::io_service>();
 	ClientSocket socket(io);
@@ -171,6 +174,8 @@ RenderClient::run()
 	TGA::write("E:/testimage.tga", heightmap);
 */
 
+	::glEnable(GL_CULL_FACE);
+
 	// CLOUD
 	CubeImage ci = CubeImage::generate_fractal_cube(); 
 
@@ -178,10 +183,17 @@ RenderClient::run()
 	cloud_fb->bind();
 	GLuint cloud_rt;
 	::glGenTextures(1, &cloud_rt);
+	::glBindTexture(GL_TEXTURE_2D, cloud_rt);
+	::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_pWindow->width(), m_pWindow->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0); //Empty image
+	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	/*
 	::glBindTexture(GL_TEXTURE_RECTANGLE, cloud_rt);
 	::glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, m_pWindow->width(), m_pWindow->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0); //Empty image
 	::glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	::glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	*/
 
 	//Depth buffer
 	GLuint cloud_depth;
