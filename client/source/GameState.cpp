@@ -11,7 +11,7 @@ namespace revel
 	{
 
 	}
-	std::pair<f32,f32> GameState::getCentre()
+	/*std::pair<f32,f32> GameState::getCentre()
 	{
 		if(airplanes.size()==0)
 			return std::make_pair<f32,f32>(0,0);
@@ -57,7 +57,7 @@ namespace revel
 			}
 			return std::make_pair<std::pair<f32,f32>,std::pair<f32,f32>>(std::make_pair(xmin,ymin), std::make_pair(xmax,ymax));
 		}
-	}
+	}*/
 
 	AirPlane::AirPlane()
 	{

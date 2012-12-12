@@ -14,21 +14,27 @@ namespace revel
 	class AirPlane
 	{
 	public:
-		f32 x; 
-		f32 y;
-		f32 angle;
-		std::string name;
-		bool alive;
+		f32 m_x; 
+		f32 m_y;
+		f32 m_angle;
+		bool m_alive;
 
 		AirPlane();
+		AirPlane(f32 x, f32 y, f32 angle, bool alive)
+		{
+			m_x = x;
+			m_y = y;
+			m_angle = angle;
+			m_alive = alive;
+		}
 		~AirPlane();
 		
-		void set(f32 xn, f32 yn, f32 anglen, bool aliven)
+		void set(f32 x, f32 y, f32 angle, bool alive)
 		{
-			x = xn;
-			y = yn;
-			angle = anglen;
-			alive = aliven;
+			m_x = x;
+			m_y = y;
+			m_angle = angle;
+			m_alive = alive;
 		}
 
 	};
@@ -36,22 +42,30 @@ namespace revel
 	class Bullet
 	{
 	public:
-		f32 x; 
-		f32 y;
-		f32 angle;
-		bool alive;
-		bool hit;
+		f32 m_x; 
+		f32 m_y;
+		f32 m_angle;
+		bool m_alive;
+		bool m_hit;
 
 		Bullet();
+		Bullet(f32 x, f32 y, f32 angle, bool alive, bool hit)
+		{
+			m_x = x;
+			m_y = y;
+			m_angle = angle;
+			m_alive = alive;
+			m_hit = hit;
+		}
 		~Bullet();
 		
-		void set(f32 xn, f32 yn, f32 anglen, bool aliven, bool hitn)
+		void set(f32 x, f32 y, f32 angle, bool alive, bool hit)
 		{
-			x = xn;
-			y = yn;
-			angle = anglen;
-			alive = aliven;
-			hit = hitn;
+			m_x = x;
+			m_y = y;
+			m_angle = angle;
+			m_alive = alive;
+			m_hit = hit;
 		}
 	};
 
@@ -66,36 +80,23 @@ namespace revel
 
 		void create_plane(i32 id,f32 x, f32 y, f32 angle)
 		{
-			AirPlane p;
-			p.x = x;
-			p.y = y;
-			p.angle = angle;
-			p.alive = true;
-
-			airplanes.insert(std::pair<i32,AirPlane>(id,p));
+			airplanes[id]=AirPlane(x,y,angle,true);
 		}
 		
 		void update_plane(i32 id, f32 x, f32 y, f32 angle, bool alive)
 		{
-			airplanes.find(id)->second.set(x,y,angle,alive);
+			airplanes[id]=AirPlane(x,y,angle,alive);
 		}
 		
 		void create_bullet(i32 id, f32 x, f32 y, f32 angle)
 		{
-			Bullet b;
-			b.x = x;
-			b.y = y;
-			b.angle = angle;
-			b.alive = true;
-			b.hit = false;
-			
-			bullets.insert(std::pair<i32,Bullet>(id,b));
+			bullets[id]=Bullet(x,y,angle,true,false);
 			
 		}
 		
 		void update_bullet(i32 id, f32 x, f32 y, f32 angle, bool alive, bool hit)
 		{
-			bullets.find(id)->second.set(x,y,angle,alive,hit);
+			bullets[id]=Bullet(x,y,angle,alive,hit);
 		}
 		
 		std::map<i32, AirPlane>& get_planes() 
