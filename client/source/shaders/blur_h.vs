@@ -1,4 +1,4 @@
-
+#version 410
 
 uniform mat4 r_MVP;
 
@@ -9,6 +9,6 @@ out vec2 uv0;
 
 void main()
 {
-	gl_Position = r_MVP * in_vertexPos;
-	uv0 = in_vertexUV0;n
+	gl_Position = r_MVP * vec4(in_vertexPos, 1.0);
+	uv0 = in_vertexUV0;
 }

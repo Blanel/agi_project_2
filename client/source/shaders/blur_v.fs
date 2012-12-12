@@ -1,3 +1,6 @@
+#version 410
+
+
 in vec2 uv0;
 
 uniform sampler2D scene_texture;
@@ -14,12 +17,12 @@ void main()
 	vec3 tc = vec3(1.0, 0.0, 0.0);
 
 	vec2 uv = uv0;
-	tc = texture2D(scene_texture, uv).rgb * weight[0];
+	tc = texture(scene_texture, uv).rgb * weight[0];
 
 	for (int i = 1; i < 3; ++i)
 	{
-		tv += texture2D(scene_texture, uv + vec2(0.0, offset[i])/rt_h).rgb * weight[i];
-		tv += texture2D(scene_texture, uv - vec2(0.0, offset[i])/rt_h).rgb * weight[i];
+		tc += texture(scene_texture, uv + vec2(0.0, offset[i])/rt_h).rgb * weight[i];
+		tc += texture(scene_texture, uv - vec2(0.0, offset[i])/rt_h).rgb * weight[i];
 	}
 
 	color = vec4(tc, 1.0);
