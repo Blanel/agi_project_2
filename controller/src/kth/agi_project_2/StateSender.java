@@ -137,7 +137,7 @@ public class StateSender {
 
 	private double getRotation()
 	{
-		return -((Math.atan2(rotX, rotY)+Math.PI/2)*10/Math.PI);
+		return ((Math.atan2(rotX, rotY)+Math.PI/2)*10/Math.PI);
 	}
 	public void startListenerThreads()
 	{
