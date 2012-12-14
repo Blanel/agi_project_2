@@ -42,14 +42,13 @@ public class AndroidClient implements Runnable{
 	private Thread timeoutThread;
 	private Thread pingThread;
 	private static final long PING = 1000;
-	private static final long TIMEOUT =10000; 
+	private static final long TIMEOUT =15000; 
 
-	private boolean shuttingDown = false;
-
+	private boolean shuttingDown;
 
 	public AndroidClient(Socket soc, GameState gs) throws IOException
 	{
-
+		shuttingDown = false;
 		this.sock = soc;
 		is = soc.getInputStream();
 		isr = new InputStreamReader(is);
@@ -196,6 +195,12 @@ public class AndroidClient implements Runnable{
 			{
 				if(line != null)
 					System.err.println(line);
+			}
+			try {
+				Thread.sleep(70);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 

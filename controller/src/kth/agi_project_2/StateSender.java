@@ -9,6 +9,7 @@ import java.io.StringReader;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
@@ -50,11 +51,11 @@ public class StateSender {
 	private int life = 5;
 
 	private Thread timeoutThread; 
-	private final long TIMEOUT = 3000;
+	private final long TIMEOUT = 15000;
 
 	private Thread reconnectThread;
-	private boolean reconnecting = false;
-	
+	//private boolean reconnecting = false;
+
 	private Thread senderThread;
 	private Thread listenerThread;
 
@@ -64,8 +65,13 @@ public class StateSender {
 
 	private final static long INTERVALL=40;
 
+	private int connectMut;
+	private int disconnMut;
+
 	public StateSender(MainActivity m)
 	{
+		connectMut = 0;
+		disconnMut = 1;
 		running = true;
 		ma = m;
 		speedFrac = 0;
@@ -75,245 +81,45 @@ public class StateSender {
 		rotY = 0;
 
 		// A timeout thread. If nothing is heard from the server in a long while, disconnect 
-		timeoutThread = new Thread()
-		{
-			public void run()
-			{
-
-				while(running)
-				{
-
-					try {
-						sleep(TIMEOUT);
-						if(soc != null && !soc.isClosed() && !reconnecting)
-						{
-
-							//shutDown();
-							System.err.println("Server timed out!");
-
-							try{
-								disconnect(true);
-							}
-							catch(IOException e)
-							{
-								System.err.println("IO Exception!");
-							}
-						}
-					} catch (InterruptedException e) {
-						// Do nothing!
-					}
-				}
-			}
-		};
+		
 
 		// A reconnect thread. If connection is lost, attempt to reconnect. 
-		reconnectThread = new Thread()
-		{
-			public void run()
-			{
-				while(running)
-				{
-					try{
-						sleep(1000);
-						if(soc !=null && soc.isClosed())
-						{
-							reconnecting = true;
-							sleep(130);
-							System.err.println("Reconnect Attempted");
-							try {
-								connect();
-							} catch (UnknownHostException e) {
-								e.printStackTrace();
-								try {
-									disconnect(true);
-								} catch (IOException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-							} catch (IOException e) {
-								e.printStackTrace();
-								try {
-									disconnect(true);
-								} catch (IOException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-							}
-						}
-					}
-					catch(InterruptedException e)
-					{
+		
 
-					}
+		
 
-				}
-			}
-
-		};
-
-		listenerThread = new Thread()
-		{
-			public void run()
-			{
-				while(!soc.isClosed() && running)
-				{
-
-					try {
-						if(br.ready())
-						{
-							String line = br.readLine();
-							timeoutThread.interrupt();
-							DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-							DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-							Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
-							setLife(Integer.parseInt(doc.getElementsByTagName("life").item(0).getTextContent()));
-							if(id==-1)
-							{
-								id = Integer.parseInt(doc.getElementsByTagName("id").item(0).getTextContent());
-							}
-						}
-					} catch (IOException e1) {
-						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
-						try {
-							disconnect(true);
-						} catch (IOException e) {
-							System.err.println("an IO derp");
-						}
-						return;
-					} catch (SAXException e1) {
-						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
-						try {
-							disconnect(true);
-						} catch (IOException e) {
-							System.err.println("an IO derp");
-						}
-						return;
-					} catch (ParserConfigurationException e1) {
-						System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
-						try {
-							disconnect(true);
-						} catch (IOException e) {
-							System.err.println("an IO derp");
-						}
-						return;
-					}
-				}
-				System.err.println("The socket was closed! Reciever");
-			}
-		};
-				
-		senderThread = new Thread()
-		{
-			public void run()
-			{
-				while(!soc.isClosed() && running) // TODO Create sane operation here
-				{
-					// Send hit info to android
-					//System.err.println(soc.isClosed());
-					try {
-						DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-						DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-						Document doc = docBuilder.newDocument();
-
-						Element rootElement = doc.createElement("androidClient");
-						doc.appendChild(rootElement);
-						Attr ts = doc.createAttribute("ts");
-						ts.setValue(""+System.currentTimeMillis());
-						rootElement.setAttributeNode(ts);
-
-						Element idTag = doc.createElement("id");
-						rootElement.appendChild(idTag);
-						idTag.appendChild(doc.createTextNode(""+id));
-
-						Element rotationTag = doc.createElement("rotation");
-						rootElement.appendChild(rotationTag);
-						rotationTag.appendChild(doc.createTextNode(""+getRotation()));
-
-						Element shootingTag = doc.createElement("shooting");
-						rootElement.appendChild(shootingTag);
-						shootingTag.appendChild(doc.createTextNode(""+shooting));
-						shooting = false;
-
-						Element speedmodTag = doc.createElement("speedmod");
-						rootElement.appendChild(speedmodTag);
-						speedmodTag.appendChild(doc.createTextNode(""+speedFrac));
-
-						TransformerFactory transformerFactory = TransformerFactory.newInstance();
-						Transformer transformer = transformerFactory.newTransformer();
-						DOMSource source = new DOMSource(doc);
-
-						StreamResult result = new StreamResult(os);
-						transformer.transform(source,result);
-						os.write("\n".getBytes());
-						os.flush();
-						//System.err.println("Sent: "+System.currentTimeMillis());
-
-					} catch (ParserConfigurationException e1) {
-						System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
-						try {
-							disconnect(true);
-						} catch (IOException e) {
-							System.err.println("an IO derp");
-						}
-						return;
-					} catch (TransformerException e1) {
-						System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
-						try {
-							disconnect(true);
-						} catch (IOException e) {
-							System.err.println("an IO derp");
-						}
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-
-
-				}
-				System.err.println("The socket was closed! Sender");
-			}
-		};
+		
 
 	}
 
 	// Connects with the specified host and port 
-	public void connect() throws UnknownHostException, IOException
+	public void connect() throws UnknownHostException, IOException, SocketTimeoutException
 	{
-
-		InetSocketAddress sa = new InetSocketAddress(host, port);
-		soc = new Socket();
-		//soc.setSoTimeout(1500);
-		soc.connect(sa, 15000);
-		is = soc.getInputStream();
-		os = soc.getOutputStream();
-		isr = new InputStreamReader(is);
-		br = new BufferedReader(isr);
-		startListenerThreads();
-		System.err.println("Connection created");
-
-		if(!timeoutThread.isAlive())
+		System.err.println("Connection called");
+		if(disconnMut>connectMut)
 		{
-			timeoutThread.start();
+			connectMut++;
+			System.err.println("Connection attempting");
+			InetSocketAddress sa = new InetSocketAddress(host, port);
+			soc = new Socket();
+			//soc.setSoTimeout(1500);
+			soc.connect(sa, 0);
+			is = soc.getInputStream();
+			os = soc.getOutputStream();
+			isr = new InputStreamReader(is);
+			br = new BufferedReader(isr);
+			startListenerThreads();
+			System.err.println("Connection established");
 		}
-		if(!reconnectThread.isAlive())
-		{
-			reconnectThread.start();
-		}
-		reconnecting = false;
 	}
 
 	public void disconnect(boolean error) throws IOException
 	{
-		if(!reconnecting)
+		System.err.println("Disconnection called");
+		if(connectMut>=disconnMut)
 		{
+			disconnMut++;
+			System.err.println("Disconnection attempted");
 			br.close();
 			isr.close();
 			os.close();
@@ -323,6 +129,8 @@ public class StateSender {
 			{
 				running = false;
 			}
+
+			System.err.println("Disconnection done");
 		}
 
 	}
@@ -333,8 +141,230 @@ public class StateSender {
 	}
 	public void startListenerThreads()
 	{
-		listenerThread.start();
-		senderThread.start();
+		if(listenerThread==null || !listenerThread.isAlive())
+		{
+			listenerThread = new Thread()
+			{
+				public void run()
+				{
+					while(!soc.isClosed() && running)
+					{
+
+						try {
+							if(br.ready())
+							{
+								String line = br.readLine();
+								timeoutThread.interrupt();
+								DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+								DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+								Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
+								setLife(Integer.parseInt(doc.getElementsByTagName("life").item(0).getTextContent()));
+								if(id==-1)
+								{
+									id = Integer.parseInt(doc.getElementsByTagName("id").item(0).getTextContent());
+								}
+							}
+						} catch (IOException e1) {
+							System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
+							try {
+								disconnect(true);
+							} catch (IOException e) {
+								System.err.println("an IO derp");
+							}
+							return;
+						} catch (SAXException e1) {
+							System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
+							try {
+								disconnect(true);
+							} catch (IOException e) {
+								System.err.println("an IO derp");
+							}
+							return;
+						} catch (ParserConfigurationException e1) {
+							System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
+							try {
+								disconnect(true);
+							} catch (IOException e) {
+								System.err.println("an IO derp");
+							}
+							return;
+						}
+					}
+					System.err.println("The socket was closed! Reciever");
+				}
+			};
+			listenerThread.start();
+		}
+		if(senderThread==null || !senderThread.isAlive()){
+			senderThread = new Thread()
+			{
+				public void run()
+				{
+					while(!soc.isClosed() && running) // TODO Create sane operation here
+					{
+						// Send hit info to android
+						//System.err.println(soc.isClosed());
+						try {
+							DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+							DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+							Document doc = docBuilder.newDocument();
+
+							Element rootElement = doc.createElement("androidClient");
+							doc.appendChild(rootElement);
+							Attr ts = doc.createAttribute("ts");
+							ts.setValue(""+System.currentTimeMillis());
+							rootElement.setAttributeNode(ts);
+
+							Element idTag = doc.createElement("id");
+							rootElement.appendChild(idTag);
+							idTag.appendChild(doc.createTextNode(""+id));
+
+							Element rotationTag = doc.createElement("rotation");
+							rootElement.appendChild(rotationTag);
+							rotationTag.appendChild(doc.createTextNode(""+getRotation()));
+
+							Element shootingTag = doc.createElement("shooting");
+							rootElement.appendChild(shootingTag);
+							shootingTag.appendChild(doc.createTextNode(""+shooting));
+							shooting = false;
+
+							Element speedmodTag = doc.createElement("speedmod");
+							rootElement.appendChild(speedmodTag);
+							speedmodTag.appendChild(doc.createTextNode(""+speedFrac));
+
+							TransformerFactory transformerFactory = TransformerFactory.newInstance();
+							Transformer transformer = transformerFactory.newTransformer();
+							DOMSource source = new DOMSource(doc);
+
+							StreamResult result = new StreamResult(os);
+							transformer.transform(source,result);
+							os.write("\n".getBytes());
+							os.flush();
+							//System.err.println("Sent: "+System.currentTimeMillis());
+
+						} catch (ParserConfigurationException e1) {
+							System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
+							try {
+								disconnect(true);
+							} catch (IOException e) {
+								System.err.println("an IO derp");
+							}
+							return;
+						} catch (TransformerException e1) {
+							System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
+							try {
+								disconnect(true);
+							} catch (IOException e) {
+								System.err.println("an IO derp");
+							}
+						} catch (IOException e1) {
+							System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
+							try {
+								disconnect(true);
+							} catch (IOException e) {
+								System.err.println("an IO derp");
+							}
+						}
+
+						try {
+							Thread.sleep(120);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+
+
+					}
+					System.err.println("The socket was closed! Sender");
+				}
+			};
+			senderThread.start();
+		}
+		if(timeoutThread==null || !timeoutThread.isAlive())
+		{
+			timeoutThread = new Thread()
+			{
+				public void run()
+				{
+
+					while(running)
+					{
+
+						try {
+							sleep(TIMEOUT);
+							if(soc != null && !soc.isClosed() && connectMut==disconnMut)
+							{
+
+								//shutDown();
+								System.err.println("Server timed out!");
+
+								try{
+									disconnect(true);
+								}
+								catch(IOException e)
+								{
+									System.err.println("IO Exception!");
+								}
+							}
+						} catch (InterruptedException e) {
+							// Do nothing!
+						}
+					}
+					System.err.println("TimeoutThread has reached its end");
+				}
+			};
+			timeoutThread.start();
+		}
+		if(reconnectThread==null || !reconnectThread.isAlive())
+		{
+			reconnectThread = new Thread()
+			{
+				public void run()
+				{
+					while(running)
+					{
+						try{
+							sleep(1000);
+							if(soc !=null && soc.isClosed())
+							{
+								sleep(130);
+								System.err.println("Reconnect Attempted");
+								try {
+									connect();
+								} catch (UnknownHostException e) {
+									System.err.println("Reconnect Failed. Shitty Host");
+									try {
+										disconnect(true);
+									} catch (IOException e1) {
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
+								} catch (IOException e) {
+									System.err.println("Reconnect Failed. General IO error");
+									try {
+										disconnect(true);
+									} catch (IOException e1) {
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
+								}
+							}
+
+						}
+						catch(InterruptedException e)
+						{
+
+						}
+
+					}
+					System.err.println("Reconnect Thread has reached its end");
+				}
+
+			};
+			reconnectThread.start();
+		}
+
 	}
 
 
