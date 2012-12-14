@@ -11,7 +11,7 @@ public class GameState implements Runnable {
 	private ListIterator<Bullet> bIt;
 	private int planeIdPool;
 	private int bulletIdPool;
-	private final double MAX_DISTANCE = 128;
+	private final double MAX_DISTANCE = 16;
 	private final long UPDATEFREQUENCY = 4000000;
 	
 	
@@ -87,6 +87,17 @@ public class GameState implements Runnable {
 	 */
 	public void moveEverything()
 	{
+		Coord centre = getCentre();
+		aIt = airplanes.listIterator();
+		Airplane temp;
+		while(aIt.hasNext())
+		{
+			temp = aIt.next();
+			if(temp.getPos().distance(centre)>=MAX_DISTANCE)
+			{
+				temp.setAngle(temp.getPos().getAngle(centre));
+			}
+		}
 		aIt = airplanes.listIterator();
 		// Move all planes
 		while(aIt.hasNext())
@@ -98,18 +109,6 @@ public class GameState implements Runnable {
 		while(bIt.hasNext())
 		{
 			bIt.next().move();
-		}
-		//Find centre of all planes and turn any planes that are too far away into the centre again
-		Coord centre = getCentre();
-		aIt = airplanes.listIterator();
-		Airplane temp;
-		while(aIt.hasNext())
-		{
-			temp = aIt.next();
-			if(temp.getPos().distance(centre)>=MAX_DISTANCE)
-			{
-				temp.setAngle(temp.getPos().getAngle(centre));
-			}
 		}
 	}
 
@@ -159,7 +158,7 @@ public class GameState implements Runnable {
 	{
 		Coord tempC = new Coord(0,0);
 		
-		if(airplanes.size() !=0)
+		if(airplanes.size() >1)
 		{
 			Airplane tempA;
 			aIt = airplanes.listIterator();

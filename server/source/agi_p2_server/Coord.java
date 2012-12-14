@@ -33,6 +33,6 @@ public class Coord
 		Coord temp = new Coord(point);
 		temp.x -=x;
 		temp.y -=y;
-		return Math.atan(temp.y/temp.x);
+		return Math.atan2(temp.y, temp.x);
 	}
 }
