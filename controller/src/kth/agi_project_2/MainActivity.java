@@ -51,7 +51,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	private ImageView imageRedFlash;
 	private ImageView circle;
 
-	private final int[] lifeResources = { R.drawable.life, R.drawable.life1, R.drawable.life2, R.drawable.life3, R.drawable.life4 }; 
+	private final int[] lifeResources = { R.drawable.life0, R.drawable.life1, R.drawable.life2, R.drawable.life3, R.drawable.life4, R.drawable.life5 }; 
 
 
 
