@@ -27,46 +27,46 @@ import org.xml.sax.SAXException;
 
 public class AndroidClient implements Runnable{
 
+	// Player variables
 	private Airplane plane;
-	private Socket sock;
 	private boolean isShooting;
-	//private boolean hasShot;
 	private double rotation;
 	private double speedMod;
+	private int cachedLife;
+	
+	// Connection variables
+	private Socket sock;
 	private InputStream is;
 	private OutputStream os;
 	private BufferedReader br;
 	private InputStreamReader isr;
+	
+	// Server Variables
 	private GameState gs;
-	private int cachedLife;
+	
+	// Threading
 	private Thread timeoutThread;
 	private Thread pingThread;
+	private boolean shuttingDown;
 	private static final long PING = 1000;
 	private static final long TIMEOUT =15000; 
 
-	private boolean shuttingDown;
-
 	public AndroidClient(Socket soc, GameState gs) throws IOException
 	{
-		shuttingDown = false;
+		this.gs = gs;
 		this.sock = soc;
+		
 		is = soc.getInputStream();
 		isr = new InputStreamReader(is);
 		os = soc.getOutputStream();
 		br = new BufferedReader(isr);
-		this.gs = gs;
-
+		
+		shuttingDown = false;
 		isShooting = false;
-		//hasShot = false;
 		rotation = 0;
-		//double angle = new Random().nextDouble()*Math.PI*2;
-		//Coord centre = gs.getCentre();
-
 		plane=null;
-		//plane = new Airplane(gs.nextAId(),centre.x+Math.cos(angle+Math.PI), centre.y+Math.sin(angle+Math.PI),angle);
-		//gs.airplanes.add(plane);
-		//cachedLife = plane.getLife();
 
+		// Checks to see if android has taken abnormally long time to respond, and kills the connection in that case
 		timeoutThread = new Thread()
 		{
 			public void run()
@@ -84,7 +84,8 @@ public class AndroidClient implements Runnable{
 				}
 			}
 		};
-
+		
+		// Sends a packet to the android, just to make sure it knows we love it.
 		pingThread = new Thread()
 		{
 			public void run()
@@ -99,13 +100,16 @@ public class AndroidClient implements Runnable{
 					}
 					catch(InterruptedException e)
 					{
-
+						// Do nothing
 					}
 				}
 			}
 		};
 	}
-
+	
+	/**
+	 * Checks all the variables set by the android and updates the gamestate to reflect this.
+	 */
 	public void update()
 	{
 		if(plane != null)
@@ -118,19 +122,18 @@ public class AndroidClient implements Runnable{
 				isShooting=false;
 			}
 		}
-
 	}
 
-
+	/**
+	 * Runs the thread keeping track of everything to do with the android and its plane.
+	 */
 	public void run() {
 		timeoutThread.start();
 		pingThread.start();
 		while(!sock.isClosed())
 		{
-
-
+			// Read in a line
 			String line=null;
-
 			try {
 				if(br.ready())
 				{
@@ -141,14 +144,17 @@ public class AndroidClient implements Runnable{
 				shutDown();
 			}
 
+			// Is the line read sane?
 			if(line!=null && line.startsWith("<?xml") && line.endsWith("</androidClient>") )
 			{
+				// In that case, interrupt the timeout thread (as we have gotten a response) and parse the line.
 				timeoutThread.interrupt();
 				try {
 					DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 					DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 					Document doc = docBuilder.parse(new InputSource(new StringReader(line)));
-					//Document doc = docBuilder.parse(line);
+
+					// If plane is null, check if there exists a plane with the given ID, else create a new plane. (This is for reconnecting)
 					if(plane==null)
 					{
 						int id = Integer.parseInt(doc.getElementsByTagName("id").item(0).getTextContent());
@@ -176,12 +182,11 @@ public class AndroidClient implements Runnable{
 						}
 						cachedLife = plane.getLife();
 					}
+					
+					// Check the usual stuff, like rotation and is he shooting and stuff.
 					rotation = Double.parseDouble(doc.getElementsByTagName("rotation").item(0).getTextContent());
 					isShooting = Boolean.parseBoolean(doc.getElementsByTagName("shooting").item(0).getTextContent());
-
-
-
-
+					speedMod = Double.parseDouble(doc.getElementsByTagName("speedmod").item(0).getTextContent());
 				} catch ( IOException e) {
 					System.err.println("Something went catostrophacally wrong while recieving data (IO)! Disconnecting android...");
 					shutDown();
@@ -199,27 +204,26 @@ public class AndroidClient implements Runnable{
 			try {
 				Thread.sleep(70);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				// Do nothing
 			}
 		}
 
 	}
 
-
-	public void sendEvents(boolean forced)
+	/**
+	 * Send stuff to android.
+	 * @param ping If true, doesn't interrupt the ping thread (as it was the ping thread that started the event) 
+	 */
+	public void sendEvents(boolean ping)
 	{
-		//System.err.println("StuffSent");
-
-
-		if(plane!=null && ((plane.getLife()<cachedLife) || forced))
+		if(plane!=null && ((plane.getLife()<cachedLife) || ping))
 		{
-			if(!forced)
+			if(!ping)
 			{
 				pingThread.interrupt();
 			}
-			//System.err.println("Sending packet to android...");
 			cachedLife = plane.getLife();
+			
 			// Send hit info to android
 			try {
 				DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -232,18 +236,9 @@ public class AndroidClient implements Runnable{
 				ts.setValue(""+System.currentTimeMillis());
 				rootElement.setAttributeNode(ts);
 
-
-
 				Element idTag = doc.createElement("id");
 				rootElement.appendChild(idTag);
 				idTag.appendChild(doc.createTextNode(""+plane.getId()));
-				/*Attr id = doc.createAttribute("id");
-				id.setValue(""+plane.getId());
-				rootElement.setAttributeNode(id);*/
-
-
-
-
 
 				Element lifeTag = doc.createElement("life");
 				rootElement.appendChild(lifeTag);
@@ -260,21 +255,19 @@ public class AndroidClient implements Runnable{
 
 			} catch (ParserConfigurationException | TransformerException e1) {
 				System.err.println("Something went catostrophacally wrong while sending data (Parser)! Disconnecting android...");
-				//e1.printStackTrace();
 				shutDown();
 				return;
 			} catch (IOException e) {
 				System.err.println("Something went catostrophacally wrong while sending data (IO)! Disconnecting android...");
 				shutDown();
+				return;
 			}
-
 
 			if(plane.getLife()<=0)
 			{
 				shutDown();
 			}
 		}
-
 	}
 
 	public boolean isOpen()
@@ -315,5 +308,4 @@ public class AndroidClient implements Runnable{
 		System.err.println("Shutdown already in progress!");
 		return false;
 	}
-
 }

@@ -28,9 +28,7 @@ public class RenderClient {
 	{
 		this.soc = soc;
 		this.gs = gs;
-		os = soc.getOutputStream();
-
-		
+		os = soc.getOutputStream();		
 	}
 
 	public boolean isOpen()
@@ -138,8 +136,14 @@ public class RenderClient {
 				return;
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("IO Exception! Did a renderer disconnect?");
+			try {
+				soc.close();
+				return;
+			} catch (IOException e1) {
+				System.err.println("... and an IOException to boot!");
+				return;
+			}
 		} 
 	}
 	

@@ -56,10 +56,12 @@ public class Entity {
 		pos.x = p.x;
 		pos.y = p.y;
 	}
+	
 	public double getAngle() 
 	{
 		return angle;
 	}
+	
 	public void setAngle(double angle) 
 	{
 		this.angle = angle;
@@ -75,14 +77,17 @@ public class Entity {
 		if(this.angle<0)
 			this.angle += Math.PI*2;
 	}
+	
 	public double getSpeed() 
 	{
 		return speed;
 	}
+	
 	public void setSpeed(double speed) 
 	{
 		this.speed = speed;
 	}
+	
 	public int getStatus()
 	{
 		return status;

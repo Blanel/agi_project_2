@@ -13,8 +13,6 @@ public class GameState implements Runnable {
 	private int bulletIdPool;
 	private final double MAX_DISTANCE = 16;
 	private final long UPDATEFREQUENCY = 4000000;
-	
-	
 	private Server srv;
 
 	private static final double planeHitbox = 0.5f;
@@ -38,8 +36,6 @@ public class GameState implements Runnable {
 		long end = 0;
 		while(true)
 		{
-			//System.err.println("Gamestate!");
-			//System.err.println("Bullets: "+bullets.size());
 			// Get changes from all clients.
 			srv.androidSync();
 			
@@ -49,10 +45,8 @@ public class GameState implements Runnable {
 			// Calculate all collisions (Seems to work as expected)
 			calculateCollisions();
 	
-			// Send data to renderclients and androids
+			// Keeps an eye on the time a loop takes to run
 			end = System.nanoTime();
-			//System.err.print("Calculation time: "+(end-start)+"     ");
-			//waitstart = System.nanoTime();
 			if(end-start < UPDATEFREQUENCY)
 			{
 				while(end-start < UPDATEFREQUENCY)
@@ -64,21 +58,15 @@ public class GameState implements Runnable {
 			{
 				System.err.println("Server can't keep up! "+((Math.floor((float)(end-start)-UPDATEFREQUENCY)/1000000000f))+" ns too slow");
 			}
-			//waitend = System.nanoTime();
-			//System.err.print("Waittime: "+(waitend-waitstart)+"      ");
 			start = System.nanoTime();
+			
+			// Send data to renderclients and androids
 			srv.androidSend();
 			srv.rendererSend();
+			
+			// Purges dead clients
 			purgeDead();
-			//end = System.nanoTime();
-			//System.err.println("Sendtime: "+(end-start));
-			//start = System.nanoTime();
-			
-			
-			//System.err.println(((end-start))+" ms");
-			
 		}
-
 	}
 
 	/**
@@ -87,6 +75,8 @@ public class GameState implements Runnable {
 	 */
 	public void moveEverything()
 	{
+		
+		// If planes are outside of playing area, sets their angle towards the middle
 		Coord centre = getCentre();
 		aIt = airplanes.listIterator();
 		Airplane temp;
@@ -98,12 +88,14 @@ public class GameState implements Runnable {
 				temp.setAngle(temp.getPos().getAngle(centre));
 			}
 		}
-		aIt = airplanes.listIterator();
+		
 		// Move all planes
+		aIt = airplanes.listIterator();
 		while(aIt.hasNext())
 		{
 			aIt.next().move();
 		}
+		
 		// Move all bullets
 		bIt = bullets.listIterator();
 		while(bIt.hasNext())
@@ -174,6 +166,7 @@ public class GameState implements Runnable {
 		return tempC;
 	}
 	
+	
 	public int nextAId()
 	{
 		return planeIdPool++;
@@ -231,8 +224,4 @@ public class GameState implements Runnable {
 		}
 		return tempA;
 	}
-
-
-
-
 }

@@ -14,7 +14,6 @@ public class Server {
 	private GameState gs;
 	private ServerSocket androidServsoc;
 	private ServerSocket renderServsoc;
-	//private int aClientId = 0;
 	
 	private static final String serverMessage = "Usage: server <androidport> <renderport> <backlogConnections> \n\tandroidport: Integer for portnumber accepting connections from android\n\trendererport: Integer for portnumber accepting connections from renderer\n\tbacklogConnections: How many that can queue for connection to the server";
 	
@@ -100,7 +99,6 @@ public class Server {
 				}
 			}}).start();
 		System.out.println("Render listener started");
-		
 		System.out.println("Server startup success!");
 		
 	}
@@ -146,5 +144,4 @@ public class Server {
 			}
 		}
 	}
-
 }
