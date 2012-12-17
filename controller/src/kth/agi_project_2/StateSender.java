@@ -30,7 +30,7 @@ import android.os.Message;
 
 public class StateSender {
 
-	
+
 	// Airplane variables
 	private double speedFrac;
 	private boolean shooting;
@@ -39,7 +39,7 @@ public class StateSender {
 	private int id = -1;
 
 
-	
+
 	// Connection Variables
 	private Socket soc =null;
 	private OutputStream os = null;
@@ -50,16 +50,16 @@ public class StateSender {
 	private int port = 1234;
 	private int connectMut;
 	private int disconnMut;
-	
+
 	// Hardware Variables
 	private int screenHeight;
 	private float rotX;
 	private float rotY;
-	
+
 	// App Variables
 	private MainActivity ma;
 	private boolean running;
-	
+
 	// Threading
 	private Thread timeoutThread; 
 	private Thread reconnectThread;
@@ -76,11 +76,11 @@ public class StateSender {
 	public StateSender(MainActivity m)
 	{
 		ma = m;
-		
+
 		cachedLife = 5;
 		life = 5;
 		id = -1;
-		
+
 		soc =null;
 		os = null;
 		is = null;
@@ -90,9 +90,9 @@ public class StateSender {
 		port = 1234;
 		connectMut = 0;
 		disconnMut = 1;
-		
+
 		running = true;
-				
+
 		speedFrac = 0;
 		shooting = false;
 		screenHeight = -1;
@@ -105,55 +105,76 @@ public class StateSender {
 		this.host = host;
 		this.port = port;
 	}
-	
-	public void connect() throws UnknownHostException, IOException, SocketTimeoutException
+
+	public boolean connect() 
 	{
 		System.err.println("Connection called");
 		if(disconnMut>connectMut)
 		{
-			connectMut++;
-			
-			System.err.println("Connection attempting");
-			
-			InetSocketAddress sa = new InetSocketAddress(host, port);
-			soc = new Socket();
-			soc.connect(sa, 0);
-			is = soc.getInputStream();
-			os = soc.getOutputStream();
-			isr = new InputStreamReader(is);
-			br = new BufferedReader(isr);
-			
-			startListenerThreads();
-			
-			System.err.println("Connection established");
+			try{
+
+
+				connectMut++;
+
+				System.err.println("Connection attempting");
+
+				InetSocketAddress sa = new InetSocketAddress(host, port);
+				soc = new Socket();
+				soc.connect(sa, 0);
+				is = soc.getInputStream();
+				os = soc.getOutputStream();
+				isr = new InputStreamReader(is);
+				br = new BufferedReader(isr);
+
+				startListenerThreads();
+
+				System.err.println("Connection established");
+				return true;
+			}
+			catch(IOException e)
+			{
+				System.err.println("Something went wrong connecting. IOException.");
+				return false;
+			}
 		}
+		return false;
 	}
 
-	public void disconnect(boolean error) throws IOException
+	public boolean disconnect(boolean error)
 	{
 		System.err.println("Disconnection called");
 		if(connectMut>=disconnMut)
 		{
-			disconnMut++;
-			
-			System.err.println("Disconnection attempted");
-			
-			br.close();
-			isr.close();
-			os.close();
-			is.close();
-			soc.close();
-			
+			try
+			{
+				disconnMut++;
+
+				System.err.println("Disconnection attempted");
+
+				br.close();
+				isr.close();
+				os.close();
+				is.close();
+				soc.close();
+			}
+			catch(IOException e)
+			{
+				System.err.println("Disconnect failed");
+				return false;
+			}
+
 			if(!error)
 			{
 				running = false;
 			}
 
 			System.err.println("Disconnection done");
+			return true;
 		}
+		return false;
 
 	}
-	
+
 	/**
 	 * Initializes and starts threads if threads are not alive. 
 	 */
@@ -194,27 +215,16 @@ public class StateSender {
 						// Lots of errorhandling!
 						catch (IOException e1) {
 							System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
-							try {
 								disconnect(true);
-							} catch (IOException e) {
-								System.err.println("an IO derp");
-							}
-							return;
 						} catch (SAXException e1) {
 							System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
-							try {
 								disconnect(true);
-							} catch (IOException e) {
-								System.err.println("an IO derp");
-							}
+
 							return;
 						} catch (ParserConfigurationException e1) {
 							System.err.println("Something went catostrophacally wrong while recieving data! Disconnecting android...");
-							try {
+
 								disconnect(true);
-							} catch (IOException e) {
-								System.err.println("an IO derp");
-							}
 							return;
 						}
 					}
@@ -223,7 +233,7 @@ public class StateSender {
 			};
 			listenerThread.start();
 		}
-		
+
 		// The sender thread sends data to the server
 		if(senderThread==null || !senderThread.isAlive()){
 			senderThread = new Thread()
@@ -273,26 +283,16 @@ public class StateSender {
 						// Lots of errorhandling!
 						catch (ParserConfigurationException e1) {
 							System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
-							try {
 								disconnect(true);
-							} catch (IOException e) {
-								System.err.println("an IO derp");
-							}
 							return;
 						} catch (TransformerException e1) {
 							System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
-							try {
 								disconnect(true);
-							} catch (IOException e) {
-								System.err.println("an IO derp");
-							}
+							return;
 						} catch (IOException e1) {
 							System.err.println("Something went catostrophacally wrong while sending data! Disconnecting android...");
-							try {
 								disconnect(true);
-							} catch (IOException e) {
-								System.err.println("an IO derp");
-							}
+							return;
 						}
 
 						try {
@@ -306,7 +306,7 @@ public class StateSender {
 			};
 			senderThread.start();
 		}
-		
+
 		// The timeout thread checks if the server has taken an abnormally long time to respond.
 		if(timeoutThread==null || !timeoutThread.isAlive())
 		{
@@ -321,13 +321,7 @@ public class StateSender {
 							if(soc != null && !soc.isClosed() && connectMut==disconnMut)
 							{
 								System.err.println("Server timed out!");
-								try{
 									disconnect(true);
-								}
-								catch(IOException e)
-								{
-									System.err.println("IO Exception!");
-								}
 							}
 						} catch (InterruptedException e) {
 							// Do nothing
@@ -338,7 +332,7 @@ public class StateSender {
 			};
 			timeoutThread.start();
 		}
-		
+
 		// The reconnect thread attempts to reconnect a connection that has been severed for any reason.
 		if(reconnectThread==null || !reconnectThread.isAlive())
 		{
@@ -356,23 +350,14 @@ public class StateSender {
 								sleep(130);
 								System.err.println("Reconnect Attempted");
 								retries++;
-								try {
-									connect();
+								if(connect())
+								{
+									System.err.println("Reconnect Success");
 									retries=0;
-								} catch (UnknownHostException e) {
-									System.err.println("Reconnect Failed. Shitty Host");
-									try {
-										disconnect(true);
-									} catch (IOException e1) {
-										System.err.println("An IO derp");
-									}
-								} catch (IOException e) {
-									System.err.println("Reconnect Failed. General IO error");
-									try {
-										disconnect(true);
-									} catch (IOException e1) {
-										System.err.println("An IO derp");
-									}
+								}
+								else
+								{
+									System.err.println("Reconnect failed");
 								}
 							}
 
@@ -399,7 +384,7 @@ public class StateSender {
 	public void setScreenHeight(int screenHeight) {
 		this.screenHeight = screenHeight;
 	}
-	
+
 	public double getSpeedFrac() {
 		return speedFrac;
 	}
@@ -407,7 +392,7 @@ public class StateSender {
 	public void setSpeedFrac(double speedFrac) {
 		this.speedFrac = speedFrac;
 	}
-	
+
 	private double getRotation()
 	{
 		return ((Math.atan2(rotX, rotY)+Math.PI/2)*10/Math.PI);

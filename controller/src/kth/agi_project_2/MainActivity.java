@@ -125,15 +125,11 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 					String host = hosttemp.toString().split(":")[0];
 					int port = Integer.parseInt(hosttemp.toString().split(":")[1]);
 					ss.setHost(host,port);
-					ss.connect();
-					initialised = true;
+					initialised = ss.connect();
 					continueRunning();
+				}
 
-				} catch (UnknownHostException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (ArrayIndexOutOfBoundsException e){
+				catch (ArrayIndexOutOfBoundsException e){
 					e.printStackTrace();
 				} catch (NumberFormatException e) {
 					e.printStackTrace();
