@@ -10,6 +10,7 @@
 #include "renderer/ClearState.h"
 #include "renderer/VertexArray.h"
 #include "renderer/GraphicsDevice.h"
+#include "renderer/Framebuffer.h"
 #include "PrimitiveType.h"
 
 #include "Device.h"
@@ -35,10 +36,8 @@ class RenderContext
 protected:
     geo::Rect_f32                               m_Viewport;
     //Color4<f32>                                 m_ClearColor;
-
     std::shared_ptr<Framebuffer>                m_pFramebuffer;
     std::shared_ptr<ClearState>                 m_pClearState;
-
     std::vector<std::unique_ptr<TextureUnit>>   m_TextureUnits;
 
 public:
@@ -53,9 +52,9 @@ public:
     virtual std::shared_ptr<VertexArray> create_vertex_array() = 0;
     virtual std::shared_ptr<VertexArray> create_vertex_array(const std::shared_ptr<geo::Mesh>& pMesh);
 
-    /*
-    virtual void create_framebuffer() = 0;
+    virtual std::shared_ptr<Framebuffer> create_framebuffer() = 0;
 
+    /*
     virtual const std::shared_ptr<Framebuffer>& get_framebuffer() = 0;
     virtual void set_framebuffer(const std::shared_ptr<Framebuffer>& fb) = 0;
     */

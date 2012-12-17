@@ -8,6 +8,11 @@
 #include <fstream>
 #include <cstring>
 
+#include "SDL_Image.h"
+#include "Log.h"
+
+#include <iterator>
+
 namespace revel
 {
 
@@ -93,7 +98,7 @@ class Image2D
 	PixelFormat m_PixelFormat;
 
 public:	
-	Image2D(u32 w, u32 h, T val = 0)
+	Image2D(u32 w, u32 h, T val = T())
 		: m_Pixels(w * h, val)
 		, m_Width(w)
 		, m_Height(h)
@@ -120,6 +125,65 @@ public:
 		, m_PixelFormat(T::pixel_format())	
 	{
 		assert(w * h == pixeldata.size());
+	}
+
+	Image2D(const std::string& filename)
+	{
+		SDL_Surface* image = IMG_Load(filename.c_str());
+		SDL_PixelFormat* format = image->format;
+
+		auto dataptr = (T*)image->pixels;
+
+		if (image)
+		{
+			m_Width = image->w;
+			m_Height = image->h;
+			m_PixelFormat = T::pixel_format();
+
+			u32 pixelcount = m_Width * m_Height;
+
+			/*
+			u32 nOfColors = surface->format->BytesPerPixel;
+
+	        if (nOfColors == 4)     // contains an alpha channel
+	        {
+                if (surface->format->Rmask == 0x000000ff)
+                        texture_format = GL_RGBA;
+                else
+                        texture_format = GL_BGRA;
+	        } 
+	        else if (nOfColors == 3)     // no alpha channel
+	        {
+                if (surface->format->Rmask == 0x000000ff)
+                        texture_format = GL_RGB;
+                else
+                        texture_format = GL_BGR;
+	        } 
+	        else 
+	        {
+	            R_LOG_ERR("warning: the image is not truecolor..  this will probably break");
+	        }
+	        */
+
+	        T* dataptr = (T*)image->pixels;
+
+			m_Pixels.reserve(pixelcount);
+
+			m_Pixels = std::vector<T>(dataptr, dataptr + pixelcount);
+
+			for (auto& pixel : m_Pixels)
+			{
+				std::swap(pixel.r, pixel.b);
+			}
+
+			SDL_FreeSurface(image);
+		}
+		else
+		{
+			R_LOG_ERR("SDL Image" << IMG_GetError());
+			throw std::exception();
+		}
+		
 	}
 
 /*

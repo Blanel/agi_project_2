@@ -17,9 +17,11 @@ class TextureSamplerGL
     void set_mag_filter(TextureMagFilter mag);
     void set_texture_wrap_s(TextureWrap wrap);
     void set_texture_wrap_t(TextureWrap wrap);
+    void set_texture_wrap_r(TextureWrap wrap);
 
 public:
     TextureSamplerGL(TextureMinFilter min, TextureMagFilter mag, TextureWrap s, TextureWrap t, f32 ani = 0.0f);
+    TextureSamplerGL(TextureMinFilter min, TextureMagFilter mag, TextureWrap s, TextureWrap t, TextureWrap r, f32 ani = 0.0f);
     virtual ~TextureSamplerGL();
 };
 

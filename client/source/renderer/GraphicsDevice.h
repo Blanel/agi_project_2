@@ -27,6 +27,7 @@ class Texture2D;
 class VertexBuffer;
 class IndexBuffer;
 class Texture2D;
+class Texture3D;
 class Texture2DDesc;
 class TextureSampler;
 class ShaderProgram;
@@ -82,6 +83,9 @@ public:
      * @param desc Texture object description.
      */
     virtual std::shared_ptr<Texture2D>          create_texture_2d(const Texture2DDesc& desc) = 0;
+
+    virtual std::shared_ptr<Texture2D>          create_texture_2d() = 0;
+    virtual std::shared_ptr<Texture3D>          create_texture_3d() = 0;
 
     //virtual std::shared_ptr<Texture2D>          create_texture_2d() = 0;
     

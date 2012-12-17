@@ -3,6 +3,7 @@
 #include "renderer/gl/RenderWindowGL.h"
 #include "renderer/gl/VertexArrayGL.h"
 #include "renderer/gl/TextureUnitGL.h"
+#include "renderer/gl/FramebufferGL.h"
 
 #include "math/Vector2.h"
 #include "math/Vector3.h"
@@ -39,6 +40,8 @@ RenderContextGL::RenderContextGL(RenderWindowGL *win)
 
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetSwapInterval(0); 
+
 
     m_ContextHandle = SDL_GL_CreateContext(win->m_pSDLWindow);
 
@@ -107,6 +110,12 @@ std::shared_ptr<VertexArray>
 RenderContextGL::create_vertex_array()
 {
     return std::make_shared<VertexArrayGL>();
+}
+
+std::shared_ptr<Framebuffer>
+RenderContextGL::create_framebuffer()
+{
+    return std::make_shared<FramebufferGL>();
 }
 
 void

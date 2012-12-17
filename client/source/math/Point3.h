@@ -50,12 +50,12 @@ public:
 	 * @param p Point
 	 * @return True if the points are equal.
 	 */
-    bool operator==(const Point3& p)
+    bool operator==(const Point3& p) const
     { 
         return (x == p.x && y == p.y && z == p.z); 
     }
 
-    bool operator!=(const Point3& p)
+    bool operator!=(const Point3& p) const
     { 
         return !(*this == p);
     }
@@ -80,9 +80,16 @@ public:
      * @param v Input vector
      * @return Point in 2D space
      */
-	Point3 operator+(Vector3<T>& v) const 
+	Point3 operator+(const Vector3<T>& v) const 
     { 
         return Point3(x + v.x, y + v.y, z + v.z); 
+    }
+
+    Point3& operator+=(const Vector3<T>& v) 
+    { 
+        x += v.x; y += v.y; z += v.z;
+
+        return *this;
     }
 
     /**

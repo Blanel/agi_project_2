@@ -29,40 +29,11 @@ protected:
 public:
     Mesh();
 
-    static std::shared_ptr<Mesh> create_cube()
-    {        
-        auto mesh = std::make_shared<Mesh>();        
-        auto pos = mesh->create_vertex_attrib<point3>("position", 8);
+    static std::shared_ptr<Mesh> create_cube();
 
-        pos->data().push_back(point3(-1, -1,  1));
-        pos->data().push_back(point3( 1, -1,  1));
-        pos->data().push_back(point3( 1,  1,  1));
-        pos->data().push_back(point3(-1,  1,  1));
+    static std::shared_ptr<Mesh> create_quad();
 
-        pos->data().push_back(point3(-1, -1, -1));
-        pos->data().push_back(point3( 1, -1, -1));
-        pos->data().push_back(point3( 1,  1, -1));
-        pos->data().push_back(point3(-1,  1, -1));
-
-        auto indices = mesh->indices<u32>();
-
-        indices->add_triangle(0, 1, 2); //front
-        indices->add_triangle(2, 3, 0);
-        indices->add_triangle(1, 5, 6); //right
-        indices->add_triangle(6, 2, 1);
-        indices->add_triangle(4, 0, 3); //left
-        indices->add_triangle(3, 7, 4);
-        indices->add_triangle(4, 5, 6); //back
-        indices->add_triangle(6, 7, 4);
-        indices->add_triangle(3, 2, 6); //top
-        indices->add_triangle(6, 7, 3);
-        indices->add_triangle(4, 5, 1); //bottom
-        indices->add_triangle(1, 0, 4);
-
-        mesh->add_vertex_attrib(pos);
-        
-        return mesh;
-    }
+    static std::shared_ptr<Mesh> create_arrow();
 
     template <typename T>
     std::shared_ptr<VertexAttrib<T>> create_vertex_attrib(const std::string& name, u32 capacity = 0)

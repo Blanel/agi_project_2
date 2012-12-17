@@ -30,59 +30,83 @@ class SimplexNoise
 		{}
 	};
 
-	static f32 dot(const Grad& g, f32 x, f32 y)
+	f32 dot(const Grad& g, f32 x, f32 y)
 	{
 		return g.x * x + g.y * y;
 	}
 
-	static f32 dot(const Grad& g, f32 x, f32 y, f32 z)
+	f32 dot(const Grad& g, f32 x, f32 y, f32 z)
 	{
 		return g.x * x + g.y * y + g.z * z;
 	}
 
-	static f32 dot(const Grad& g, f32 x, f32 y, f32 z, f32 w)
+	f32 dot(const Grad& g, f32 x, f32 y, f32 z, f32 w)
 	{
 		return g.x * x + g.y * y + g.z * z + g.w * w;
 	}
 
 
-	static std::array<u8, 512> p;
-	static std::array<u8, 512> pmod12;
+	std::vector<u8> p;
+	std::vector<u8> pmod12;
 
 	static std::array<Grad, 12> grad3;
 	static std::array<Grad, 32> grad4;
-
 	static f32 F2, G2, F3, G3, F4, G4;
 
+	f32 m_Amplitude;
+	f32 m_Frequency;
+	f32 m_Persitence;
+	u32 m_Octaves;
 
-	static std::array<u8, 512> init_array(int seed)
-	{
-		std::mt19937 g(seed);
-		std::shuffle(p.begin(), p.end(), g);
-		std::array<u8, 512> array = p;
-
-		for (auto& i : array)
-		{
-			i = i%12;
-		}
-
-		return array;
-	}
+	f32 noise_value(f32 x, f32 y);
+	f32 noise_value(f32 x, f32 y, f32 z);
+	f32 noise_value(f32 x, f32 y, f32 z, f32 w);
 
 public:
-	static f32 noise(f32 x, f32 y);
+	SimplexNoise();
+	SimplexNoise(u32 seed);
 
-	static f32 noise(f32 x, f32 y, f32 z);
+	void set_amplitude(f32 a);
+	f32 amplitude() const;
 
-	static f32 noise(f32 x, f32 y, f32 z, f32 w);
+	void set_frequency(f32 f);
+	f32 frequency() const;
 
+	void set_persistance(f32 p);
+	f32 persistance() const;
 
-	static void debug()
+	void set_octaves(u32 o);
+	u32 octaves() const;
+
+	f32 noise_fractal_brownian_motion(i32 octaves, f32 x, f32 y, f32 z)
 	{
-		R_LOG_INFO("DEBUG: " << (i32)pmod12[0]);
-		R_LOG_INFO("DEBUG: " << grad3[0].y);
+		const f32 lacunarity = 1.9;
+		const f32 gain = 0.65;
+
+		f32 sum = 0.0f;
+		f32 amplitude = 1.0f;
+
+		for (i32 i = 0; i < octaves; ++i)
+		{
+			sum += noise_value(x, y, z);
+			amplitude *= gain;
+
+			x*=lacunarity;
+			y*=lacunarity;
+			z*=lacunarity;
+		}
+
+		return sum;
 	}
 
+	f32 turbulence(f32 x, f32 y, i32 octaves, f32 lacunarity = 2.0f, f32 gain = 0.5f)
+	{
+		
+	}
+
+	f32 noise(f32 x, f32 y);
+	f32 noise(f32 x, f32 y, f32 z);
+	f32 noise(f32 x, f32 y, f32 z, f32 w);
 
 };
 	

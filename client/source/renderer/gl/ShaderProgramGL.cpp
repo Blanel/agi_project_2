@@ -180,6 +180,8 @@ ShaderProgramGL::setup_uniforms()
             m_Uniforms[name] = std::unique_ptr<UniformGL<math::mat3>>(new UniformGL<math::mat3>(loc, name, math::mat3::Identity)); break;
         case GL_FLOAT_MAT4:
             m_Uniforms[name] = std::unique_ptr<UniformGL<math::mat4>>(new UniformGL<math::mat4>(loc, name, math::mat4::Identity)); break;
+        case GL_SAMPLER_2D:
+            m_Uniforms[name] = std::unique_ptr<UniformGL<i32>>(new UniformGL<i32>(loc, name, 0)); break;
 
         default:
             throw GpuException("Unknown type in OpenGL GLSL Uniform");

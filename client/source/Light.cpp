@@ -13,23 +13,22 @@ Light::~Light()
 
 }
 
-void
-Light::set_position(const point3& p)
+
+DirectionalLight::DirectionalLight(const vec3& d)
+	: m_Direction(d)
+{}	
+
+
+const vec3& 
+DirectionalLight::direction() const
 {
-	m_Position = p;
+	return m_Direction;
 }
 
 void
-Light::set_position(f32 x, f32 y, f32 z)
+DirectionalLight::set_direction(const vec3& d)
 {
-	m_Position = point3(x, y, z);
+	m_Direction = d;
 }
 
-const point3&
-Light::position() const
-{
-	return m_Position;
-}
-
-	
-}
+} // ::revel

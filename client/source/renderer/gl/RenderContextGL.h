@@ -21,6 +21,7 @@ public:
     void make_current();
 
     virtual std::shared_ptr<VertexArray> create_vertex_array() override;
+    virtual std::shared_ptr<Framebuffer> create_framebuffer() override;
 
     virtual void clear(const std::shared_ptr<ClearState> &cs) override;
     virtual void clear(const ClearState& cs) override;

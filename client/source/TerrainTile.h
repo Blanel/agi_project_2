@@ -1,17 +1,23 @@
 #ifndef TERRAINTILE_H_
 #define TERRAINTILE_H_
-#include "geo/Mesh.h"
+
+#include "renderer/VertexArray.h"
+#include "renderer/RenderContext.h"
+
 namespace revel
 {
 
+/*
 class TerrainTile
-{
-	
+{	
 public:
-	TerrainTile(float x, float y, int res, float len, float hei);
+	TerrainTile(std::shared_ptr<renderer::RenderContext> ctx, float x, float y, int res, float len, float hei);
 	~TerrainTile();
-	std::shared_ptr<geo::Mesh> mesh;
+
+	std::shared_ptr<renderer::VertexArray> va;
+	std::shared_ptr<renderer::ShaderProgram> sp;
 };
+*/
 
 }
 

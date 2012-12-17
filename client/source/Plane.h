@@ -2,7 +2,11 @@
 #define PLANE_H_
 
 #include "math/Vector3.h"
+#include "math/Point3.h"
+#include "math/Transform.h"
 #include "renderer/RenderContext.h"
+#include "renderer/ShaderProgram.h"
+#include "renderer/Texture2D.h"
 #include "Camera.h"
 
 namespace revel
@@ -13,24 +17,36 @@ class Plane
 {
 	std::shared_ptr<renderer::VertexArray>		m_pVertexArray;
 	std::shared_ptr<renderer::ShaderProgram> 	m_pGpuProgram;
+	std::shared_ptr<renderer::Texture2D>		m_DiffuseMap;
 	
-	point3 		m_Position;
+	point3 			m_Position;
 	//math::quat 	m_Orientation;
 
 	f32 m_Angle;
 
-	Plane(const std::shared_ptr<renderer::VertexArray>& va, std::shared_ptr<renderer::ShaderProgram>& sp, const point3& p = point3::(0, 0, 30), f32 angle = 0)	
+	u32 texid;
+
+public:
+	Plane(const std::shared_ptr<renderer::VertexArray>& va, 
+		  const std::shared_ptr<renderer::ShaderProgram>& sp,
+		  f32 x, f32 y,
+		  f32 angle = 0)
 		: m_pVertexArray(va)
 		, m_pGpuProgram(sp)
-		, m_Position(p)
+		, m_Position(point3(x, y, 50))
 		, m_Angle(angle)
 	{
+		/*
+		Image2D<pixel::RGB_u8> img("e:/test.tga");
 
+		m_DiffuseMap = Device::graphics()->create_texture_2d();
+		m_DiffuseMap->copy_from_sys_mem(img);	 
+		*/
 	}
 
 	virtual ~Plane()
 	{
-		
+		//::glDeleteTextures(1, &texid);		
 	}
 
 	void draw(const std::shared_ptr<renderer::RenderContext>& ctx, const std::shared_ptr<Camera>& cam)
@@ -39,8 +55,39 @@ class Plane
 		m_pGpuProgram->use();
 
 
+		::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+		math::mat4 model 	  = Transform::translate(m_Position.x, m_Position.y, m_Position.z) * Transform::rotate_y(0) * Transform::scale(2);
+		math::mat4 view 	  = cam->view_matrix();
+		math::mat4 projection = cam->projection_matrix();
+
+		auto& color = m_pGpuProgram->uniform<vec3>("r_Color");
+		color = vec3(0.4, 0.6, 0.9);
+
+		//auto& mv = m_pGpuProgram->uniform<mat4>("r_ModelView");
+		//auto& p = m_pGpuProgram->uniform<mat4>("r_Projection");
+		auto& mvp = m_pGpuProgram->uniform<mat4>("r_MVP");
+		//auto& diffmap = m_pGpuProgram->uniform<i32>("diffuseMap");
+		//diffmap = 0;
+
+		//m_DiffuseMap->bind();
+
+		mvp = projection * view * model;
+
+		::glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		m_pVertexArray->unbind();
+	}
+
+	void set_position(f32 x, f32 y)
+	{
+		m_Position.x = x;
+		m_Position.y = y;
+	}
+
+	void set_angle(f32 angle)
+	{
+		m_Angle = angle;
 	}
 };
 
