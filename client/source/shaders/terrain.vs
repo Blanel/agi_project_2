@@ -14,8 +14,6 @@ out vec2 UV;
 void main()
 {
 	Normal = vec4(r_ModelView * vec4(in_VtxNormal, 0.0)).xyz;	
-	//Normal = normalize(in_VtxNormal);	
 	UV = in_TexCoord0;
-
     gl_Position = r_MVP * vec4(in_VtxPosition, 1.0);
 }
