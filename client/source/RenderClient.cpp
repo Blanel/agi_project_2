@@ -94,14 +94,14 @@ RenderClient::is_connected() const
 i32
 RenderClient::run()
 {
+	auto& ctx = active_window()->context();
+
 	m_Running = true;
 
 	std::string ip = Config::get<std::string>("ip");
 	u32 port = Config::get<u32>("port");
 
     std::string xmlframe;
-
-	auto& ctx = active_window()->context();
 
     auto clearstate = std::make_shared<ClearState>();
     clearstate->set_buffers(ClearBuffers::ALL);
@@ -132,13 +132,8 @@ RenderClient::run()
 	//Only use one (dynamic?) light source
 	DirectionalLight sun(vec3(-0.4, -1, 0.3).normalized());
 
-    Scene scene(ctx);
-    scene.set_camera(camera);
-
-    Cloud c;
-    c.load("e:/cloud4.dae");
-
-    auto tex3d = Device::graphics()->create_texture_3d();
+    // Scene scene(ctx);
+    // scene.set_camera(camera);
 
 	GameState gs;
 	//TerrainManager tm(ctx, 100, 3, 128, 10, 2.5);
@@ -147,74 +142,80 @@ RenderClient::run()
 	gs.set_plane_va(planemeshva);
 	gs.set_plane_sp(planesp);
 	
-	Terrain terrain(ctx, 128, 128);
+	Terrain terrain(ctx, 32, 32);
 
 	StopWatch timer;
 
-	camera->set_position(0, 0, 200);
+	camera->set_position(0, 0, 500);
 
 	//Move this to a seperate thread
 	auto io = std::make_shared<boost::asio::io_service>();
 	ClientSocket socket(io);
 
-/*
-	Noise2 noise2;
-
-	Image2D<pixel::RGB_u8> heightmap(256, 256);
-
-	for (u32 y = 0; y < 256; ++y)
-	{
-		for (u32 x = 0; x < 256; ++x)
-		{
-			f32 n = noise2.noise(x, y) * 128.0f + 128;
-			if (n < 0)
-				n = 0;
-			if (n > 255)
-				n = 255;
-			heightmap(x, y) = pixel::RGB_u8(n, n, n);
-		}
-	}
-
-
-	TGA::write("E:/testimage.tga", heightmap);
-*/
-
+	//Enable backface culling
 	::glEnable(GL_CULL_FACE);
 
 	// CLOUD
 	CubeImage ci = CubeImage::generate_fractal_cube(); 
 
-	auto cloud_fb = ctx->create_framebuffer();
-	cloud_fb->bind();
+	auto fs_quad = std::make_shared<geo::Mesh>();
+    auto fs_quadp = fs_quad->create_vertex_attrib<point3>("position");
+    fs_quadp->data().push_back(point3(-1, -1, 0));
+    fs_quadp->data().push_back(point3( 1, -1, 0));
+    fs_quadp->data().push_back(point3(-1,  1, 0));
+    fs_quadp->data().push_back(point3( 1,  1, 0));
+	
+	auto fs_va = ctx->create_vertex_array(fs_quad);
+
+    auto screen_sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/screen.vs", 
+												  	    				 "../client/source/shaders/screen.fs");
+
+	/*
+	auto fs_vb = Device::graphics()->create_vertex_buffer(BufferHint::STATIC, 8);
+	
+	fs_vb->bind();
+	std::vector<vec2> fs_vertices;
+	fs_vertices.push_back(vec2(-1, -1));
+	fs_vertices.push_back(vec2( 1, -1));
+	fs_vertices.push_back(vec2(-1,  1));
+	fs_vertices.push_back(vec2( 1,  1));
+
+	fs_vb->copy_from_sys_mem(fs_vertices);
+	fs_vb->unbind();
+	*/
+
+
 	GLuint cloud_rt;
 	::glGenTextures(1, &cloud_rt);
 	::glBindTexture(GL_TEXTURE_2D, cloud_rt);
 	::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_pWindow->width(), m_pWindow->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0); //Empty image
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-	/*
-	::glBindTexture(GL_TEXTURE_RECTANGLE, cloud_rt);
-	::glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, m_pWindow->width(), m_pWindow->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0); //Empty image
-	::glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	::glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	*/
+	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	//Depth buffer
 	GLuint cloud_depth;
 	::glGenRenderbuffers(1, &cloud_depth);
 	::glBindRenderbuffer(GL_RENDERBUFFER, cloud_depth);
-	::glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_pWindow->width(), m_pWindow->height());
-	::glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, cloud_depth);
-	
-	::glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, cloud_rt, 0);
-	GLenum buffers[] = {GL_COLOR_ATTACHMENT0};
-	::glDrawBuffers(1, buffers);
+	::glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, m_pWindow->width(), m_pWindow->height());
+	::glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-	if(::glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		R_LOG_ERR("Invalid framebuffer");
+
+	auto cloud_fb = ctx->create_framebuffer();
+	cloud_fb->bind();
+	//::glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, cloud_fb->id(), 0);
+	::glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, cloud_rt, 0);
+	::glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, cloud_depth);	
+	GLenum status;
+
+	if(status = ::glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		R_LOG_ERR("Invalid framebuffer: " << status);
 
 	cloud_fb->unbind();
+
+	//GLenum buffers[] = {GL_COLOR_ATTACHMENT0};
+	//::glDrawBuffers(1, buffers);
 
 	try
 	{
@@ -274,9 +275,9 @@ RenderClient::run()
     	//update data
     	//poll socket
     	
-    	auto xmlframe = socket.read_frame_data();
+    	// auto xmlframe = socket.read_frame_data();
 		
-		fp.parse_frame(xmlframe, gs);
+		// fp.parse_frame(xmlframe, gs);
 		//p.set_position(gs.get_planes()[0].m_x, gs.get_planes()[0].m_y);
 		//R_LOG_INFO("Plane [0] pos: " << gs.get_planes()[0].m_x << ", " << gs.get_planes()[0].m_y);
 		//camera->set_eye(gs.getCentre().first, gs.getCentre().second, 100);
@@ -298,9 +299,26 @@ RenderClient::run()
 		//tm.generate(gs);
 		
     	//draw data
+        cloud_fb->bind();
+        terrain.draw(ctx, camera);
+        cloud_fb->unbind();
+
 		ctx->clear(clearstate);
 
-		terrain.draw(ctx, camera);
+		fs_va->bind();
+		screen_sp->use();
+		screen_sp->uniform<u32>("fbo_texture") = 0;
+		blur_v_sp->use();
+		blur_v_sp->uniform<u32>("scene_texture") = 0;
+		//blur_v_sp->uniform<f32>("rt_w") = 1280;
+		//blur_v_sp->uniform<f32>("rt_h") = 720;
+		::glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		blur_h_sp->use();
+		blur_h_sp->uniform<u32>("scene_texture") = 0;
+		::glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		fs_va->unbind();
+		//terrain.draw(ctx, camera);
+
 		//p.draw(ctx, camera);
 
 		//draw gamestate

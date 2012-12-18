@@ -1,26 +1,11 @@
 #include "TerrainGen.h"
+#include "TerrainTile.h"
 #include "geo/Mesh.h"
 #include "Noise2.h"
+#include "Surface.h"
 
 namespace revel
 {
-
-TerrainTile::TerrainTile()
-{
-
-}
-
-void 
-TerrainTile::set_vertex_array(const std::shared_ptr<renderer::VertexArray>& va)
-{
-	m_pVertexArray = va;
-}
-
-const std::shared_ptr<renderer::VertexArray>& 
-TerrainTile::vertex_array()
-{
-	return  m_pVertexArray;
-}
 
 
 Terrain::Terrain(const std::shared_ptr<renderer::RenderContext>& ctx, i32 tile_w, i32 tile_h)
@@ -37,13 +22,9 @@ Terrain::Terrain(const std::shared_ptr<renderer::RenderContext>& ctx, i32 tile_w
 	m_pShaderProgram = Device::graphics()->create_shader_program_from_file("../client/source/shaders/terrain.vs",
 																		   "../client/source/shaders/terrain.fs");
 
-	create_tile(vec2_i32(0,0));	
-	create_tile(vec2_i32(-1,0));
-	create_tile(vec2_i32(0,-1));
-	create_tile(vec2_i32(-1,-1));
-
-
-	m_DrawNormals = true;
+	for (i32 j = -8; j < 8; ++j)
+		for (i32 i = -8; i < 8; ++i)
+			create_tile(i, j);
 }
 
 Terrain::~Terrain()
@@ -52,39 +33,29 @@ Terrain::~Terrain()
 }
 
 void
-Terrain::create_tile(i32 x, i32 y)
+Terrain::create_tile(i32 tile_x, i32 tile_y)
 {
-	create_tile(vec2_i32(x, y));
-}
+	const u32 w = m_TileSize.x;
+	const u32 h = m_TileSize.y;
 
-void
-Terrain::create_tile(const vec2_i32& p)
-{
-	u32 w = m_TileSize.x;
-	u32 h = m_TileSize.y;
-
-	std::unique_ptr<TerrainTile> tile(new TerrainTile());
+	Surface<TerrainVertex> heightmap(w, h);
 
 	auto mesh = std::make_shared<geo::Mesh>();    
     auto meshp = mesh->create_vertex_attrib<point3>("position");
     auto meshn = mesh->create_vertex_attrib<vec3>("normals");
     auto mesht = mesh->create_vertex_attrib<vec2>("uv0");
     auto meshi = mesh->indices<u32>();
+	
 
-    Image2D<pixel::Gray_f32> hmap(w, h);
-
-    i32 offset_x = p.x * (m_TileSize.x - 1);
-    i32 offset_y = p.y * (m_TileSize.y - 1);
+    i32 offset_x = tile_x * (m_TileSize.x - 1);
+    i32 offset_y = tile_y * (m_TileSize.y - 1);
 
     for(i32 y=0; y<h ; y++)
 	{
 		for(i32 x=0 ; x<w ; x++)
 		{
 			f32 n = 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y + y));
-			hmap(x, y).val = n;
-
-			meshp->data().push_back(point3(x,y,n));
-			mesht->data().push_back(vec2(x / (256.0f / 16), y / (256.0f / 16)));
+			heightmap(x, y).pos = point3(x, y, n);
 		}
 	}
 
@@ -98,18 +69,16 @@ Terrain::create_tile(const vec2_i32& p)
 		}		
 	}
 
-	std::vector<vec3> normals(w * h, vec3::UnitZ);
-
-	//TODO: storing half of the normals would suffice
+		//TODO: storing half of the normals would suffice
 	for (i32 y = 1; y < h-1; ++y)
 	{
 		for (i32 x = 1; x < w-1; ++x)
 		{
 			//upper left
-			vec3 d = meshp->data()[(y-1) * w + x] - meshp->data()[y * w + x];
-			vec3 l = meshp->data()[y * w + x-1] - meshp->data()[y * w + x];
-			vec3 r = meshp->data()[y * w + x+1] - meshp->data()[y * w + x];
-			vec3 u = meshp->data()[(y+1) * w + x] - meshp->data()[y * w + x];
+			vec3 d = heightmap(x, y - 1).pos - heightmap(x, y).pos;
+			vec3 l = heightmap(x - 1, y).pos - heightmap(x, y).pos;
+			vec3 r = heightmap(x + 1, y).pos - heightmap(x, y).pos;
+			vec3 u = heightmap(x, y + 1).pos - heightmap(x, y).pos;
 
 			math::normalize(u);
 			math::normalize(d);
@@ -121,55 +90,54 @@ Terrain::create_tile(const vec2_i32& p)
 			vec3 lrn = math::cross(d, r);
 			vec3 lln = math::cross(l, d);
 
-			normals[y * h + x] = (uln + urn + lrn + lln)/4;
+			heightmap(x, y).normal = (uln + urn + lrn + lln)/4;
 		}
 	}
 
-	//fix edge cases
+	// fix edge cases
 	std::vector<point3> up(w);
 	std::vector<point3> down(w);
 	std::vector<point3> left(h);
 	std::vector<point3> right(h);
 
-	//points for adjacent tiles
 	for (i32 x = 0; x < w; ++x)
 	{
-		up.push_back(point3(x, h, m_pNoiseGen->noise(offset_x + x, offset_y + h)));
-		down.push_back(point3(x, -1, m_pNoiseGen->noise(offset_x + x, offset_y - 1)));
+		up.push_back(point3(x, h, 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y + h))));
+		down.push_back(point3(x, -1, 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y - 1))));
 	}
 
 	for (i32 y = 0; y < h; ++y)
 	{
-		left.push_back(point3(-1, y, m_pNoiseGen->noise(offset_x - 1, offset_y + y)));
-		right.push_back(point3(w, y, m_pNoiseGen->noise(offset_x + w, offset_y + y)));
+		left.push_back(point3(-1, y, 1 - fabs(m_pNoiseGen->noise(offset_x - 1, offset_y + y))));
+		right.push_back(point3(w, y, 1 - fabs(m_pNoiseGen->noise(offset_x + w, offset_y + y))));
 	}
 	
+
 	//lower
 	for (i32 x = 0; x < w; ++x)
 	{
 		vec3 u, l, r, d;
-		point3 p = meshp->data()[0 * w + x];
 
 		if (x == 0)
 		{
-			u = meshp->data()[1 * w + x] - p;
-			l = left[0] - p;
-			r = meshp->data()[0 * w + (x+1)] - p;
-			d = down[x] - p;
+			u = heightmap(x, 1).pos - heightmap(x, 0).pos;
+			l = left[0] - heightmap(x, 0).pos;
+			r = heightmap(x+1, 0).pos - heightmap(x, 0).pos;
+			d = down[x] - heightmap(x, 0).pos;
 		}
 		else if (x == w-1)
 		{
-			u = meshp->data()[1 * w + x] - p;
-			l = meshp->data()[0 * w + (x-1)] - p;
-			r = right[0] - p;
-			d = down[x] - p;
+			u = heightmap(x, 1).pos - heightmap(x, 0).pos;
+			l = heightmap(x-1, 0).pos - heightmap(x, 0).pos;
+			r = right[0] - heightmap(x, 0).pos;
+			d = down[x] - heightmap(x, 0).pos;
 		}
 		else
 		{
-			u = meshp->data()[1 * w + x] - p;
-			l = meshp->data()[0 * w + (x-1)] - p;
-			r = meshp->data()[0 * w + (x+1)] - p;
-			d = down[x] - p;
+			u = heightmap(x, 1).pos - heightmap(x, 0).pos;
+			l = heightmap(x-1, 0).pos - heightmap(x, 0).pos;
+			r = heightmap(x+1, 0).pos - heightmap(x, 0).pos;
+			d = down[x] - heightmap(x, 0).pos;
 		}
 
 		math::normalize(u);
@@ -182,35 +150,35 @@ Terrain::create_tile(const vec2_i32& p)
 		vec3 lrn = math::cross(d, r);
 		vec3 lln = math::cross(l, d);
 
-		normals[0 * w + x] = (uln + urn + lrn + lln)/4;
+		//normals[0 * w + x] = (uln + urn + lrn + lln)/4;
+		heightmap(x, 0).normal = (uln + urn + lrn + lln)/4;
 	}	
 
 	//upper
 	for (i32 x = 0; x < w; ++x)
 	{
 		vec3 u, l, r, d;
-		point3 p = meshp->data()[(h-1) * w + x];
 
 		if (x == 0)
 		{
-			u = up[x] - p;
-			l = left[h-1] - p;
-			r = meshp->data()[(h-1) * w + (x+1)] - p;
-			d = meshp->data()[(h-2) * w + x] - p; 
+			u = up[x] - heightmap(x, h-1).pos;
+			l = left[h-1] - heightmap(x, h-1).pos;
+			r = heightmap(x+1, h-1).pos - heightmap(x, h-1).pos;
+			d = heightmap(x, h-2).pos - heightmap(x, h-1).pos;
 		}
 		else if (x == w-1)
 		{
-			u = up[x] - p;
-			l = meshp->data()[(h-1) * w + (x-1)] - p;
-			r = right[h-1] - p;
-			d = meshp->data()[(h-2) * w + x] - p; 
+			u = up[x] - heightmap(x, h-1).pos;
+			l = heightmap(x-1, h-1).pos - heightmap(x, h-1).pos;
+			r = right[h-1] - heightmap(x, h-1).pos;
+			d = heightmap(x, h-2).pos - heightmap(x, h-1).pos;
 		}
 		else
 		{
-			u = up[x] - p;
-			l = meshp->data()[(h-1) * w + (x-1)] - p;
-			r = meshp->data()[(h-1) * w + (x+1)] - p;
-			d = meshp->data()[(h-2) * w + x] - p; 
+			u = up[x] - heightmap(x, h-1).pos;
+			l = heightmap(x-1, h-1).pos - heightmap(x, h-1).pos;
+			r = heightmap(x+1, h-1).pos - heightmap(x, h-1).pos;
+			d = heightmap(x, h-2).pos - heightmap(x, h-1).pos;
 		}
 
 		math::normalize(u);
@@ -223,36 +191,35 @@ Terrain::create_tile(const vec2_i32& p)
 		vec3 lrn = math::cross(d, r);
 		vec3 lln = math::cross(l, d);
 
-		normals[h-1 * w + x] = (uln + urn + lrn + lln)/4;
-		// normals[h-1 * w + x] = vec3::UnitZ;
+		// normals[h-1 * w + x] = (uln + urn + lrn + lln)/4;
+	 	heightmap(x, h-1).normal = (uln + urn + lrn + lln)/4; 
 	}
-
+	
 	//left
 	for (i32 y = 0; y < h; ++y)
 	{
 		vec3 u, l, r, d;
-		point3 p = meshp->data()[y * h + 0];
 
 		if (y == 0)
 		{			
-			u = meshp->data()[(y+1) * w + 0] - p;
-			l = left[y] - p;
-			r = meshp->data()[y * w + 1] - p;
-			d = down[0] - p;
+			u = heightmap(0, y+1).pos - heightmap(0, y).pos;
+			l = left[y] - heightmap(0, y).pos;
+			r = heightmap(1, y).pos - heightmap(0, y).pos;
+			d = down[0] - heightmap(0, y).pos;
 		}
 		else if (y == (h-1))
 		{
-			u = up[0] - p;
-			l = left[y] - p;
-			r = meshp->data()[y * w + 1] - p;
-			d = meshp->data()[(y-1) * w] - p;
+			u = up[0] - heightmap(0, y).pos;
+			l = left[y] - heightmap(0, y).pos;
+			r = heightmap(1, y).pos - heightmap(0, y).pos;
+			d = heightmap(0, y-1).pos - heightmap(0, y).pos;
 		}
 		else
 		{
-			u = meshp->data()[(y+1) * w + 0] - p;
-			l = left[y] - p;
-			r = meshp->data()[y * w + 1] - p;
-			d = meshp->data()[(y-1) * w + 0] - p;
+			u = heightmap(0, y+1).pos - heightmap(0, y).pos;
+			l = left[y] - heightmap(0, y).pos;
+			r = heightmap(1, y).pos - heightmap(0, y).pos;
+			d = heightmap(0, y-1).pos - heightmap(0, y).pos;
 		}
 
 		math::normalize(u);
@@ -265,35 +232,36 @@ Terrain::create_tile(const vec2_i32& p)
 		vec3 lrn = math::cross(d, r);
 		vec3 lln = math::cross(l, d);
 
-		normals[y * w + 0] = (uln + urn + lrn + lln)/4;
+		// normals[y * w + 0] = (uln + urn + lrn + lln)/4;
+		heightmap(0, y).normal = (uln + urn + lrn + lln)/4; 
 	}
 	
 	//right
 	for (i32 y = 0; y < h; ++y)
+	for (i32 y = 0; y < h; ++y)
 	{
 		vec3 u, l, r, d;
-		point3 p = meshp->data()[y * h + (w-1)];
 
 		if (y == 0)
-		{
-			u = meshp->data()[(y+1) * w + (w-1)] - p;
-			l = meshp->data()[y * w + (w-2)] - p;
-			r = right[y] - p;
-			d = down[w-1] - p;
+		{			
+			u = heightmap(w-1, y+1).pos - heightmap(w-1, y).pos;
+			l = heightmap(w-2, y).pos - heightmap(w-1, y).pos;
+			r = right[y] - heightmap(w-1, y).pos;
+			d = down[w-1] - heightmap(w-1, y).pos;
 		}
 		else if (y == (h-1))
 		{
-			u = up[w-1] - p;
-			l = meshp->data()[y * w + (w-2)] - p;
-			r = right[y] - p;
-			d = meshp->data()[(y-1) * w + (w-1)] - p;
+			u = up[w-1] - heightmap(w-1, y).pos;
+			l = heightmap(w-2, y).pos - heightmap(w-1, y).pos;
+			r = right[y] - heightmap(w-1, y).pos;
+			d = heightmap(w-1, y-1).pos - heightmap(w-1, y).pos;
 		}
 		else
 		{
-			u = meshp->data()[(y+1) * w + (w-1)] - p;
-			l = meshp->data()[y * w + (w-2)] - p;
-			r = right[y] - p;
-			d = meshp->data()[(y-1) * w + (w-1)] - p;
+			u = heightmap(w-1, y+1).pos - heightmap(w-1, y).pos;
+			l = heightmap(w-2, y).pos - heightmap(w-1, y).pos;
+			r = right[y] - heightmap(w-1, y).pos;
+			d = heightmap(w-1, y-1).pos - heightmap(w-1, y).pos;
 		}
 
 		math::normalize(u);
@@ -306,17 +274,27 @@ Terrain::create_tile(const vec2_i32& p)
 		vec3 lrn = math::cross(d, r);
 		vec3 lln = math::cross(l, d);
 
-		normals[y * w + (w-1)] = (uln + urn + lrn + lln)/4;
+		// normals[y * w + 0] = (uln + urn + lrn + lln)/4;
+		heightmap(w-1, y).normal = (uln + urn + lrn + lln)/4; 
 	}	
 
-	for (auto n : normals)
-		meshn->data().push_back(n);
+	for (i32 y = 0; y < h; ++y)
+	{
+		for (i32 x = 0; x < w; ++x)
+		{
+			meshp->data().push_back(heightmap(x, y).pos);
+			meshn->data().push_back(heightmap(x, y).normal);
+		}
+	}
 
-	tile->set_vertex_array(m_pCtx->create_vertex_array(mesh));
+	auto tile = std::make_shared<TerrainTile>();
 
-	m_Tiles[p] = std::move(tile);
+	auto va = m_pCtx->create_vertex_array(mesh);
+	tile->set_vertex_array(va);
+
+	m_Tiles.insert(std::make_pair(ivec2(tile_x, tile_y), tile));
+
 }
-
 
 void 
 Terrain::draw(const std::shared_ptr<renderer::RenderContext>& ctx, const std::shared_ptr<Camera>& cam)
@@ -332,23 +310,20 @@ Terrain::draw(const std::shared_ptr<renderer::RenderContext>& ctx, const std::sh
 
 	for (auto iter = m_Tiles.begin(); iter != m_Tiles.end(); ++iter)
 	{
-		mvp = cam->projection_matrix() * cam->view_matrix() * math::Transform::translate(iter->first.x * (m_TileSize.x - 1), iter->first.y * (m_TileSize.y - 1), 0);
+		if (!iter->second)
+			continue;
 
-		// mv = cam->view_matrix() * math::Transform::translate(iter->first.first * 255, iter->first.second * 255, 0);
+		mvp = cam->projection_matrix() * cam->view_matrix() * math::Transform::translate(iter->first.x * (m_TileSize.x - 1), iter->first.y * (m_TileSize.y - 1), 0);
+		mv = cam->view_matrix() * math::Transform::translate(iter->first.x * (m_TileSize.x - 1), iter->first.y * (m_TileSize.y - 1), 0);
 
 		auto& va = iter->second->vertex_array();
 		va->bind();
 		::glDrawElements(GL_TRIANGLES, va->index_count(), GL_UNSIGNED_INT, 0);
-
-		if (m_DrawNormals)
-		{
-			
-		}
-
+		va->unbind();
 	}
 }
 
-const std::unique_ptr<TerrainTile>&
+const std::shared_ptr<TerrainTile>&
 Terrain::tile(const vec2_i32& p)
 {
 	return m_Tiles[p];

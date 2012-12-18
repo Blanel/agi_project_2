@@ -10,7 +10,7 @@ solution "AGI12 Project2"
 
 		if (os.is("windows")) then
 
-			includedirs { "D:/Applications/mingw64/mingw64/include", 
+			includedirs { "d:/dev/mingw64/include", 
 						  "client/source",
 						  "client/externals/mingw64/include",
 						  "client/externals/mingw64/include/SDL"
