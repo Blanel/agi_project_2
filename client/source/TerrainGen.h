@@ -11,26 +11,15 @@
 #include "renderer/ShaderProgram.h"
 #include "Camera.h"
 #include "GameState.h"
+#include "TerrainTile.h"
 
 namespace revel
 {
 
-class TerrainTile
-{
-	std::shared_ptr<renderer::VertexArray> m_pVertexArray;
-
-public:
-	TerrainTile();
-
-	void set_vertex_array(const std::shared_ptr<renderer::VertexArray>& va);
-
-	const std::shared_ptr<renderer::VertexArray>& vertex_array();
-};
-
 class Terrain
 {
 	std::shared_ptr<renderer::RenderContext> m_pCtx;
-	std::map<vec2_i32, std::unique_ptr<TerrainTile>> m_Tiles;
+	std::map<ivec2, std::shared_ptr<TerrainTile>> m_Tiles;
 	std::shared_ptr<renderer::ShaderProgram> m_pShaderProgram;
 	std::unique_ptr<SimplexNoise> m_pNoiseGen;
 
@@ -38,7 +27,7 @@ class Terrain
 
 	vec2_i32 m_TileSize;
 
-	void create_tile(const vec2_i32& p);
+	// void create_tile(const vec2_i32& p);
 	void create_tile(i32 x, i32 y);
 
 public:
@@ -47,7 +36,8 @@ public:
 
 	void update(const GameState& gs);
 	
-	const std::unique_ptr<TerrainTile>&	tile(const vec2_i32& p);
+	const std::shared_ptr<TerrainTile>&	tile(i32 x, i32 y);
+	const std::shared_ptr<TerrainTile>&	tile(const vec2_i32& p);
 
 	void draw(const std::shared_ptr<renderer::RenderContext>& ctx, const std::shared_ptr<Camera>& cam);
 

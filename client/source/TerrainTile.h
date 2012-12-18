@@ -3,21 +3,36 @@
 
 #include "renderer/VertexArray.h"
 #include "renderer/RenderContext.h"
+#include "math/Point3.h"
+#include "math/Vector3.h"
+#include "Surface.h"
 
 namespace revel
 {
 
-/*
-class TerrainTile
+struct TerrainVertex
+{
+	point3 pos;
+	vec3 normal;
+	vec2 uv;
+};
+
+class TerrainTile// : public Surface<TerrainVertex>
 {	
+	std::shared_ptr<renderer::VertexArray> m_VertexArray;
+	std::shared_ptr<renderer::ShaderProgram> m_ShaderProgram;
+
 public:
-	TerrainTile(std::shared_ptr<renderer::RenderContext> ctx, float x, float y, int res, float len, float hei);
+	TerrainTile();
 	~TerrainTile();
 
-	std::shared_ptr<renderer::VertexArray> va;
-	std::shared_ptr<renderer::ShaderProgram> sp;
+	const std::shared_ptr<renderer::VertexArray>& vertex_array();
+	void set_vertex_array(const std::shared_ptr<renderer::VertexArray>& va);
+
+	const std::shared_ptr<renderer::ShaderProgram>& shader_program();
+	void set_shader_program(const std::shared_ptr<renderer::ShaderProgram>& sp);	
+
 };
-*/
 
 }
 
