@@ -6,5 +6,9 @@ out vec4 color;
 
 void main()
 {
-	color = texture2D(fbo_texture, uv0);
+	vec2 texcoord = uv0;
+
+	//texcoord.x += sin(texcoord.y *4*2*3.141592 + 3.0) / 100;
+
+	color = texture2D(fbo_texture, texcoord);
 }
