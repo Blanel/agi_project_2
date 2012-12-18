@@ -212,20 +212,6 @@ public:
 			return false;
 	}
 
-	bool
-	operator>(const Vector2& v) const
-	{
-		if (x > v.x)
-			return true;
-		else if (x == v.x)
-		{
-			if (y > v.y)
-				return true;
-		}
-		else
-			return false;
-	}
-
     /**
      * Multiply vector elements with a scalar.
      *
@@ -403,6 +389,7 @@ Vector2<T>::UnitY = Vector2<T>(0,1);
     typedef math::Vector2<f32> vec2_f32;
     typedef math::Vector2<f64> vec2_f64;
     typedef math::Vector2<i32> vec2_i32;
+    typedef math::Vector2<i32> ivec2;
     typedef math::Vector2<u32> vec2_u32;
 
 } // ::revel
