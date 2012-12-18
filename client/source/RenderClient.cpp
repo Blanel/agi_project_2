@@ -308,6 +308,13 @@ RenderClient::run()
 		fs_va->bind();
 		screen_sp->use();
 		screen_sp->uniform<u32>("fbo_texture") = 0;
+		blur_v_sp->use();
+		blur_v_sp->uniform<u32>("scene_texture") = 0;
+		//blur_v_sp->uniform<f32>("rt_w") = 1280;
+		//blur_v_sp->uniform<f32>("rt_h") = 720;
+		::glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		blur_h_sp->use();
+		blur_h_sp->uniform<u32>("scene_texture") = 0;
 		::glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		fs_va->unbind();
 		//terrain.draw(ctx, camera);
