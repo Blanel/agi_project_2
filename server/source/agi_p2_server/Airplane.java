@@ -7,8 +7,8 @@ public class Airplane extends Entity{
 	private int kills;
 	private String name;
 	
-	private final static double BASESPEED = 0.01;
-	private final static double SPM = 0.01;
+	private final static double BASESPEED = 0.1;
+	private final static double SPM = 0.1;
 	
 	/*
 	 * Statuses for planes:

@@ -272,12 +272,10 @@ RenderClient::run()
 
     	}
 
-    	//update data
-    	//poll socket
-    	
-    	// auto xmlframe = socket.read_frame_data();
-		
-		// fp.parse_frame(xmlframe, gs);
+		// THESE TWO LINES NEED TO BE THREADED GOD DAMNIT!
+    	auto xmlframe = socket.read_frame_data();
+		fp.parse_frame(xmlframe, gs);
+		 
 		//p.set_position(gs.get_planes()[0].m_x, gs.get_planes()[0].m_y);
 		//R_LOG_INFO("Plane [0] pos: " << gs.get_planes()[0].m_x << ", " << gs.get_planes()[0].m_y);
 		//camera->set_eye(gs.getCentre().first, gs.getCentre().second, 100);
@@ -322,36 +320,63 @@ RenderClient::run()
 		//p.draw(ctx, camera);
 
 		//draw gamestate
-		/*
+		
 		{
 
 			planemeshva->bind();
 			planesp->use();
-
+			// Draw planes
 			for (auto& plane : gs.get_planes())
 			{
+				if(plane.second.m_alive)
+				{
+					::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-				::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+					math::mat4 model = Transform::translate(plane.second.m_x, plane.second.m_y, 150) * Transform::rotate_y(plane.second.m_angle);
+					math::mat4 view = camera->view_matrix();
+					math::mat4 projection = camera->projection_matrix();
 
-				math::mat4 model = Transform::translate(plane.x, plane.y, 50) * Transform::rotate_y(plane.angle);
-				math::mat4 view = camera->view_matrix();
-				math::mat4 projection = camera->projection_matrix();
+					auto& color = planesp->uniform<vec3>("r_Color");
+					color = vec3(0.4, 0.6, 0.9);
+				
+					R_LOG_INFO("Plane pos: " << plane.second.m_x << ", " << plane.second.m_y);
 
-				auto& color = planesp->uniform<vec3>("r_Color");
-				color = vec3(0.4, 0.6, 0.9);
+					auto& mvp = planesp->uniform<mat4>("r_MVP");
+
+					mvp = projection * view * model;
+
+					::glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+				}
+			}
 			
-				R_LOG_INFO("Plane pos: " << plane.x << ", " << plane.y);
+			
+			//Draw bullets
+			for (auto& bullet : gs.get_bullets())
+			{
+				if(bullet.second.m_alive)
+				{
+					::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-				auto& mvp = planesp->uniform<mat4>("r_MVP");
+					math::mat4 model = Transform::translate(bullet.second.m_x, bullet.second.m_y, 150) * Transform::rotate_y(bullet.second.m_angle);
+					math::mat4 view = camera->view_matrix();
+					math::mat4 projection = camera->projection_matrix();
 
-				mvp = projection * view * model;
+					auto& color = planesp->uniform<vec3>("r_Color");
+					color = vec3(0.4, 0.6, 0.9);
+				
+					R_LOG_INFO("Bullet pos: " << bullet.second.m_x << ", " << bullet.second.m_y);
 
-				::glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+					auto& mvp = planesp->uniform<mat4>("r_MVP");
+
+					mvp = projection * view * model;
+
+					::glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+				}
 			}
 
 			planemeshva->unbind();	
 		}
-		*/
+		
 		//ctx->render(scene);
 
 		/*
