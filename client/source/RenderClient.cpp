@@ -42,7 +42,7 @@ using namespace revel::renderer;
 #include "Plane.h"
 
 #include <pugixml.hpp>
-#include <thread>
+#include <boost/thread.hpp>
 #include "FrameParser.h"
 
 #include "TerrainGen.h"
@@ -96,6 +96,8 @@ RenderClient::run()
 {
 	auto& ctx = active_window()->context();
 
+	// boost::thread t1;
+
 	m_Running = true;
 
 	std::string ip = Config::get<std::string>("ip");
@@ -142,7 +144,7 @@ RenderClient::run()
 	gs.set_plane_va(planemeshva);
 	gs.set_plane_sp(planesp);
 	
-	Terrain terrain(ctx, 32, 32);
+	Terrain terrain(ctx, 128, 128);
 
 	StopWatch timer;
 
@@ -154,6 +156,10 @@ RenderClient::run()
 
 	//Enable backface culling
 	::glEnable(GL_CULL_FACE);
+	// ::glEnable(GL_DEPTH_TEST);
+
+	auto cubemesh = geo::Mesh::create_cube();
+	auto cube_va = ctx->create_vertex_array(cubemesh);
 
 	// CLOUD
 	CubeImage ci = CubeImage::generate_fractal_cube(); 
@@ -184,15 +190,36 @@ RenderClient::run()
 	fs_vb->unbind();
 	*/
 
+	Cloud cloud;
+	cloud.load("e:/cloud4.dae");
 
-	GLuint cloud_rt;
-	::glGenTextures(1, &cloud_rt);
-	::glBindTexture(GL_TEXTURE_2D, cloud_rt);
+	GLuint terrain_rt, blur_v, blur_h;
+	
+	::glGenTextures(1, &terrain_rt);
+	::glBindTexture(GL_TEXTURE_2D, terrain_rt);
 	::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_pWindow->width(), m_pWindow->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0); //Empty image
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+/*
+	::glGenTextures(1, &blur_v);
+	::glBindTexture(GL_TEXTURE_2D, blur_v);
+	::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_pWindow->width(), m_pWindow->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0); //Empty image
+	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	::glGenTextures(1, &blur_h);
+	::glBindTexture(GL_TEXTURE_2D, blur_h);
+	::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_pWindow->width(), m_pWindow->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0); //Empty image
+	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+*/
 
 	//Depth buffer
 	GLuint cloud_depth;
@@ -205,7 +232,7 @@ RenderClient::run()
 	auto cloud_fb = ctx->create_framebuffer();
 	cloud_fb->bind();
 	//::glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, cloud_fb->id(), 0);
-	::glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, cloud_rt, 0);
+	::glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, terrain_rt, 0);
 	::glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, cloud_depth);	
 	GLenum status;
 
@@ -230,6 +257,8 @@ RenderClient::run()
 	
 	FrameParser fp;
 	active_window()->show_cursor(false);
+
+	vec2 campos(0, 0);
 
 	while (this->is_running())
 	{
@@ -297,27 +326,42 @@ RenderClient::run()
         }
 
 		//tm.generate(gs);
-		
+
+
+		camera->set_position(campos.x, campos.y, 300);
+
+		campos.x += 0.01;
+		campos.y += 0.01;
+
+		terrain.update(camera);
     	//draw data
         cloud_fb->bind();
+        ctx->clear(clearstate);
         terrain.draw(ctx, camera);
+		// blur_v_sp->use();
+		// blur_v_sp->uniform<u32>("scene_texture") = 0;
+		
+		// blur_v_sp->uniform<f32>("rt_w") = 1280;
+		//blur_v_sp->uniform<f32>("rt_h") = 720;
+		
+		// ::glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		// blur_h_sp->use();
+		// blur_h_sp->uniform<u32>("scene_texture") = 0;
         cloud_fb->unbind();
 
+		
 		ctx->clear(clearstate);
+		// terrain.draw(ctx, camera);
 
+		::glDisable(GL_DEPTH_TEST);
 		fs_va->bind();
 		screen_sp->use();
 		screen_sp->uniform<u32>("fbo_texture") = 0;
-		blur_v_sp->use();
-		blur_v_sp->uniform<u32>("scene_texture") = 0;
-		//blur_v_sp->uniform<f32>("rt_w") = 1280;
-		//blur_v_sp->uniform<f32>("rt_h") = 720;
-		::glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		blur_h_sp->use();
-		blur_h_sp->uniform<u32>("scene_texture") = 0;
 		::glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		fs_va->unbind();
+		// ::glEnable(GL_DEPTH_TEST);
 		//terrain.draw(ctx, camera);
+
 
 		//p.draw(ctx, camera);
 
