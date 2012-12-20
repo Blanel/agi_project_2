@@ -12,7 +12,7 @@ public class GameState implements Runnable {
 	private int planeIdPool;
 	private int bulletIdPool;
 	private final double MAX_DISTANCE = 16;
-	private final long UPDATEFREQUENCY = 4000000;
+	private final long UPDATEFREQUENCY = 17000000;
 	private Server srv;
 
 	private static final double planeHitbox = 0.5f;
