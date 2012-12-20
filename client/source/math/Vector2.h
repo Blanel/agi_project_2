@@ -201,13 +201,8 @@ public:
 	bool
 	operator<(const Vector2& v) const
 	{
-		if (x < v.x)
+		if (x < v.x || (x == v.x && y < v.y))
 			return true;
-		else if (x == v.x)
-		{
-			if (y < v.y)
-				return true;
-		}
 		else
 			return false;
 	}
