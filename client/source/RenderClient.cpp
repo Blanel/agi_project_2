@@ -42,7 +42,7 @@ using namespace revel::renderer;
 #include "Plane.h"
 
 #include <pugixml.hpp>
-#include <thread>
+#include <boost/thread/thread.hpp>
 #include "FrameParser.h"
 
 #include "TerrainGen.h"
@@ -64,6 +64,8 @@ RenderClient::RenderClient()
 	u32 screenh = Config::get<u32>("screen_height");
 
 	string title = "AGI12 Project 2";
+	auto io = std::make_shared<boost::asio::io_service>();
+	m_socket = std::make_shared<ClientSocket>(io);
 
 	Device::register_device(renderer::GraphicsDeviceCreator::create_device(api));
 	m_pWindow = Device::graphics()->create_window(screenw, screenh, title);
@@ -135,12 +137,12 @@ RenderClient::run()
     // Scene scene(ctx);
     // scene.set_camera(camera);
 
-	GameState gs;
+	
 	//TerrainManager tm(ctx, 100, 3, 128, 10, 2.5);
 	//tm.generate(gs);
 
-	gs.set_plane_va(planemeshva);
-	gs.set_plane_sp(planesp);
+	m_gs.set_plane_va(planemeshva);
+	m_gs.set_plane_sp(planesp);
 	
 	Terrain terrain(ctx, 32, 32);
 
@@ -149,8 +151,7 @@ RenderClient::run()
 	camera->set_position(0, 0, 500);
 
 	//Move this to a seperate thread
-	auto io = std::make_shared<boost::asio::io_service>();
-	ClientSocket socket(io);
+
 
 	//Enable backface culling
 	::glEnable(GL_CULL_FACE);
@@ -219,7 +220,7 @@ RenderClient::run()
 
 	try
 	{
-		socket.open(ip, port);
+		m_socket->open(ip, port);
 	}
 	catch(std::exception &e)
 	{
@@ -228,8 +229,10 @@ RenderClient::run()
 
 	u32 fps = 0;
 	
-	FrameParser fp;
+	
 	active_window()->show_cursor(false);
+	
+	boost::thread t1(&RenderClient::gs_update_loop, this);
 
 	while (this->is_running())
 	{
@@ -273,8 +276,7 @@ RenderClient::run()
     	}
 
 		// THESE TWO LINES NEED TO BE THREADED GOD DAMNIT!
-    	auto xmlframe = socket.read_frame_data();
-		fp.parse_frame(xmlframe, gs);
+    	
 		 
 		//p.set_position(gs.get_planes()[0].m_x, gs.get_planes()[0].m_y);
 		//R_LOG_INFO("Plane [0] pos: " << gs.get_planes()[0].m_x << ", " << gs.get_planes()[0].m_y);
@@ -326,7 +328,7 @@ RenderClient::run()
 			planemeshva->bind();
 			planesp->use();
 			// Draw planes
-			for (auto& plane : gs.get_planes())
+			for (auto& plane : m_gs.get_planes())
 			{
 				if(plane.second.m_alive)
 				{
@@ -351,7 +353,7 @@ RenderClient::run()
 			
 			
 			//Draw bullets
-			for (auto& bullet : gs.get_bullets())
+			for (auto& bullet : m_gs.get_bullets())
 			{
 				if(bullet.second.m_alive)
 				{
@@ -427,6 +429,15 @@ const std::shared_ptr<RenderWindow>&
 RenderClient::active_window()
 {
 	return m_pWindow;
+}
+
+void RenderClient::gs_update_loop()
+{
+	while(this->is_running())
+	{
+		auto xmlframe = m_socket->read_frame_data();
+		m_fp.parse_frame(xmlframe, m_gs);
+	}
 }
 
 	
