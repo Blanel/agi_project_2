@@ -3,6 +3,7 @@
 #include "geo/Mesh.h"
 #include "Noise2.h"
 #include "Surface.h"
+#include "Image2D.h"
 
 namespace revel
 {
@@ -14,16 +15,21 @@ Terrain::Terrain(const std::shared_ptr<renderer::RenderContext>& ctx, i32 tile_w
 	m_TileSize = vec2_i32(tile_w, tile_h);
 
 	m_pNoiseGen = std::unique_ptr<SimplexNoise>(new SimplexNoise(2));
-	m_pNoiseGen->set_frequency(0.33f/256.0f);
-	m_pNoiseGen->set_octaves(8);
-	m_pNoiseGen->set_amplitude(15.f);
-	m_pNoiseGen->set_persistance(0.335f);
+	m_pNoiseGen->set_frequency(0.32f/256.0f);
+	m_pNoiseGen->set_octaves(12);
+	m_pNoiseGen->set_amplitude(17.5f);
+	m_pNoiseGen->set_persistance(0.39f);
 
 	m_pShaderProgram = Device::graphics()->create_shader_program_from_file("../client/source/shaders/terrain.vs",
 																		   "../client/source/shaders/terrain.fs");
 
-	for (i32 j = -8; j < 8; ++j)
-		for (i32 i = -8; i < 8; ++i)
+	Image2D<pixel::RGB_u8> img("e:/rock.tga");
+
+	m_DiffuseMap = Device::graphics()->create_texture_2d();
+	m_DiffuseMap->copy_from_sys_mem(img);	 
+
+	for (i32 j = -3; j < 4; ++j)
+		for (i32 i = -3; i < 4; ++i)
 			create_tile(i, j);
 }
 
@@ -56,6 +62,7 @@ Terrain::create_tile(i32 tile_x, i32 tile_y)
 		{
 			f32 n = 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y + y));
 			heightmap(x, y).pos = point3(x, y, n);
+			heightmap(x, y).uv = vec2(4*x/w, 4*y/h);
 		}
 	}
 
@@ -94,25 +101,6 @@ Terrain::create_tile(i32 tile_x, i32 tile_y)
 		}
 	}
 
-	// fix edge cases
-	std::vector<point3> up(w);
-	std::vector<point3> down(w);
-	std::vector<point3> left(h);
-	std::vector<point3> right(h);
-
-	for (i32 x = 0; x < w; ++x)
-	{
-		up.push_back(point3(x, h, 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y + h))));
-		down.push_back(point3(x, -1, 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y - 1))));
-	}
-
-	for (i32 y = 0; y < h; ++y)
-	{
-		left.push_back(point3(-1, y, 1 - fabs(m_pNoiseGen->noise(offset_x - 1, offset_y + y))));
-		right.push_back(point3(w, y, 1 - fabs(m_pNoiseGen->noise(offset_x + w, offset_y + y))));
-	}
-	
-
 	//lower
 	for (i32 x = 0; x < w; ++x)
 	{
@@ -121,23 +109,23 @@ Terrain::create_tile(i32 tile_x, i32 tile_y)
 		if (x == 0)
 		{
 			u = heightmap(x, 1).pos - heightmap(x, 0).pos;
-			l = left[0] - heightmap(x, 0).pos;
+			l = point3(x-1, 0, 1 - fabs(m_pNoiseGen->noise(offset_x + x-1, offset_y + 0))) - heightmap(x, 0).pos;
 			r = heightmap(x+1, 0).pos - heightmap(x, 0).pos;
-			d = down[x] - heightmap(x, 0).pos;
+			d = point3(x, -1, 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y - 1))) - heightmap(x, 0).pos;
 		}
 		else if (x == w-1)
 		{
 			u = heightmap(x, 1).pos - heightmap(x, 0).pos;
 			l = heightmap(x-1, 0).pos - heightmap(x, 0).pos;
-			r = right[0] - heightmap(x, 0).pos;
-			d = down[x] - heightmap(x, 0).pos;
+			r = point3(x+1, 0, 1 - fabs(m_pNoiseGen->noise(offset_x + x+1, offset_y))) - heightmap(x, 0).pos;
+			d = point3(x, -1, 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y - 1))) - heightmap(x, 0).pos;
 		}
 		else
 		{
 			u = heightmap(x, 1).pos - heightmap(x, 0).pos;
 			l = heightmap(x-1, 0).pos - heightmap(x, 0).pos;
 			r = heightmap(x+1, 0).pos - heightmap(x, 0).pos;
-			d = down[x] - heightmap(x, 0).pos;
+			d = point3(x, -1, 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y - 1))) - heightmap(x, 0).pos;
 		}
 
 		math::normalize(u);
@@ -152,6 +140,7 @@ Terrain::create_tile(i32 tile_x, i32 tile_y)
 
 		//normals[0 * w + x] = (uln + urn + lrn + lln)/4;
 		heightmap(x, 0).normal = (uln + urn + lrn + lln)/4;
+		// heightmap(x, 0).normal = vec3::UnitZ;
 	}	
 
 	//upper
@@ -161,21 +150,21 @@ Terrain::create_tile(i32 tile_x, i32 tile_y)
 
 		if (x == 0)
 		{
-			u = up[x] - heightmap(x, h-1).pos;
-			l = left[h-1] - heightmap(x, h-1).pos;
+			u = point3(x, h, 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y + h))) - heightmap(x, h-1).pos;
+			l = point3(x-1, h-1, 1 - fabs(m_pNoiseGen->noise(offset_x + x-1, offset_y + (h-1)))) - heightmap(x, h-1).pos;
 			r = heightmap(x+1, h-1).pos - heightmap(x, h-1).pos;
 			d = heightmap(x, h-2).pos - heightmap(x, h-1).pos;
 		}
 		else if (x == w-1)
 		{
-			u = up[x] - heightmap(x, h-1).pos;
+			u = point3(x, h, 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y + h))) - heightmap(x, h-1).pos;
 			l = heightmap(x-1, h-1).pos - heightmap(x, h-1).pos;
-			r = right[h-1] - heightmap(x, h-1).pos;
+			r = point3(x+1, h-1, 1 - fabs(m_pNoiseGen->noise(offset_x + x+1, offset_y + (h-1)))) - heightmap(x, h-1).pos;
 			d = heightmap(x, h-2).pos - heightmap(x, h-1).pos;
 		}
 		else
 		{
-			u = up[x] - heightmap(x, h-1).pos;
+			u = point3(x, h, 1 - fabs(m_pNoiseGen->noise(offset_x + x, offset_y + h))) - heightmap(x, h-1).pos;
 			l = heightmap(x-1, h-1).pos - heightmap(x, h-1).pos;
 			r = heightmap(x+1, h-1).pos - heightmap(x, h-1).pos;
 			d = heightmap(x, h-2).pos - heightmap(x, h-1).pos;
@@ -193,6 +182,7 @@ Terrain::create_tile(i32 tile_x, i32 tile_y)
 
 		// normals[h-1 * w + x] = (uln + urn + lrn + lln)/4;
 	 	heightmap(x, h-1).normal = (uln + urn + lrn + lln)/4; 
+	 	// heightmap(x, h-1).normal = vec3::UnitZ;
 	}
 	
 	//left
@@ -203,21 +193,21 @@ Terrain::create_tile(i32 tile_x, i32 tile_y)
 		if (y == 0)
 		{			
 			u = heightmap(0, y+1).pos - heightmap(0, y).pos;
-			l = left[y] - heightmap(0, y).pos;
+			l = point3(-1, y, 1 - fabs(m_pNoiseGen->noise(offset_x - 1, offset_y + y))) - heightmap(0, y).pos;
 			r = heightmap(1, y).pos - heightmap(0, y).pos;
-			d = down[0] - heightmap(0, y).pos;
+			d = point3(0, -1, 1 - fabs(m_pNoiseGen->noise(offset_x + 0, offset_y - 1))) - heightmap(0, y).pos;
 		}
 		else if (y == (h-1))
 		{
-			u = up[0] - heightmap(0, y).pos;
-			l = left[y] - heightmap(0, y).pos;
+			u = point3(0, h, 1 - fabs(m_pNoiseGen->noise(offset_x + 0, offset_y + h))) - heightmap(0, y).pos;
+			l = point3(-1, h-1, 1 - fabs(m_pNoiseGen->noise(offset_x - 1, offset_y + h-1))) - heightmap(0, y).pos;
 			r = heightmap(1, y).pos - heightmap(0, y).pos;
 			d = heightmap(0, y-1).pos - heightmap(0, y).pos;
 		}
 		else
 		{
 			u = heightmap(0, y+1).pos - heightmap(0, y).pos;
-			l = left[y] - heightmap(0, y).pos;
+			l = point3(-1, y, 1 - fabs(m_pNoiseGen->noise(offset_x - 1, offset_y + y))) - heightmap(0, y).pos;
 			r = heightmap(1, y).pos - heightmap(0, y).pos;
 			d = heightmap(0, y-1).pos - heightmap(0, y).pos;
 		}
@@ -234,10 +224,10 @@ Terrain::create_tile(i32 tile_x, i32 tile_y)
 
 		// normals[y * w + 0] = (uln + urn + lrn + lln)/4;
 		heightmap(0, y).normal = (uln + urn + lrn + lln)/4; 
+		// heightmap(0, y).normal = vec3::UnitZ;
 	}
 	
 	//right
-	for (i32 y = 0; y < h; ++y)
 	for (i32 y = 0; y < h; ++y)
 	{
 		vec3 u, l, r, d;
@@ -246,21 +236,21 @@ Terrain::create_tile(i32 tile_x, i32 tile_y)
 		{			
 			u = heightmap(w-1, y+1).pos - heightmap(w-1, y).pos;
 			l = heightmap(w-2, y).pos - heightmap(w-1, y).pos;
-			r = right[y] - heightmap(w-1, y).pos;
-			d = down[w-1] - heightmap(w-1, y).pos;
+			r = point3(w, y, 1 - fabs(m_pNoiseGen->noise(offset_x + w, offset_y + y))) - heightmap(0, y).pos; - heightmap(w-1, y).pos;
+			d = point3(w-1, y-1, 1 - fabs(m_pNoiseGen->noise(offset_x + w-1, offset_y - 1))) - heightmap(w-1, y).pos;
 		}
 		else if (y == (h-1))
 		{
-			u = up[w-1] - heightmap(w-1, y).pos;
+			u = point3(w-1, y+1, 1 - fabs(m_pNoiseGen->noise(offset_x + w-1, offset_y + y+1))) - heightmap(w-1, y).pos;
 			l = heightmap(w-2, y).pos - heightmap(w-1, y).pos;
-			r = right[y] - heightmap(w-1, y).pos;
+			r = point3(w, y, 1 - fabs(m_pNoiseGen->noise(offset_x + w, offset_y + y))) - heightmap(0, y).pos; - heightmap(w-1, y).pos;
 			d = heightmap(w-1, y-1).pos - heightmap(w-1, y).pos;
 		}
 		else
 		{
 			u = heightmap(w-1, y+1).pos - heightmap(w-1, y).pos;
 			l = heightmap(w-2, y).pos - heightmap(w-1, y).pos;
-			r = right[y] - heightmap(w-1, y).pos;
+			r = point3(w, y, 1 - fabs(m_pNoiseGen->noise(offset_x + w, offset_y + y))) - heightmap(0, y).pos; - heightmap(w-1, y).pos;
 			d = heightmap(w-1, y-1).pos - heightmap(w-1, y).pos;
 		}
 
@@ -274,8 +264,8 @@ Terrain::create_tile(i32 tile_x, i32 tile_y)
 		vec3 lrn = math::cross(d, r);
 		vec3 lln = math::cross(l, d);
 
-		// normals[y * w + 0] = (uln + urn + lrn + lln)/4;
 		heightmap(w-1, y).normal = (uln + urn + lrn + lln)/4; 
+		// heightmap(w-1, y).normal = vec3::UnitZ; 
 	}	
 
 	for (i32 y = 0; y < h; ++y)
@@ -284,6 +274,7 @@ Terrain::create_tile(i32 tile_x, i32 tile_y)
 		{
 			meshp->data().push_back(heightmap(x, y).pos);
 			meshn->data().push_back(heightmap(x, y).normal);
+			mesht->data().push_back(heightmap(x, y).uv);
 		}
 	}
 
@@ -313,6 +304,12 @@ Terrain::draw(const std::shared_ptr<renderer::RenderContext>& ctx, const std::sh
 		if (!iter->second)
 			continue;
 
+		f32 x = cam->position().x / (m_TileSize.x - 1);
+		f32 y = cam->position().y / (m_TileSize.y - 1);
+
+		if (fabs(iter->first.x - x) > 3 || fabs(iter->first.y - y) > 2)
+			continue;
+
 		mvp = cam->projection_matrix() * cam->view_matrix() * math::Transform::translate(iter->first.x * (m_TileSize.x - 1), iter->first.y * (m_TileSize.y - 1), 0);
 		mv = cam->view_matrix() * math::Transform::translate(iter->first.x * (m_TileSize.x - 1), iter->first.y * (m_TileSize.y - 1), 0);
 
@@ -333,6 +330,24 @@ void
 Terrain::update(const GameState& gs)
 {
 	//step through all tiles, if tile > set distance, remove from map
+
+}
+
+void
+Terrain::update(const std::shared_ptr<Camera>& cam)
+{
+	i32 x = cam->position().x / (m_TileSize.x - 1);
+	i32 y = cam->position().y / (m_TileSize.y - 1);
+
+	for (i32 ty = y-4; ty < y+4; ++ty)
+	{
+		for (i32 tx = x-4; tx < x+4; ++tx)
+		{
+			if (m_Tiles.find(ivec2(tx, ty)) == m_Tiles.end())
+				create_tile(tx, ty);
+
+		}
+	}
 
 }
 

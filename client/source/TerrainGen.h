@@ -27,6 +27,8 @@ class Terrain
 
 	vec2_i32 m_TileSize;
 
+	std::shared_ptr<renderer::Texture2D>		m_DiffuseMap;
+
 	// void create_tile(const vec2_i32& p);
 	void create_tile(i32 x, i32 y);
 
@@ -35,6 +37,7 @@ public:
 	~Terrain();
 
 	void update(const GameState& gs);
+	void update(const std::shared_ptr<Camera>& cam);
 	
 	const std::shared_ptr<TerrainTile>&	tile(i32 x, i32 y);
 	const std::shared_ptr<TerrainTile>&	tile(const vec2_i32& p);
