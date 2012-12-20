@@ -86,8 +86,8 @@ public:
     {
         //return look_at(m_Eye, m_Target, m_Up).inversed();
         //return (math::Transform::translate(m_Position) * math::Transform::rotate_x(math::PI/6) * math::Transform::rotate_y(-math::PI/12)).inversed();
-        return (math::Transform::rotate_x(math::PI/9) * math::Transform::translate(position())).inversed();
-        return math::Transform::translate(position()).inversed();
+        return (math::Transform::rotate_x(math::PI/128) * math::Transform::translate(position())).inversed();
+        // return math::Transform::translate(position()).inversed();
     }
 
     math::mat4 look_at(point3 eye, point3 target, vec3 up = vec3(0, 1, 0))
@@ -117,7 +117,7 @@ class PerspectiveCamera : public Camera
 public:
     PerspectiveCamera()
     {
-        m_Projection = math::Transform::perspective(65.0f, 16.0/9.0, 0.5, 1500.0);
+        m_Projection = math::Transform::perspective(52.5f, 16.0/9.0, 0.5, 1500.0);
     }
 };
 
