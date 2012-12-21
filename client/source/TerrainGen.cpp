@@ -195,12 +195,12 @@ Terrain::create_tile(i32 tile_x, i32 tile_y)
 			u = heightmap(0, y+1).pos - heightmap(0, y).pos;
 			l = point3(-1, y, 1 - fabs(m_pNoiseGen->noise(offset_x - 1, offset_y + y))) - heightmap(0, y).pos;
 			r = heightmap(1, y).pos - heightmap(0, y).pos;
-			d = point3(0, -1, 1 - fabs(m_pNoiseGen->noise(offset_x + 0, offset_y - 1))) - heightmap(0, y).pos;
+			d = point3(0, y-1, 1 - fabs(m_pNoiseGen->noise(offset_x + 0, offset_y + (y-1)))) - heightmap(0, y).pos;
 		}
 		else if (y == (h-1))
 		{
-			u = point3(0, h, 1 - fabs(m_pNoiseGen->noise(offset_x + 0, offset_y + h))) - heightmap(0, y).pos;
-			l = point3(-1, h-1, 1 - fabs(m_pNoiseGen->noise(offset_x - 1, offset_y + h-1))) - heightmap(0, y).pos;
+			u = point3(0, y+1, 1 - fabs(m_pNoiseGen->noise(offset_x + 0, offset_y + y+1))) - heightmap(0, y).pos;
+			l = point3(-1, y, 1 - fabs(m_pNoiseGen->noise(offset_x - 1, offset_y + y))) - heightmap(0, y).pos;
 			r = heightmap(1, y).pos - heightmap(0, y).pos;
 			d = heightmap(0, y-1).pos - heightmap(0, y).pos;
 		}
@@ -307,7 +307,7 @@ Terrain::draw(const std::shared_ptr<renderer::RenderContext>& ctx, const std::sh
 		f32 x = cam->position().x / (m_TileSize.x - 1);
 		f32 y = cam->position().y / (m_TileSize.y - 1);
 
-		if (fabs(iter->first.x - x) > 3 || fabs(iter->first.y - y) > 2)
+		if (fabs(iter->first.x - x) > 3 || fabs(iter->first.y - y) > 3)
 			continue;
 
 		mvp = cam->projection_matrix() * cam->view_matrix() * math::Transform::translate(iter->first.x * (m_TileSize.x - 1), iter->first.y * (m_TileSize.y - 1), 0);
@@ -348,7 +348,6 @@ Terrain::update(const std::shared_ptr<Camera>& cam)
 
 		}
 	}
-
 }
 
 

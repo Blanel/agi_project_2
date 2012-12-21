@@ -20,8 +20,8 @@ void main()
 
 	for (int i = 1; i < 3; ++i)
 	{
-		tc += texture(scene_texture, uv + vec2(0.0, offset[i])/rt_h).rgb * weight[i];
-		tc += texture(scene_texture, uv - vec2(0.0, offset[i])/rt_h).rgb * weight[i];
+		tc += texture(scene_texture, uv + vec2(0.0, offset[i])/rt_h).rgba * weight[i];
+		tc += texture(scene_texture, uv - vec2(0.0, offset[i])/rt_h).rgba * weight[i];
 	}
 
 	color = vec4(tc, 1.0);

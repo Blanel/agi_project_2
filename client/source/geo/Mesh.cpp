@@ -103,7 +103,7 @@ Mesh::create_cube()
     uv->data().push_back(vec2(1, 1));
     normals->data().push_back(vec3(1, 0, 0));
     
-    pos->data().push_back(point3( 1,  1, -1));
+    pos->data().push_back(point3( 1,  1, 1));
     uv->data().push_back(vec2(0, 1));
     normals->data().push_back(vec3(1, 0, 0));
 

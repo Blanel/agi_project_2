@@ -53,8 +53,8 @@ public:
 		SimplexNoise simplex;
 
 		simplex.set_amplitude(1.0f);
-		simplex.set_frequency(0.04f);
-		simplex.set_octaves(1);
+		simplex.set_frequency(0.5f);
+		simplex.set_octaves(4);
 		simplex.set_persistance(1.0f);
 
 		for (u32 y = 0; y < 256; ++y)
@@ -72,7 +72,7 @@ public:
 			}			
 		}
 
-		//TGA::write("E:/test123.tga", *(cube.front()));
+		TGA::write("E:/test123.tga", *(cube.front()));
 
 		return cube;
 	}
@@ -89,6 +89,14 @@ class Cloud
 	std::shared_ptr<ShaderProgram> m_pShaderProgram;
 
 public:
+	Cloud()
+	{
+	    auto cube_sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/cube.vs", 
+			 								  	    				   	   "../client/source/shaders/cube.fs");
+
+	    m_pShaderProgram = cube_sp;
+	}
+
 	void load(const std::string& file)
 	{
 		pugi::xml_document doc;
@@ -105,6 +113,13 @@ public:
 		auto vstr = vtext.child_value();
 		std::stringstream vss(vstr);
 
+		// u32 vcount = doc.child("COLLADA").child("library_geometries").child("geometry").child("mesh").child("source").child("float_array").attribute("count").as_uint() / 3;
+		// auto vtext = doc.child("COLLADA").child("library_geometries").child("geometry").child("mesh").child("source").child("float_array");
+
+		// auto vstr = vtext.child_value();
+		// std::stringstream vss(vstr);
+
+
 		f32 x, y, z;
 
 		for (u32 i = 0; i < vcount; ++i)
@@ -116,7 +131,7 @@ public:
 			cloudp->data().push_back(point3(x, y, z));
 		}
 
-		R_LOG_INFO("POINT: " << x << ", " << y << ", " << z);
+		R_LOG_INFO("Vertices: " << x << ", " << y << ", " << z);
 
 		point3 p(x, y, z);
 
@@ -125,11 +140,36 @@ public:
 
 	}
 
-	void draw(const std::shared_ptr<renderer::RenderContext>& ctx)
+	void draw(const std::shared_ptr<renderer::RenderContext>& ctx, const std::shared_ptr<Camera>& cam)
 	{
-		//create framebuffer and render to texture target
-		//load
+		// ::glDisable(GL_DEPTH_TEST);
 
+		m_VA->bind();
+		m_pShaderProgram->use();
+
+		math::mat4 model = Transform::translate(0, 0, 200) * Transform::rotate_y(math::PI/4);
+		math::mat4 view = cam->view_matrix();
+		math::mat4 projection = cam->projection_matrix();
+
+		auto& mvp = m_pShaderProgram->uniform<mat4>("r_MVP");
+		auto& mv = m_pShaderProgram->uniform<mat4>("r_ModelView");
+		mvp = projection * view * model;
+		mv = view * model;
+
+		::glDrawElements(GL_TRIANGLES, m_VA->index_count(), GL_UNSIGNED_INT, 0);
+
+		m_VA->unbind();
+	}
+
+	void set_vertex_array(const std::shared_ptr<VertexArray>& va)
+	{
+		m_VA = va;
+	}
+
+	const std::shared_ptr<VertexArray>&
+	vertex_array() const
+	{
+		return m_VA;
 	}
 };
 

@@ -158,8 +158,6 @@ RenderClient::run()
 	::glEnable(GL_CULL_FACE);
 	// ::glEnable(GL_DEPTH_TEST);
 
-	auto cubemesh = geo::Mesh::create_cube();
-	auto cube_va = ctx->create_vertex_array(cubemesh);
 
 	// CLOUD
 	CubeImage ci = CubeImage::generate_fractal_cube(); 
@@ -176,6 +174,8 @@ RenderClient::run()
     auto screen_sp = Device::graphics()->create_shader_program_from_file("../client/source/shaders/screen.vs", 
 												  	    				 "../client/source/shaders/screen.fs");
 
+
+
 	/*
 	auto fs_vb = Device::graphics()->create_vertex_buffer(BufferHint::STATIC, 8);
 	
@@ -191,35 +191,37 @@ RenderClient::run()
 	*/
 
 	Cloud cloud;
-	cloud.load("e:/cloud4.dae");
+	//cloud.load("e:/cloud4.dae");
+	auto cubemesh = geo::Mesh::create_cube();
+	auto cube_va = ctx->create_vertex_array(cubemesh);
+	cloud.set_vertex_array(cube_va);
 
-	GLuint terrain_rt, blur_v, blur_h;
+
+	GLuint scene_rt, cloud_rt, cloud_rt2;
 	
-	::glGenTextures(1, &terrain_rt);
-	::glBindTexture(GL_TEXTURE_2D, terrain_rt);
+	::glGenTextures(1, &scene_rt);
+	::glBindTexture(GL_TEXTURE_2D, scene_rt);
 	::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_pWindow->width(), m_pWindow->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0); //Empty image
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-/*
-	::glGenTextures(1, &blur_v);
-	::glBindTexture(GL_TEXTURE_2D, blur_v);
+	::glGenTextures(1, &cloud_rt);
+	::glBindTexture(GL_TEXTURE_2D, cloud_rt);
 	::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_pWindow->width(), m_pWindow->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0); //Empty image
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	::glGenTextures(1, &blur_h);
-	::glBindTexture(GL_TEXTURE_2D, blur_h);
+	::glGenTextures(1, &cloud_rt2);
+	::glBindTexture(GL_TEXTURE_2D, cloud_rt2);
 	::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_pWindow->width(), m_pWindow->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0); //Empty image
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-*/
 
 	//Depth buffer
 	GLuint cloud_depth;
@@ -229,17 +231,26 @@ RenderClient::run()
 	::glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 
-	auto cloud_fb = ctx->create_framebuffer();
-	cloud_fb->bind();
+	
+	auto scene_fb = ctx->create_framebuffer();
+	scene_fb->bind();
+	::glBindTexture(GL_TEXTURE_2D, scene_rt);
 	//::glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, cloud_fb->id(), 0);
-	::glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, terrain_rt, 0);
+	::glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, scene_rt, 0);
 	::glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, cloud_depth);	
 	GLenum status;
 
 	if(status = ::glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		R_LOG_ERR("Invalid framebuffer: " << status);
 
+	scene_fb->unbind();
+
+	auto cloud_fb = ctx->create_framebuffer();
+	cloud_fb->bind();
+	::glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, cloud_rt, 0);
+	::glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, cloud_depth);	
 	cloud_fb->unbind();
+
 
 	//GLenum buffers[] = {GL_COLOR_ATTACHMENT0};
 	//::glDrawBuffers(1, buffers);
@@ -262,7 +273,6 @@ RenderClient::run()
 
 	while (this->is_running())
 	{
-		//fp(
 		SDL_Event e;
 
 		//Poll events
@@ -330,14 +340,22 @@ RenderClient::run()
 
 		camera->set_position(campos.x, campos.y, 300);
 
-		campos.x += 0.01;
-		campos.y += 0.01;
+		// campos.x += 0.001;
+		// campos.y += 0.001;
 
 		terrain.update(camera);
     	//draw data
-        cloud_fb->bind();
+        scene_fb->bind();        
         ctx->clear(clearstate);
         terrain.draw(ctx, camera);
+
+        scene_fb->unbind();
+        cloud_fb->bind();
+        ::glClear(GL_COLOR_BUFFER_BIT);
+		cloud.draw(ctx, camera);
+		scene_fb->unbind();
+
+		// ::glBindTexture(GL_TEXTURE_2D, 0);
 		// blur_v_sp->use();
 		// blur_v_sp->uniform<u32>("scene_texture") = 0;
 		
@@ -347,21 +365,21 @@ RenderClient::run()
 		// ::glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		// blur_h_sp->use();
 		// blur_h_sp->uniform<u32>("scene_texture") = 0;
-        cloud_fb->unbind();
-
 		
 		ctx->clear(clearstate);
 		// terrain.draw(ctx, camera);
 
-		::glDisable(GL_DEPTH_TEST);
+		// ::glDisable(GL_DEPTH_TEST);
 		fs_va->bind();
 		screen_sp->use();
 		screen_sp->uniform<u32>("fbo_texture") = 0;
+		::glBindTexture(GL_TEXTURE_2D, scene_rt);  
 		::glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		::glBindTexture(GL_TEXTURE_2D, 0);  
 		fs_va->unbind();
+
 		// ::glEnable(GL_DEPTH_TEST);
 		//terrain.draw(ctx, camera);
-
 
 		//p.draw(ctx, camera);
 
