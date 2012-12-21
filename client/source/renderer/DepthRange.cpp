@@ -13,13 +13,13 @@ DepthRange::DepthRange(f32 near, f32 far)
 }
 
 f32
-DepthRange::near() const
+DepthRange::get_near() const
 {
     return m_Near;
 }
 
 f32
-DepthRange::far() const
+DepthRange::get_far() const
 {
     return m_Far;
 }

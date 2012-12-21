@@ -4,7 +4,9 @@
 #include "renderer/RenderWindow.h"
 #include "Scene.h"
 #include <memory>
+#include "FrameParser.h"
 //#include <boost/asio.hpp>
+#include "ServerConn.h"
 
 namespace revel
 {
@@ -12,8 +14,12 @@ namespace revel
 class RenderClient
 {
 	std::shared_ptr<renderer::RenderWindow> m_pWindow;
+	void gs_update_loop();
 	bool m_Running;
 	bool m_Connected;
+	FrameParser m_fp;
+	GameState m_gs;
+	std::shared_ptr<ClientSocket> m_socket;
 
 public:
 	RenderClient();	

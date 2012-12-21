@@ -47,6 +47,11 @@ public:
 		boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string(ip), port);
 		m_pSocket->connect(endpoint);
 	}
+	
+	bool is_open()
+	{
+		return m_pSocket->is_open();
+	}
 
 	std::string read_frame_data()
 	{

@@ -19,13 +19,10 @@ public class DummyRenderClient {
 				{
 					System.out.println(sc.nextLine().substring(79));
 				}
-				
 			}
 		}catch(IOException e)
 		{
-			
+			System.err.println("DERP!");
 		}
-		
 	}
-
 }

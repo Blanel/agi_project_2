@@ -9,15 +9,17 @@
     >
 	<VideoView
 	    android:id						="@+id/videoViewBK"
-	    android:layout_width			="wrap_content"
-	    android:layout_height			="wrap_content"
+	    android:layout_width			="0dp"
+	    android:layout_height			="0dp"
 	    android:layout_alignParentLeft	="true"
 	    android:layout_alignParentTop	="true"
+	    android:layout_alignParentRight ="true"
+	    android:layout_alignParentBottom="true"
 	/>
 	<ImageView
 	    android:id						="@+id/imageFire"
-	    android:layout_width			="wrap_content"
-	    android:layout_height			="wrap_content"
+	    android:layout_width			="55dp"
+	    android:layout_height			="fill_parent"
 	    android:layout_alignParentBottom="true"
 	    android:layout_alignParentRight	="true"
 	    android:layout_alignParentTop	="true"
@@ -26,8 +28,8 @@
 	/>
 	<ImageView
 	    android:id						="@+id/imageGas"
-	    android:layout_width			="wrap_content"
-	    android:layout_height			="wrap_content"
+	    android:layout_width			="55dp"
+	    android:layout_height			="fill_parent"
 	    android:layout_alignParentBottom="true"
 	    android:layout_alignParentLeft	="true"
 	    android:layout_alignParentTop	="true"
@@ -36,36 +38,34 @@
 	/>
 	<ImageView
 	    android:id						="@+id/imageViewLife"
-	    android:layout_width			="wrap_content"
-	    android:layout_height			="wrap_content"
-	    android:layout_alignParentLeft	="true"
+	    android:layout_width			="150dp"
+	    android:layout_height			="75dp"
+	    android:layout_toLeftOf			= "@id/imageFire"
 	    android:layout_alignParentTop	="true"
 	    android:src						="@drawable/life5" 
 	/>
 	<ImageView
 	    android:id						="@+id/imageViewNavigation"
-	    android:layout_width			="wrap_content"
-	    android:layout_height			="wrap_content"
-	    android:layout_marginRight		="50sp"
-	    android:layout_marginLeft		="250sp"
-	    android:layout_marginTop		="100sp"
-	    android:layout_alignParentLeft	="true"
+	    android:layout_width			="175dp"
+	    android:layout_height			="175dp"
+	    android:layout_marginRight		="5dp"
+	    android:layout_alignParentBottom = "true"
+	    android:layout_toLeftOf			= "@id/imageFire"
 	    android:src						="@drawable/navigation2" 
 	/>
 	<ImageView
 	    android:id						="@+id/imageViewArrow"
-	    android:layout_width			="wrap_content"
-	    android:layout_height			="wrap_content"
-	    android:layout_marginRight		="50sp"
-	    android:layout_marginLeft		="250sp"
-	    android:layout_marginTop		="100sp"
-	    android:layout_alignParentLeft	="true"
+	    android:layout_width			="175dp"
+	    android:layout_height			="175dp"
+	    android:layout_marginRight		="5dp"
+	    android:layout_alignParentBottom = "true"
+	    android:layout_toLeftOf			= "@id/imageFire"
 	    android:src						="@drawable/a0" 
 	/>
 		<ImageView
 	    android:id						="@+id/imageRedFlash"
-	    android:layout_width			="wrap_content"
-	    android:layout_height			="wrap_content"
+	    android:layout_width			="match_parent"
+	    android:layout_height			="match_parent"
 	    android:layout_alignParentBottom="true"
 	    android:layout_alignParentLeft	="true"
 	    android:layout_alignParentRight	="true"
@@ -74,57 +74,3 @@
 	    />
 	
 </RelativeLayout>
-
-<!-- 
-	    
-	    
-	    
-	
-	    
-	    
-	android:background				="#86E00000" 
-
-	android:src						="@drawable/ic_launcher" 
-
-
-
-   	Bör använda onklick istället i den här filen
-   	men varför gick det inte.
-   	android:onClick					="fire"
-  	android:background 				="#00FF00"
-  	android:textColor				="#FF0000" 
-  	android:background				="#FFFFFFCC" 
-  	android:background				="#FF0000CC" 
-  	android:opacity					="3"
-  	
-   
-   	<TextView
-       android:layout_width				="wrap_content"
-       android:layout_height			="wrap_content"
-       android:layout_centerHorizontal	="true"
-       android:layout_centerVertical	="true"
-       
-/>
-
-
-	<Button
-	    android:id						="@+id/button01"
-	    android:layout_width			="100sp"
-	    android:layout_height			="wrap_content"
-	    android:layout_alignParentBottom="true"
-	    android:layout_alignParentLeft	="true"
-	    android:layout_alignParentTop	="true"
-	    android:textSize				="20sp" 
-	    android:onClick					="gas"
-	    
-	/>
-
-	<ImageView
-	    android:id						="@+id/imageViewBK"
-	    android:layout_width			="wrap_content"
-	    android:layout_height			="wrap_content"
-	    android:layout_alignParentLeft	="true"
-	    android:layout_alignParentTop	="true"
-	    android:src						="@drawable/airp"
-	/>
-  	-->

@@ -16,8 +16,8 @@ class DepthRange
 public:
     DepthRange(f32 n = 0.0f, f32 f = 1.0f);
 
-    f32 near() const;
-    f32 far() const;
+    f32 get_near() const;
+    f32 get_far() const;
 
     void set_near(f32 near);
     void set_far(f32 far);

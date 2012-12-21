@@ -9,7 +9,9 @@ public class Entity {
 	
 	private int status;
 	
-	public Entity(int id, double x, double y, double angle, double speed)
+	protected GameState gs;
+	
+	public Entity(int id, double x, double y, double angle, double speed, GameState gs)
 	{
 		this.id = id;
 		pos = new Coord();
@@ -18,6 +20,18 @@ public class Entity {
 		this.angle = angle;
 		this.speed = speed;
 		status =1;
+		this.gs = gs;
+	}
+	
+	public Entity(int id, double x, double y, double angle, GameState gs)
+	{
+		this.id = id;
+		pos = new Coord();
+		pos.x = x;
+		pos.y = y;
+		this.angle = angle;
+		status =1;
+		this.gs = gs;
 	}
 	
 	
@@ -56,10 +70,12 @@ public class Entity {
 		pos.x = p.x;
 		pos.y = p.y;
 	}
+	
 	public double getAngle() 
 	{
 		return angle;
 	}
+	
 	public void setAngle(double angle) 
 	{
 		this.angle = angle;
@@ -71,20 +87,21 @@ public class Entity {
 	public void addAngle(double angle)
 	{
 		this.angle += angle;
-		
 		this.angle %= Math.PI*2;
 		if(this.angle<0)
 			this.angle += Math.PI*2;
-		
 	}
+	
 	public double getSpeed() 
 	{
 		return speed;
 	}
+	
 	public void setSpeed(double speed) 
 	{
 		this.speed = speed;
 	}
+	
 	public int getStatus()
 	{
 		return status;
