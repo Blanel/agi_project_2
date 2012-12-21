@@ -433,10 +433,13 @@ RenderClient::active_window()
 
 void RenderClient::gs_update_loop()
 {
+	if(m_socket->is_open()==true)
+	{
 	while(this->is_running())
 	{
 		auto xmlframe = m_socket->read_frame_data();
 		m_fp.parse_frame(xmlframe, m_gs);
+	}
 	}
 }
 
