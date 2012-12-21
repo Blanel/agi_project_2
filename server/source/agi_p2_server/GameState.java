@@ -166,7 +166,7 @@ public class GameState implements Runnable {
 	{
 		Coord tempC = new Coord(0,0);
 		
-		if(airplanes.size() >1)
+		if(airplanes.size() >0)
 		{
 			Airplane tempA;
 			aIt = airplanes.listIterator();

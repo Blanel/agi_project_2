@@ -428,6 +428,11 @@ public class StateSender {
 		if(life<cachedLife)
 			(Message.obtain(ma.mainHandler, 1)).sendToTarget();
 		cachedLife = l;
+		
+		if(life == 0)
+		{
+			disconnect(false);
+		}
 	}
 
 	public int getLife()

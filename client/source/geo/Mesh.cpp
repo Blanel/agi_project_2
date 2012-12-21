@@ -221,11 +221,10 @@ Mesh::create_quad()
     auto quadt = quad->create_vertex_attrib<vec2>("texcoord");
     auto quadn = quad->create_vertex_attrib<vec3>("normal");
     
-
     quadp->data().push_back(point3(-0.5, -0.5, 0));
     quadp->data().push_back(point3( 0.5, -0.5, 0));
-    quadp->data().push_back(point3( 0.5,  0.5, 0));
     quadp->data().push_back(point3(-0.5,  0.5, 0));
+    quadp->data().push_back(point3( 0.5,  0.5, 0));
 
     quadt->data().push_back(vec2(0.0f, 0.0f));
     quadt->data().push_back(vec2(1.0f, 0.0f));

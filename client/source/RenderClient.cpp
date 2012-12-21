@@ -150,7 +150,7 @@ RenderClient::run()
 
 	StopWatch timer;
 
-	camera->set_position(0, 0, 500);
+	camera->set_position(m_gs.getCentre().first, m_gs.getCentre().second, 500);
 
 	//Move this to a seperate thread
 
@@ -326,7 +326,7 @@ RenderClient::run()
 
 		//tm.generate(gs);
 
-		camera->set_position(campos.x, campos.y, 300);
+		camera->set_position(m_gs.getCentre().first, m_gs.getCentre().second, 300);
 
 		// campos.x += 0.1;
 		// campos.y += 0.1;
@@ -391,7 +391,7 @@ RenderClient::run()
 					auto& color = planesp->uniform<vec3>("r_Color");
 					color = vec3(0.4, 0.6, 0.9);
 				
-					R_LOG_INFO("Plane pos: " << plane.second.m_x << ", " << plane.second.m_y);
+					// R_LOG_INFO("Plane pos: " << plane.second.m_x << ", " << plane.second.m_y);
 
 					auto& mvp = planesp->uniform<mat4>("r_MVP");
 

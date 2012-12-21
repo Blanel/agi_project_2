@@ -12,7 +12,7 @@ namespace gl
 RenderWindowGL::RenderWindowGL(u32 w, u32 h, const std::string& title)
     : RenderWindow(w, h, title)
 {
-    m_pSDLWindow = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    m_pSDLWindow = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     m_pContext = std::make_shared<gl::RenderContextGL>(this);
 }
 

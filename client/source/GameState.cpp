@@ -11,25 +11,23 @@ namespace revel
 	{
 
 	}
-	/*std::pair<f32,f32> GameState::getCentre()
+	std::pair<f32,f32> GameState::getCentre()
 	{
-		if(airplanes.size()==0)
-			return std::make_pair<f32,f32>(0,0);
-		else
+		f32 x = 0;
+		f32 y = 0;
+
+		f32 c = 0;
+
+		for (auto it = airplanes.begin(); it != airplanes.end(); ++it)
 		{
-			f32 x;
-			f32 y;
-			for(i32 i=0 ; i<airplanes.size() ; i++)
-			{
-				if(airplanes.at(i).alive)
-				{
-				x+=airplanes.at(i).x;
-				y+=airplanes.at(i).y;
-				}
-			}
-			return std::make_pair<f32,f32>(x/airplanes.size(),y/airplanes.size());
-			// Get middle of planes
+			x += it->second.m_x;
+			y += it->second.m_y;
+			c++;
 		}
+
+		if (c < 1.0f)
+			c = 1.0f;
+		return std::make_pair(x/c, y/c);
 	}
 
 	std::pair<std::pair<f32,f32>,std::pair<f32,f32>> GameState::getBoundingBox()
@@ -44,8 +42,8 @@ namespace revel
 			f32 ymax = std::numeric_limits<float>::min();
 			for(int i=0 ; i<airplanes.size() ;i++)
 			{
-				f32 tX = airplanes.at(i).x;
-				f32 tY = airplanes.at(i).y;
+				f32 tX = airplanes.at(i).m_x;
+				f32 tY = airplanes.at(i).m_y;
 				if(tX>xmax)
 					xmax = tX;
 				if(tX<xmin)
@@ -57,7 +55,7 @@ namespace revel
 			}
 			return std::make_pair<std::pair<f32,f32>,std::pair<f32,f32>>(std::make_pair(xmin,ymin), std::make_pair(xmax,ymax));
 		}
-	}*/
+	}
 
 	AirPlane::AirPlane()
 	{
