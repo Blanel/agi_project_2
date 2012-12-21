@@ -114,7 +114,7 @@ public class AndroidClient implements Runnable{
 	{
 		if(plane != null)
 		{
-			plane.addAngle(rotation*0.001);
+			plane.addAngle(rotation*0.002);
 			plane.speedMod(speedMod);
 			if(isShooting)
 			{
@@ -147,6 +147,7 @@ public class AndroidClient implements Runnable{
 			// Is the line read sane?
 			if(line!=null && line.startsWith("<?xml") && line.endsWith("</androidClient>") )
 			{
+				//System.err.println(line);
 				// In that case, interrupt the timeout thread (as we have gotten a response) and parse the line.
 				timeoutThread.interrupt();
 				try {

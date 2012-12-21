@@ -52,6 +52,8 @@ ShaderObjectGL::ShaderObjectGL(ShaderType type, const std::string& source)
         R_LOG_ERR("Unable to compile: " << log);
         free(log);
 
+        R_LOG_ERR(source);
+
         glDeleteShader(m_Identifier);
         //return 0;
     }

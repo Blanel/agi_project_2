@@ -146,7 +146,7 @@ RenderClient::run()
 	m_gs.set_plane_va(planemeshva);
 	m_gs.set_plane_sp(planesp);
 	
-	Terrain terrain(ctx, 128, 128);
+	std::shared_ptr<Terrain> terrain = std::make_shared<Terrain>(ctx, 128, 128);
 
 	StopWatch timer;
 
@@ -270,7 +270,8 @@ RenderClient::run()
 	
 	active_window()->show_cursor(false);
 	
-	boost::thread t1(&RenderClient::gs_update_loop, this);
+	boost::thread t1(boost::bind(&RenderClient::gs_update_loop, this));
+	// boost::thread t2(boost::bind(&Terrain::update, terrain.get(), camera));
 
 	vec2 campos(0, 0);
 
@@ -314,18 +315,6 @@ RenderClient::run()
 
     	}
 
-		// THESE TWO LINES NEED TO BE THREADED GOD DAMNIT!
-    	
-		 
-		//p.set_position(gs.get_planes()[0].m_x, gs.get_planes()[0].m_y);
-		//R_LOG_INFO("Plane [0] pos: " << gs.get_planes()[0].m_x << ", " << gs.get_planes()[0].m_y);
-		//camera->set_eye(gs.getCentre().first, gs.getCentre().second, 100);
-		//doc.save(std::cout);
-		//R_LOG_INFO("TS: " << doc.child("tick").attribute("ts").value());
-
-		//gs.draw(ctx, camera);
-      	//std::cout << xmlframe << std::endl;
-
       	fps++;
 
         if (timer.elapsed_time() > 1)
@@ -337,17 +326,16 @@ RenderClient::run()
 
 		//tm.generate(gs);
 
-
 		camera->set_position(campos.x, campos.y, 300);
 
-		// campos.x += 0.001;
-		// campos.y += 0.001;
+		// campos.x += 0.1;
+		// campos.y += 0.1;
 
-		terrain.update(camera);
+		terrain->update(camera);
     	//draw data
         scene_fb->bind();        
         ctx->clear(clearstate);
-        terrain.draw(ctx, camera);
+        terrain->draw(ctx, camera);
 
         scene_fb->unbind();
         cloud_fb->bind();
@@ -396,7 +384,7 @@ RenderClient::run()
 				{
 					::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-					math::mat4 model = Transform::translate(plane.second.m_x, plane.second.m_y, 150) * Transform::rotate_y(plane.second.m_angle);
+					math::mat4 model = Transform::translate(plane.second.m_x, plane.second.m_y, 150); //* Transform::rotate_y(plane.second.m_angle);
 					math::mat4 view = camera->view_matrix();
 					math::mat4 projection = camera->projection_matrix();
 
@@ -421,12 +409,12 @@ RenderClient::run()
 				{
 					::glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-					math::mat4 model = Transform::translate(bullet.second.m_x, bullet.second.m_y, 150) * Transform::rotate_y(bullet.second.m_angle);
+					math::mat4 model = Transform::translate(bullet.second.m_x, bullet.second.m_y, 150);// * Transform::rotate_y(bullet.second.m_angle);
 					math::mat4 view = camera->view_matrix();
 					math::mat4 projection = camera->projection_matrix();
 
 					auto& color = planesp->uniform<vec3>("r_Color");
-					color = vec3(0.4, 0.6, 0.9);
+					color = vec3(0.8, 0.6, 0.4);
 				
 					R_LOG_INFO("Bullet pos: " << bullet.second.m_x << ", " << bullet.second.m_y);
 
@@ -495,13 +483,14 @@ RenderClient::active_window()
 
 void RenderClient::gs_update_loop()
 {
-	if(m_socket->is_open()==true)
-	{
+	
 	while(this->is_running())
 	{
-		auto xmlframe = m_socket->read_frame_data();
-		m_fp.parse_frame(xmlframe, m_gs);
-	}
+		if(m_socket->is_open()==true)
+		{
+			auto xmlframe = m_socket->read_frame_data();
+			m_fp.parse_frame(xmlframe, m_gs);
+		}
 	}
 }
 

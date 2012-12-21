@@ -23,10 +23,10 @@ Terrain::Terrain(const std::shared_ptr<renderer::RenderContext>& ctx, i32 tile_w
 	m_pShaderProgram = Device::graphics()->create_shader_program_from_file("../client/source/shaders/terrain.vs",
 																		   "../client/source/shaders/terrain.fs");
 
-	Image2D<pixel::RGB_u8> img("e:/rock.tga");
+	// Image2D<pixel::RGB_u8> img("e:/rock.tga");
 
-	m_DiffuseMap = Device::graphics()->create_texture_2d();
-	m_DiffuseMap->copy_from_sys_mem(img);	 
+	// m_DiffuseMap = Device::graphics()->create_texture_2d();
+	// m_DiffuseMap->copy_from_sys_mem(img);	 
 
 	for (i32 j = -3; j < 4; ++j)
 		for (i32 i = -3; i < 4; ++i)

@@ -5,7 +5,7 @@ in vec2 TexCoord;
 
 uniform vec3 sunDirection = vec3(1, 0, 1);
 
-out vec3 FragmentColor;
+out vec4 FragmentColor;
 
 void main()
 {

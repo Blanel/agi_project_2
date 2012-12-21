@@ -23,6 +23,7 @@ class Terrain
 	std::shared_ptr<renderer::ShaderProgram> m_pShaderProgram;
 	std::unique_ptr<SimplexNoise> m_pNoiseGen;
 
+	// std::shared_ptr<Camera> cam;
 	bool m_DrawNormals;
 
 	vec2_i32 m_TileSize;

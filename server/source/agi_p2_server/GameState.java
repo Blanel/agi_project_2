@@ -33,9 +33,9 @@ public class GameState implements Runnable {
 		bulletIdPool = 0;
 		
 		planeHitbox = 0.5f;
-		maxDistance = 16;
-		updateFrequency = 17000000;
-		planeBaseSpeed = 0.1;
+		maxDistance = 48;
+		updateFrequency = 4000000;
+		planeBaseSpeed = 0.05;
 		planeModSpeed = 0.1;
 		bulletBaseSpeed = 0.2;
 		planeBaseLife = 5;
