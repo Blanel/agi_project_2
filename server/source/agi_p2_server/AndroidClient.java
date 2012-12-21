@@ -118,7 +118,7 @@ public class AndroidClient implements Runnable{
 			plane.speedMod(speedMod);
 			if(isShooting)
 			{
-				gs.bullets.add(new Bullet(gs.nextBId(), plane));
+				gs.bullets.add(new Bullet(gs.nextBId(), plane, gs));
 				isShooting=false;
 			}
 		}
@@ -163,7 +163,7 @@ public class AndroidClient implements Runnable{
 						if(id == -1)
 						{
 							System.out.println("New Plane created!");
-							plane = new Airplane(gs.nextAId(),centre.x+Math.cos(angle+Math.PI), centre.y+Math.sin(angle+Math.PI),angle);
+							plane = new Airplane(gs.nextAId(),centre.x+Math.cos(angle+Math.PI), centre.y+Math.sin(angle+Math.PI),angle, gs);
 							gs.airplanes.add(plane);
 						}
 						else
@@ -172,7 +172,7 @@ public class AndroidClient implements Runnable{
 							if(plane == null)
 							{
 								System.out.println("New Plane created!");
-								plane = new Airplane(gs.nextAId(),centre.x+Math.cos(angle+Math.PI), centre.y+Math.sin(angle+Math.PI),angle);
+								plane = new Airplane(gs.nextAId(),centre.x+Math.cos(angle+Math.PI), centre.y+Math.sin(angle+Math.PI),angle, gs);
 								gs.airplanes.add(plane);
 							}
 							else

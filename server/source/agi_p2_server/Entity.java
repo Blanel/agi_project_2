@@ -9,7 +9,9 @@ public class Entity {
 	
 	private int status;
 	
-	public Entity(int id, double x, double y, double angle, double speed)
+	protected GameState gs;
+	
+	public Entity(int id, double x, double y, double angle, double speed, GameState gs)
 	{
 		this.id = id;
 		pos = new Coord();
@@ -18,6 +20,18 @@ public class Entity {
 		this.angle = angle;
 		this.speed = speed;
 		status =1;
+		this.gs = gs;
+	}
+	
+	public Entity(int id, double x, double y, double angle, GameState gs)
+	{
+		this.id = id;
+		pos = new Coord();
+		pos.x = x;
+		pos.y = y;
+		this.angle = angle;
+		status =1;
+		this.gs = gs;
 	}
 	
 	

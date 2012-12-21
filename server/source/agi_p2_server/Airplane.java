@@ -7,8 +7,8 @@ public class Airplane extends Entity{
 	private int kills;
 	private String name;
 	
-	private final static double BASESPEED = 0.1;
-	private final static double SPM = 0.1;
+	//private final static double BASESPEED = 0.1;
+	//private final static double SPM = 0.1;
 	
 	/*
 	 * Statuses for planes:
@@ -17,17 +17,18 @@ public class Airplane extends Entity{
 	 * -1 = dead
 	 */
 	
-	public Airplane(int id, double x, double y, double angle, String name)
+	/*public Airplane(int id, double x, double y, double angle, String name, GameState gs)
 	{
-		super(id, x,y,angle, BASESPEED);
+		super(id, x,y,angle, gs);
 		this.name = name;
 		life = 5;
-	}
-	public Airplane(int id, double x, double y, double angle)
+	}*/
+	public Airplane(int id, double x, double y, double angle, GameState gs)
 	{
-		super(id, x,y,angle, BASESPEED);	
+		super(id, x,y,angle, gs);	
+		setSpeed(gs.planeBaseSpeed);
 		name = "John Doe";
-		life = 5;
+		life = gs.planeBaseLife;
 	}
 	
 
@@ -113,6 +114,7 @@ public class Airplane extends Entity{
 	 */
 	public void speedMod(double m)
 	{
-		setSpeed(BASESPEED+m*SPM);
+		setSpeed(gs.planeBaseSpeed+m*gs.planeModSpeed);
 	}
+	
 }

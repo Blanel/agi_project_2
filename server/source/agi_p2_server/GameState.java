@@ -11,11 +11,18 @@ public class GameState implements Runnable {
 	private ListIterator<Bullet> bIt;
 	private int planeIdPool;
 	private int bulletIdPool;
-	private final double MAX_DISTANCE = 16;
-	private final long UPDATEFREQUENCY = 17000000;
+
 	private Server srv;
 
-	private static final double planeHitbox = 0.5f;
+	public double planeHitbox;
+	public double maxDistance;
+	public long updateFrequency;
+	public double planeBaseSpeed;
+	public double planeModSpeed;
+	public double bulletBaseSpeed;
+	public int planeBaseLife;
+	public int bulletTtl;
+
 
 	public GameState(Server srv)
 	{
@@ -24,6 +31,15 @@ public class GameState implements Runnable {
 		bullets = new LinkedList<Bullet>();
 		planeIdPool = 0;
 		bulletIdPool = 0;
+		
+		planeHitbox = 0.5f;
+		maxDistance = 16;
+		updateFrequency = 17000000;
+		planeBaseSpeed = 0.1;
+		planeModSpeed = 0.1;
+		bulletBaseSpeed = 0.2;
+		planeBaseLife = 5;
+		bulletTtl = 180;
 	}
 
 	/**
@@ -47,16 +63,16 @@ public class GameState implements Runnable {
 	
 			// Keeps an eye on the time a loop takes to run
 			end = System.nanoTime();
-			if(end-start < UPDATEFREQUENCY)
+			if(end-start < updateFrequency)
 			{
-				while(end-start < UPDATEFREQUENCY)
+				while(end-start < updateFrequency)
 				{
 					end = System.nanoTime();
 				}
 			}
-			else if((end-start)-UPDATEFREQUENCY>1000000000)
+			else if((end-start)-updateFrequency>1000000000)
 			{
-				System.err.println("Server can't keep up! "+((Math.floor((float)(end-start)-UPDATEFREQUENCY)/1000000000f))+" ns too slow");
+				System.err.println("Server can't keep up! "+((Math.floor((float)(end-start)-updateFrequency)/1000000000f))+" ns too slow");
 			}
 			start = System.nanoTime();
 			
@@ -83,7 +99,7 @@ public class GameState implements Runnable {
 		while(aIt.hasNext())
 		{
 			temp = aIt.next();
-			if(temp.getPos().distance(centre)>=MAX_DISTANCE)
+			if(temp.getPos().distance(centre)>=maxDistance)
 			{
 				temp.setAngle(temp.getPos().getAngle(centre));
 			}
