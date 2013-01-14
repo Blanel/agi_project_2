@@ -1,4 +1,4 @@
-package kth.agi_project_2;
+package kth.agi_project_2.controller;
 
 public abstract class AbstractController {
 	
@@ -12,27 +12,27 @@ public abstract class AbstractController {
 	
 	protected abstract double getRotation();
 	
-	protected void setSpeedFrac(double speedFrac)
+	public void setSpeedFrac(double speedFrac)
 	{
 		sio.setSpeedFrac(speedFrac);
 	}
-	protected void setShooting(boolean shooting)
+	public void setShooting(boolean shooting)
 	{
 		sio.setShooting(shooting);
 	}
-	protected int getLife()
+	public int getLife()
 	{
 		return sio.getLife();
 	}
-	protected boolean connect()
+	public boolean connect()
 	{
 		return sio.connect();
 	}
-	protected void setHost(String host, int port)
+	public void setHost(String host, int port)
 	{
 		sio.setHost(host, port);
 	}
-	protected boolean isAlive()
+	public boolean isAlive()
 	{
 		return sio.isAlive();
 	}

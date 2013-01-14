@@ -1,4 +1,4 @@
-package agi_p2_server;
+package kth.agi_project_2.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
