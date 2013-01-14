@@ -19,7 +19,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
-//import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MotionEvent;
@@ -27,9 +26,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.VideoView;
-
-import java.io.*;
-import java.net.*;
 
 import kth.agi_project_2.R;
 
@@ -39,7 +35,7 @@ import android.view.GestureDetector;
 public final class MainActivity extends Activity
 implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 
-	private StateSender ss;
+	private AndroidController ac;
 
 	/**
 	 * Image Viewers
@@ -103,7 +99,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		ss = new StateSender(this);
+		ac = new AndroidController(this);
 		
 		final Context context = this;
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
@@ -124,8 +120,8 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 				try {
 					String host = hosttemp.toString().split(":")[0];
 					int port = Integer.parseInt(hosttemp.toString().split(":")[1]);
-					ss.setHost(host,port);
-					initialised = ss.connect();
+					ac.setHost(host,port);
+					initialised = ac.connect();
 					continueRunning();
 				}
 
@@ -165,7 +161,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		Display display = getWindowManager().getDefaultDisplay(); 
 		this.screenWidth = display.getWidth();
 		this.screenHeight = display.getHeight();
-		ss.setScreenHeight(screenHeight);
+		ac.setScreenHeight(screenHeight);
 
 		/**
 		 * Images
@@ -189,7 +185,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		(new Thread(){
 			@Override
 			public void run(){
-				while(ss.isAlive()){
+				while(ac.isAlive()){
 					try {
 						Thread.sleep(100);
 						(Message.obtain(mainHandler, 0)).sendToTarget();
@@ -243,8 +239,8 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 		float x = event.values[0];
 		float y = event.values[1];
 		
-		ss.setRotX(x);
-		ss.setRotY(y);
+		ac.setRotX(x);
+		ac.setRotY(y);
 
 		float degree = (float) (-Math.atan2(y/10, x/10)*180/Math.PI);
 
@@ -303,13 +299,13 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 			}
 			if (gas != this.lastGas){
 				if(gas !=-1)
-					ss.setSpeedFrac(1-e.getY()/(double)screenHeight);
+					ac.setSpeedFrac(1-e.getY()/(double)screenHeight);
 				else
-					ss.setSpeedFrac(0);
+					ac.setSpeedFrac(0);
 			}
 			if(shootingToggle && !shootingDown)
 			{
-				ss.setShooting(true);
+				ac.setShooting(true);
 				shootingDown = true;
 			}
 			else
@@ -353,7 +349,7 @@ implements View.OnTouchListener, SensorEventListener, OnGestureListener {
 	}
 
 	public void lifeSpan() {	
-		this.viewLifeImage.setImageResource(lifeResources[ss.getLife()]);
+		this.viewLifeImage.setImageResource(lifeResources[ac.getLife()]);
 		imageRedFlash.setBackgroundColor(Color.parseColor("#86E00000"));
 		(new Thread(){
 			@Override

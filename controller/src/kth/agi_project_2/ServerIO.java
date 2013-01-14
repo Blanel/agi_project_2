@@ -8,8 +8,6 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -26,9 +24,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import android.os.Message;
-
-public class StateSender {
+public class ServerIO {
 
 
 	// Airplane variables
@@ -51,13 +47,10 @@ public class StateSender {
 	private int connectMut;
 	private int disconnMut;
 
-	// Hardware Variables
-	private int screenHeight;
-	private float rotX;
-	private float rotY;
+
 
 	// App Variables
-	private MainActivity ma;
+	private AbstractController ac;
 	private boolean running;
 
 	// Threading
@@ -73,9 +66,9 @@ public class StateSender {
 
 
 
-	public StateSender(MainActivity m)
+	public ServerIO(AbstractController m)
 	{
-		ma = m;
+		ac = m;
 
 		cachedLife = 5;
 		life = 5;
@@ -95,9 +88,6 @@ public class StateSender {
 
 		speedFrac = 0;
 		shooting = false;
-		screenHeight = -1;
-		rotX = 0;
-		rotY = 0;
 	}
 
 	public void setHost(String host, int port)
@@ -259,7 +249,7 @@ public class StateSender {
 
 							Element rotationTag = doc.createElement("rotation");
 							rootElement.appendChild(rotationTag);
-							rotationTag.appendChild(doc.createTextNode(""+getRotation()));
+							rotationTag.appendChild(doc.createTextNode(""+ac.getRotation()));
 
 							Element shootingTag = doc.createElement("shooting");
 							rootElement.appendChild(shootingTag);
@@ -377,13 +367,7 @@ public class StateSender {
 
 	}
 
-	public int getScreenHeight() {
-		return screenHeight;
-	}
-
-	public void setScreenHeight(int screenHeight) {
-		this.screenHeight = screenHeight;
-	}
+	
 
 	public double getSpeedFrac() {
 		return speedFrac;
@@ -393,10 +377,7 @@ public class StateSender {
 		this.speedFrac = speedFrac;
 	}
 
-	private double getRotation()
-	{
-		return ((Math.atan2(rotX, rotY)+Math.PI/2)*10/Math.PI);
-	}
+	
 
 	public boolean isShooting() {
 		return shooting;
@@ -406,27 +387,13 @@ public class StateSender {
 		this.shooting = shooting;
 	}
 
-	public float getRotX() {
-		return rotX;
-	}
-
-	public void setRotX(float rotX) {
-		this.rotX = rotX;
-	}
-
-	public float getRotY() {
-		return rotY;
-	}
-
-	public void setRotY(float rotY) {
-		this.rotY = rotY;
-	}
+	
 
 	public void setLife(int l)
 	{
 		life = l;
 		if(life<cachedLife)
-			(Message.obtain(ma.mainHandler, 1)).sendToTarget();
+			ac.lifeChangeEvent(life);
 		cachedLife = l;
 		
 		if(life == 0)
