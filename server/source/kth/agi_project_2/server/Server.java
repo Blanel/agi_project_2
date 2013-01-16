@@ -24,7 +24,7 @@ public class Server {
 		if(args.length!=3)
 		{
 			System.out.println("No input given\n"+serverMessage+"\nDefault Settings applied");
-			new Server(3975, 20, 3976, 20);
+			new Server(1234, 20, 1235, 20);
 		}
 		else
 		{

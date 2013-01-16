@@ -1,11 +1,85 @@
 package kth.agi_project_2.controller.java;
 
-public class ControllerGui {
+import java.awt.BorderLayout;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+public class ControllerGui extends JFrame implements KeyListener {
 	
 	private JavaController jc;
-	public ControllerGui(JavaController jc)
+	
+	private JPanel contentPane;
+	
+	private static final int KEY_SHOOTING = 32;
+	private static final int KEY_ACCELERATOR = 38;
+	private static final int KEY_LEFT =37;
+	private static final int KEY_RIGHT = 39;
+	
+	public static void main(String[] args)
 	{
-		this.jc = jc;
+		new ControllerGui();
+	}
+	
+	private ControllerGui()
+	{
+		jc = new JavaController(this);
+		this.addKeyListener(this);
+		contentPane = new JPanel(new BorderLayout());
+		populateContentPane();
+		jc.setHost("localhost", 1234);
+		jc.connect();
+		this.setContentPane(contentPane);
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.pack();
+		this.setVisible(true);
+	}
+	
+	private void populateContentPane()
+	{
+		
+	}
+
+	// Keyboard releated
+	public void keyPressed(KeyEvent arg0) {
+		
+		System.err.println(arg0.getKeyCode()); // TODO Handle key down events
+		handleKey(arg0.getKeyCode(), true);
+		
+	}
+
+	public void keyReleased(KeyEvent arg0) {
+		// TODO Handle key up events
+		handleKey(arg0.getKeyCode(), false);
+		
+	}
+	
+	private void handleKey(int key, boolean down)
+	{
+		if(key == KEY_SHOOTING)
+		{
+			jc.setShooting(down);
+		}
+		else if(key == KEY_ACCELERATOR)
+		{
+			jc.setSpeedFrac((down ? 1 : 0));
+		}
+		else if(key == KEY_LEFT)
+		{
+			jc.setRotation((down ? 1 : 0));
+		}
+		else if(key == KEY_RIGHT)
+		{
+			jc.setRotation((down ? -1 : 0));
+		}
+		
+	}
+
+	public void keyTyped(KeyEvent arg0) {
+		// This probably won't be needed
+		
 	}
 
 }
