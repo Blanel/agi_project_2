@@ -21,6 +21,7 @@ public class JavaController extends AbstractController {
 		
 	}
 	protected void lifeChangeEvent(int l) {
+		cg.life.setText(""+l);
 		System.err.println("Life has changed! New life: "+ l);
 
 	}

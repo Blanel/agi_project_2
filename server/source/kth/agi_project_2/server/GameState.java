@@ -1,3 +1,9 @@
+/**
+ * The gamestate holds all relevant information about the current state of the game.
+ * All positions of entites and relevant global variables are stored here.
+ * @author Eric Nellåker
+ */
+
 package kth.agi_project_2.server;
 import java.util.LinkedList;
 import java.util.ListIterator;

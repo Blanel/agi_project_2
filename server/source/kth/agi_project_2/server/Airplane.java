@@ -1,3 +1,8 @@
+/**
+ * Holds all useful information about each airplane entity
+ * @author Eric Nellåker
+ */
+
 package kth.agi_project_2.server;
 
 public class Airplane extends Entity{
@@ -7,22 +12,7 @@ public class Airplane extends Entity{
 	private int kills;
 	private String name;
 	
-	//private final static double BASESPEED = 0.1;
-	//private final static double SPM = 0.1;
 	
-	/*
-	 * Statuses for planes:
-	 * 1 = spawned
-	 * 0 = alive
-	 * -1 = dead
-	 */
-	
-	/*public Airplane(int id, double x, double y, double angle, String name, GameState gs)
-	{
-		super(id, x,y,angle, gs);
-		this.name = name;
-		life = 5;
-	}*/
 	public Airplane(int id, double x, double y, double angle, GameState gs)
 	{
 		super(id, x,y,angle, gs);	

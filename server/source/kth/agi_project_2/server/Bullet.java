@@ -1,3 +1,8 @@
+/**
+ * Contains relevant information for bullet entities
+ * @author Eric Nellåker
+ */
+
 package kth.agi_project_2.server;
 
 public class Bullet extends Entity {

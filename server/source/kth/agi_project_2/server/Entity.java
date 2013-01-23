@@ -1,6 +1,9 @@
+/**
+ * Abstract class for moving objects in the game server
+ */
 package kth.agi_project_2.server;
 
-public class Entity {
+public abstract class Entity {
 	private int id;
 	private Coord pos;
 	private double angle;

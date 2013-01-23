@@ -1,3 +1,10 @@
+/**
+ * This class is used to inherit the common parts of a controller to easier develop controllers for
+ * android airbattles.
+ * 
+ * @author Eric Nellåker
+ */
+
 package kth.agi_project_2.controller;
 
 public abstract class AbstractController {

@@ -1,3 +1,8 @@
+/**
+ * A naive renderclient to test output of render XML.
+ * Simply writes out everything the server sends.
+ * @author Eric Nellåker
+ */
 package kth.agi_project_2.server;
 
 import java.io.IOException;

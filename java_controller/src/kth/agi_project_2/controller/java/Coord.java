@@ -1,8 +1,4 @@
-/**
- * Coordinate helper class
- * @author Eric Nellåker
- */
-package kth.agi_project_2.server;
+package kth.agi_project_2.controller.java;
 
 public class Coord
 {

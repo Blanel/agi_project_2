@@ -1,3 +1,8 @@
+/**
+ * Android specific implementation of controller
+ * @author Jonas André, Eric Nellåker
+ */
+
 package kth.agi_project_2.controller.android;
 
 import kth.agi_project_2.controller.AbstractController;

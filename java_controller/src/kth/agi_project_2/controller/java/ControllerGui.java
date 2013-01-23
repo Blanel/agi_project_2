@@ -1,10 +1,19 @@
+/**
+ * Unused begining to a gui for the controller. 
+ * Works with arrowkeys and spacebar for shooting.
+ * No graphics shown in controller
+ * @author Eric Nellåker
+ */
+
 package kth.agi_project_2.controller.java;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class ControllerGui extends JFrame implements KeyListener {
@@ -17,6 +26,7 @@ public class ControllerGui extends JFrame implements KeyListener {
 	private static final int KEY_ACCELERATOR = 38;
 	private static final int KEY_LEFT =37;
 	private static final int KEY_RIGHT = 39;
+	public JLabel life;
 	
 	public static void main(String[] args)
 	{
@@ -39,7 +49,14 @@ public class ControllerGui extends JFrame implements KeyListener {
 	
 	private void populateContentPane()
 	{
+		life = new JLabel("5");
 		
+		JPanel west = new JPanel(new FlowLayout());
+		
+		west.add(new JLabel("Life: "));
+		west.add(life);
+		
+		contentPane.add(west, BorderLayout.WEST);
 	}
 
 	// Keyboard releated

@@ -1,3 +1,8 @@
+/**
+ * GUI for android controller
+ * @author Jonas André, Eric Nellåker
+ */
+
 package kth.agi_project_2.controller.android;
 
 import android.app.Activity;

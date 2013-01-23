@@ -1,3 +1,9 @@
+/**
+ * The network comunications class. This class uses the abstract controller and sends and recieves
+ * information from the game server.
+ * @author Eric Nellåker
+ */
+
 package kth.agi_project_2.controller;
 
 import java.io.BufferedReader;

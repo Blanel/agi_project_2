@@ -1,3 +1,6 @@
+/**
+ * Server loop. Starts and runs the server, listening for connections.
+ */
 package kth.agi_project_2.server;
 
 import java.io.BufferedReader;
@@ -11,13 +14,13 @@ import java.util.ArrayList;
 
 public class Server {
 
-	private ArrayList<AndroidClient> androids;
+	private ArrayList<ControllerClient> controllers;
 	public ArrayList<RenderClient> renderers;
 	private GameState gs;
 	private ServerSocket androidServsoc;
 	private ServerSocket renderServsoc;
 
-	private static final String serverMessage = "Usage: server <androidport> <renderport> <backlogConnections> \n\tandroidport: Integer for portnumber accepting connections from android\n\trendererport: Integer for portnumber accepting connections from renderer\n\tbacklogConnections: How many that can queue for connection to the server";
+	private static final String serverMessage = "Usage: server <controllerport> <renderport> <backlogConnections> \n\tcontrollerport: Integer for portnumber accepting connections from controllers\n\trendererport: Integer for portnumber accepting connections from renderer\n\tbacklogConnections: How many that can queue for connection to the server";
 
 	public static void main(String[] args) throws IOException 
 	{
@@ -56,9 +59,9 @@ public class Server {
 		} catch (UnknownHostException e) {
 			System.err.println("Unable to find local ip. Continuing without, but may be unpredictable.");
 		}
-		System.out.println("Android Adress:"+ip+":"+androidServsoc.getLocalPort());
+		System.out.println("Controller Adress:"+ip+":"+androidServsoc.getLocalPort());
 		System.out.println("Render Adress:"+ip+":"+renderServsoc.getLocalPort());
-		androids = new ArrayList<AndroidClient>();
+		controllers = new ArrayList<ControllerClient>();
 		renderers = new ArrayList<RenderClient>();
 
 		gs = new GameState(this);
@@ -74,12 +77,12 @@ public class Server {
 			{
 				try {
 					Socket soc = androidServsoc.accept();
-					AndroidClient temp = new AndroidClient(soc, gs);
-					androids.add(temp);
-					System.out.println("Android Client Connected: "+soc.getInetAddress().getHostAddress());
+					ControllerClient temp = new ControllerClient(soc, gs);
+					controllers.add(temp);
+					System.out.println("Controller Client Connected: "+soc.getInetAddress().getHostAddress());
 					(new Thread(temp)).start();
 				} catch (IOException e) {
-					System.err.println("Connection of android failed!");
+					System.err.println("Connection of Controller failed!");
 				}
 			}
 		}}).start();
@@ -96,7 +99,7 @@ public class Server {
 					renderers.add(new RenderClient(soc,gs));
 					System.out.println("Render Client Connected: "+soc.getInetAddress().getHostAddress());
 				} catch (IOException e) {
-					System.err.println("Connection of android failed!");
+					System.err.println("Connection of Render Client failed!");
 				}
 			}
 		}}).start();
@@ -177,28 +180,28 @@ public class Server {
 
 	public void androidSync()
 	{
-		for(int i=0 ; i < androids.size() ; i++)
+		for(int i=0 ; i < controllers.size() ; i++)
 		{
-			if(androids.get(i).isOpen())
-				androids.get(i).update();
+			if(controllers.get(i).isOpen())
+				controllers.get(i).update();
 			else
 			{
-				System.out.println("Android Client Disconnected: "+androids.get(i).getSocket().getInetAddress());
-				androids.remove(i--);
+				System.out.println("Controller Client Disconnected: "+controllers.get(i).getSocket().getInetAddress());
+				controllers.remove(i--);
 			}
 		}
 	}
 
 	public void androidSend()
 	{
-		for(int i=0 ; i<androids.size() ; i++)
+		for(int i=0 ; i<controllers.size() ; i++)
 		{
-			if(androids.get(i).isOpen())
-				androids.get(i).sendEvents(false);
+			if(controllers.get(i).isOpen())
+				controllers.get(i).sendEvents(false);
 			else
 			{
-				System.out.println("Android Client Disconnected: "+androids.get(i).getSocket().getInetAddress());
-				androids.remove(i--);
+				System.out.println("Controller Client Disconnected: "+controllers.get(i).getSocket().getInetAddress());
+				controllers.remove(i--);
 			}
 		}
 	}

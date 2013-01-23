@@ -1,3 +1,8 @@
+/**
+ * Handles communication with a render client.
+ * @author Eric Nellåker
+ */
+
 package kth.agi_project_2.server;
 
 import java.io.IOException;
